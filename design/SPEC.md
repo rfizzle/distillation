@@ -39,15 +39,15 @@ The stand's ingredient slot accepts any **graph ingredient** (vanilla accepts on
 
 1. A brew cycle starts when the ingredient is a graph ingredient, fuel is present, and at least one bottle slot holds a receptive bottle. Cycle length is vanilla's 400 ticks.
 2. On completion, **each bottle resolves independently**: a bottle whose `(potion, ingredient)` pair is a valid conversion becomes the output; a bottle whose pair is invalid becomes a **Murky Draught** (`distillation:murky_draught`).
-3. A Murky Draught records, in item components: the input potion it came from, and a **hint ingredient** — one ingredient chosen from the set of valid conversions for that input potion, uniformly at random (seeded by stand position + game time, so the three bottles of one failed pass agree). Its tooltip reads: *"Perhaps a <ingredient> would have taken."*
-4. Drinking a Murky Draught applies Nausea 0:15, restores nothing, and returns the glass bottle. Murky Draughts are **inert to further brewing**: the stand treats them as non-receptive bottles.
+3. A Murky Draught records, in item components: the input potion it came from, and a **hint ingredient** — one ingredient chosen from the set of valid conversions for that input potion, uniformly at random (seeded by stand position + game time, so the three bottles of one failed pass agree). Its tooltip reads: *"Perhaps a <ingredient> would have taken."* If the input potion has no valid conversions at all (e.g. a lingering potion — nothing brews onward from it), the draught records no hint and its tooltip reads: *"Perhaps nothing would have taken."*
+4. Drinking a Murky Draught applies Nausea 0:15 plus the **flicker** — a taste of the brew the hint pointed at: the hinted conversion's output potion applies its effects at amplifier 0, duration effects capped at 0:20 (400 ticks), instant effects applied once. A hintless draught is nausea alone. The flicker never records discovery; the drink restores nothing and returns the glass bottle either way. Murky Draughts are **inert to further brewing**: the stand treats them as non-receptive bottles.
 
 With `enableMurkyDraughts=false`, invalid pairs simply do not brew (the bottle passes through unchanged), and a cycle needs at least one valid pair to start — near-vanilla gating.
 
 ### Behavior — Discovery & the Recipes Page
 
 1. When a player **removes a brewed output** from a bottle slot, the conversion that produced it is recorded in that player's persistent discovery set. First-time discovery shows the ✦ toast (action bar): *"✦ Recipe learned: Potion of Resistance"* and plays the discovery chime (Sound Design).
-2. The stand screen carries a **recipes page button** (a small bottle-glyph tab, top-right of the panel). It opens a paged overlay listing every discovered conversion as `input + ingredient → output`, in discovery order, with page arrows and a running count (`23 / 61`). It is a screen overlay, not a HUD surface.
+2. The stand screen carries a **recipes page button** (a small bottle-glyph tab, top-right of the panel). It opens a paged overlay listing every discovered conversion as `input + ingredient → output`, in discovery order, with page arrows and a running count (`23 / 61`). At full discovery the count renders gilded with the discovery marker (`✦ 61 / 61`). It is a screen overlay, not a HUD surface.
 3. Discovery is permanent: it survives death, relog, and dimension change. `/distillation forget` (Commands) is the only removal.
 4. With `startDiscovered=true`, every player's set starts (and joins) complete — for servers of veterans.
 
@@ -110,10 +110,12 @@ Five new potion lines, registered under the `distillation:` namespace and brewed
 - Luck and Glowing have no meaningful second level; glowstone on them is an invalid pair (→ Murky Draught, which the absent vapor hint warns about).
 - **Corruptions** (fermented spider eye): Haste → Mining Fatigue 3:00 (+redstone 8:00); Luck → Bad Luck 8:00 (+redstone 20:00). Resistance, Absorption, and Glowing have no corruption (invalid pair).
 - All five lines take gunpowder (splash) and dragon's breath (lingering) as vanilla, subject to §7.
+- **The Mundane bottle's onward arrow:** Mundane Potion + Fermented Spider Eye → Weakness 1:30 (+redstone 4:00 as vanilla), alongside vanilla's untouched water-bottle route. With §6's Thick base, neither of vanilla's dead-end base bottles ends the graph — every conversion the stand teaches leads somewhere.
 
 ### Edge Cases
 
 - Vanilla's recipe-less `minecraft:luck` potion item is left untouched (still obtainable only by command); the brewed line is Distillation's own. Commands/loot referencing the vanilla potion keep working.
+- **Luck's vanilla surface is fishing:** the fishing loot table is vanilla's only consumer of the luck attribute — each luck point shifts the junk/treasure split, stacking with Luck of the Sea. Distillation never widens what luck touches (loot tables belong to the world); siblings that consume the attribute do so in their own repos.
 - **Absorption stacking:** drinking Absorption while holding golden-apple absorption follows vanilla effect-merge rules (higher amplifier wins; equal amplifier takes the longer duration). No special casing.
 - **Multiplayer:** none beyond §1 discovery — recipes are world rules, identical for everyone.
 - **Disabled** (`enableMissingBrews=false`): the conversions leave the graph (existing bottles keep working; hints and murky logic follow the graph).
@@ -276,9 +278,9 @@ Curing is all-or-nothing: milk wipes your 8-minute buffs to shake a 30-second po
 
 ### Behavior
 
-Six antidotes, each an **instant** potion that removes exactly one effect type (all amplifiers, any remaining duration) and touches nothing else:
+Six antidotes, each brewed on a **Thick Potion** base (water + glowstone dust — glowstone's body carries the cure, and vanilla's dead-end bottle becomes the medicine base), each an **instant** potion that removes exactly one effect type (all amplifiers, any remaining duration) and touches nothing else:
 
-| Antidote | Recipe (Awkward +) | Cures | Source logic |
+| Antidote | Recipe (Thick +) | Cures | Source logic |
 |---|---|---|---|
 | Poison Antidote | Fermented Spider Eye | Poison | the eye that poisons |
 | Wither Antidote | Wither Rose | Wither | the rose the Wither leaves |
@@ -294,7 +296,8 @@ Six antidotes, each an **instant** potion that removes exactly one effect type (
 
 ### Edge Cases
 
-- **Awkward + Fermented Spider Eye** is undefined in vanilla (vanilla's fermented-eye corruptions apply to other potions; Weakness brews from a *water* bottle) — the antidote claims an empty slot in the graph, colliding with nothing.
+- **Thick + Fermented Spider Eye** — and every other antidote pair — is undefined in vanilla (Thick has no vanilla onward conversions at all), so the antidote lines claim empty slots in the graph, colliding with nothing, including §2's Mundane route to Weakness.
+- **The Wither Antidote is post-boss by design:** pre-boss wither exposure is a 10-second brush from wither skeletons; sustained exposure is Wither farming, which begins exactly when wither roses do. Beat the boss once and every rematch is one you enter stocked.
 - **Mobs:** splash/lingering antidotes affect any living entity (curing a drowned's nothing is a no-op; curing a poisoned ally works). Effects flagged un-removable by their source (e.g. a boss fight's scripted effect from another mod) are skipped silently.
 - **Multiplayer:** consumption is per player; clouds serve whoever stands in them.
 - **Disabled** (`enableAntidotes=false`): conversions leave the graph; existing bottles keep working.
@@ -366,7 +369,7 @@ All feedback is localized (`command.distillation.*`). Diagnostic density is favo
 
 ## 9. Advancements
 
-Six entries, parented under vanilla's **Local Brewery** (`minecraft:nether/brew_potion`) — extending the brewing story vanilla already tells.
+Seven entries, parented under vanilla's **Local Brewery** (`minecraft:nether/brew_potion`) — extending the brewing story vanilla already tells.
 
 | Id | Title | Trigger |
 |---|---|---|
@@ -376,8 +379,9 @@ Six entries, parented under vanilla's **Local Brewery** (`minecraft:nether/brew_
 | `round_for_the_table` | Round for the Table | complete a six-bottle batch pass |
 | `surgical` | Surgical | an antidote strips an effect while you keep ≥ 2 other effects |
 | `the_good_stuff` | The Good Stuff | brew a premium (extended + amplified) potion |
+| `every_drop` | Every Drop | the capstone: discover every recipe in the graph |
 
-Custom criterion triggers fired from the §1 brew/discovery choke points, the §3 batch pass, and the §6 consume path. Icons reuse the mod's item sprites and vanilla potions.
+Custom criterion triggers fired from the §1 brew/discovery choke points, the §3 batch pass, and the §6 consume path. `every_drop` is evaluated at each discovery against the live graph (stale ids hidden per §1 don't count against it); once granted it persists as any advancement, even if a later mod or datapack grows the graph. Icons reuse the mod's item sprites and vanilla potions.
 
 ---
 
@@ -423,7 +427,7 @@ Per concord [`API-STANDARD.md`](../../concord/API-STANDARD.md): the only stable 
 - `DistillationAPI.isDiscovered(ServerPlayer, ResourceLocation recipeId): boolean`
 - `DistillationAPI.getDiscoveredRecipes(ServerPlayer): Set<ResourceLocation>` — immutable copy.
 - `DistillationAPI.getRecipeIds(): Set<ResourceLocation>` — the current graph, immutable.
-- `DistillationAPI.registerAntidote(ResourceLocation effectId, Ingredient reagent): boolean` — the sanctioned additive-registration point: adds an Awkward-based antidote line for the given effect (false and no-op if the effect already has one). Callable during mod init only; the graph builds after all registrations.
+- `DistillationAPI.registerAntidote(ResourceLocation effectId, Ingredient reagent): boolean` — the sanctioned additive-registration point: adds a Thick-based antidote line for the given effect (false and no-op if the effect already has one). Callable during mod init only; the graph builds after all registrations.
 - **`DistillationBrewCallback`** — Fabric event fired server-side from the brew choke point after a cycle completes: `(ServerLevel, BlockPos, ItemStack ingredient, List<ItemStack> results, @Nullable UUID batchOwner, boolean batch)`. Results are an immutable view — observation only (potion identity is the recipe graph's job, not a mutation surface). A listener that throws is caught, logged, and skipped.
 - **`DistillationDiscoveryCallback`** — Fabric event fired server-side when a player first discovers a recipe: `(ServerPlayer, ResourceLocation recipeId)`.
 
@@ -499,7 +503,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 
 ### Unit Tests (JUnit + `fabric-loader-junit`)
 
-- Recipe graph: construction from a synthetic registry, stable id derivation (namespaced ingredients), per-bottle validity resolution, murky hint-candidate selection (seeded determinism, candidate always valid for the input potion)
+- Recipe graph: construction from a synthetic registry, stable id derivation (namespaced ingredients), per-bottle validity resolution, murky hint-candidate selection (seeded determinism, candidate always valid for the input potion, empty candidate set → hintless draught)
 - Duration retune math: override table application, §2 lines exempt from double-scaling, splash factor application, draught halving (⌊÷2⌋, no quarter-splits)
 - Premium formula: `long ÷ 2` durations and amplifiers per line; concentration validity (strong-form-only, base-potion-only)
 - Discovery set semantics: idempotent re-discovery, forget, stale-id hiding vs retention
@@ -507,19 +511,21 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 
 ### Gametests (Fabric Gametest API)
 
-- Brew each §2 line (base, redstone, glowstone where defined); glowstone on Luck murks; corruptions brew
+- Brew each §2 line (base, redstone, glowstone where defined); glowstone on Luck murks; corruptions brew; Mundane + Fermented Spider Eye brews Weakness while the water-bottle route stays intact
 - Invalid pair produces Murky Draughts with a valid hint ingredient; `enableMurkyDraughts=false` leaves bottles unbrewed; murky bottles are inert to further brewing
+- Drinking a Murky Draught applies Nausea 0:15 plus the hinted output's flicker (amplifier 0, 400 ticks); a hintless draught (lingering-potion input) applies nausea alone; the flicker records no discovery
 - Output extraction records discovery exactly once and fires the callback; hopper extraction records nothing
 - Batch rig: detection across all six heat sources; missing water/heat/cauldron fails; engaged pass consumes 3 ingredients + 2 fuel + 1 water level and fills six bottles; undiscovered batch-row bottle skipped untouched; hopper insert clears owner and blocks batching; hoppers cannot reach batch slots
 - Draughts: sneak-drink halves duration and yields a half; half returns bottle; instants and splash refuse to sip
 - Concentration → both dusts (either order) yields premium at `long ÷ 2`; concentrating a modified potion murks
-- Each antidote strips exactly its effect and nothing else; absent-effect drink consumes silently; splash antidote cures a poisoned entity; lingering antidote cloud lasts 1200 ticks at 4.5 radius
+- Each antidote brews from a Thick base (Awkward + the same reagent murks) and strips exactly its effect and nothing else; absent-effect drink consumes silently; splash antidote cures a poisoned entity; lingering antidote cloud lasts 1200 ticks at 4.5 radius
+- Discovering the final graph recipe grants Every Drop
 - Splash potion applies 87.5% duration; dispenser-thrown identical
 - Commands: `recipes`, `discover`, `forget`, `rig` behave and permission-gate as specced
 
 ### Manual Testing
 
-- Vapor hint tinting (single and blended outputs), tooltip gating on discovery, recipes page paging and count
+- Vapor hint tinting (single and blended outputs), tooltip gating on discovery, recipes page paging and count, the gilded `✦` count at full discovery
 - Half-bottle, murky, antidote, and concentrated item rendering; recipe-viewer filtering with and without `recipeViewerShowsUndiscovered`
 - The two custom cues at vanilla loudness beside stand foley; subtitles
 - Batch row appearing/ejecting as the rig is built/broken; Jade/WTHIT lines
