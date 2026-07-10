@@ -1,4 +1,6 @@
-<h1 align="center">Distillation</h1>
+<p align="center">
+  <img src="art/logo.png" alt="Distillation" width="800">
+</p>
 
 <p align="center"><strong>Every drop counts.</strong></p>
 

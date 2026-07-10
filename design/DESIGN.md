@@ -70,13 +70,7 @@ Asset-family judgments (the suite stance: custom where it earns its place, vanil
 
 ## 4. Generation Prompts
 
-**Full logo (Gemini):**
-
-> Pixel art logo for a Minecraft mod named "DISTILLATION". A dark stone brickwork frame in near-black plums (#1a0a18, #2e102c), thin copper pipes (#E77C56) threaded along the top course, a single glowing drop falling from the keystone. Centered inside the frame: a Minecraft brewing stand mid-brew — three round-bottomed glass bottles glowing potion magenta (#C44DCC), copper-blade arms, wisps of magenta vapor (#DA79E3) curling up past the frame. Below the frame, "DISTILLATION" in a chunky blocky pixel font with a magenta gradient (#C44DCC → #DA79E3), and beneath it "MINECRAFT ALCHEMY OVERHAUL" in small pixel type. Dark background (#0a0a0a). Crisp pixel-art style, limited palette, no anti-aliasing.
-
-**Icon 128×128 (Gemini):**
-
-> Pixel art icon, 128×128, for a Minecraft mod: a single round-bottomed glass potion bottle with a cork stopper, liquid glowing potion magenta (#C44DCC) with a bright rim highlight (#DA79E3), one thin vapor wisp rising, subtle copper (#E77C56) band at the neck, against a dark background (#0a0a0a). Centered, chunky pixels, limited palette, no anti-aliasing, no text.
+No master is prompt-sourced: the logo and OG image are composed deterministically by `art/glyphs/logo.gen.py`, the 128/512 icons by `art/glyphs/icon.gen.py`, and the bottle glyph is `.glyph`-authored (`art/glyphs/bottle-16.glyph`) — re-render any of them by re-running its generator or the pipeline, per DESIGN-SYSTEM §8. A Gemini prompt for an illustrated hero logo is retained as an exploration/upgrade path in `art/exploration/logo-gemini-prompt.md`.
 
 Pixel-art sources (glyph, item sprites, GUI sprites) are `.glyph` files under `art/` — authored through the glyph pipeline, referenced from `ASSETS.md`, never duplicated here. Sound sources are `.sfx` files under `art/audio/`.
 
@@ -84,7 +78,7 @@ Pixel-art sources (glyph, item sprites, GUI sprites) are `.glyph` files under `a
 
 ## 5. Image References
 
-Exploration renders, rejected variants, and reference shots live in `art/exploration/`. None committed yet; the first logo-generation round seeds it.
+Exploration renders, rejected variants, and reference shots live in `art/exploration/` (currently: the retained Gemini logo prompt).
 
 ---
 
