@@ -16,11 +16,11 @@ Distillation makes brewing a craft you learn instead of a chart you look up: a s
 
 ### Motif
 
-The motif object is a **brewing stand mid-brew** — three bottles under a glowing vessel, vapor rising. It may appear in the logo, site headers, and flavor art; it never appears in another mod's assets. The 16×16 glyph reduces the motif to a single round-bottomed potion bottle with a rising vapor wisp.
+The motif object is the **alchemist's still** — an alembic bench mid-distillation: a copper retort over a flame, coiled copper piping, round-bottomed flasks of glowing magenta. It may appear in the logo, site headers, and flavor art; it never appears in another mod's assets. The 16×16 glyph reduces the motif to a single round-bottomed potion bottle with a rising vapor wisp.
 
 ### Logo Description
 
-**Full logo (`art/logo.png`):** Pixel art per the Concord stone-frame formula. A dark stone brickwork frame in near-black plums, its upper course threaded with thin copper piping that drips a single glowing drop from the keystone. Centered, a brewing stand mid-brew: three round-bottomed bottles glowing potion magenta, copper-blade arms, wisps of magenta vapor curling upward past the frame's top edge. Below, "DISTILLATION" in blocky pixel type in the magenta gradient, with "MINECRAFT ALCHEMY OVERHAUL" as the subtitle line.
+**Full logo (`art/logo.png`):** An illustrated pixel-art render, 2784×1504. A rune-carved circular stone medallion with a neon potion-magenta ring glow, set on dark plum brickwork threaded with copper pipes along the top courses and shadowed vines with violet blooms in the corners; a single glowing magenta drop falls from above the keystone. Inside the medallion, the alchemist's still: a copper alembic over a small burner flame, feeding round-bottomed and conical flasks of glowing magenta liquid through coiled copper piping, with rose-quartz crystals and an open rune-marked folio on the stone bench. Below, "DISTILLATION" in blocky beveled pixel type in the magenta gradient, with "MINECRAFT ALCHEMY OVERHAUL" as the subtitle line. A procedural pixel-art alternative is retained at `art/exploration/logo-pixel.png` (`art/glyphs/logo.gen.py`).
 
 **Icon (`art/icon-128.png`):** The single potion bottle isolated — round-bottomed flask, cork stopper, liquid glowing potion magenta with a copper-highlight rim, one vapor wisp rising — against a dark/transparent background. Reads cleanly at 128×128.
 
@@ -70,7 +70,7 @@ Asset-family judgments (the suite stance: custom where it earns its place, vanil
 
 ## 4. Generation Prompts
 
-No master is prompt-sourced: the logo and OG image are composed deterministically by `art/glyphs/logo.gen.py`, the 128/512 icons by `art/glyphs/icon.gen.py`, and the bottle glyph is `.glyph`-authored (`art/glyphs/bottle-16.glyph`) — re-render any of them by re-running its generator or the pipeline, per DESIGN-SYSTEM §8. A Gemini prompt for an illustrated hero logo is retained as an exploration/upgrade path in `art/exploration/logo-gemini-prompt.md`.
+The full logo is a **Gemini render**; its regeneration prompt lives in `art/exploration/logo-gemini-prompt.md`, kept beside the palette hexes it embeds. The web copies derive from that master deterministically: `site/assets/logo.png` is a ½-scale lanczos resize, and `site/assets/og-image.png` is the master contained on an Ink field at 1200×630 (both via ffmpeg). The 128/512 icons are composed deterministically by `art/glyphs/icon.gen.py`, and the bottle glyph is `.glyph`-authored (`art/glyphs/bottle-16.glyph`) — re-render either by re-running its generator or the pipeline, per DESIGN-SYSTEM §8. A fully procedural pixel-art logo variant is retained in `art/exploration/` (`art/glyphs/logo.gen.py`).
 
 Pixel-art sources (glyph, item sprites, GUI sprites) are `.glyph` files under `art/` — authored through the glyph pipeline, referenced from `ASSETS.md`, never duplicated here. Sound sources are `.sfx` files under `art/audio/`.
 
@@ -78,7 +78,7 @@ Pixel-art sources (glyph, item sprites, GUI sprites) are `.glyph` files under `a
 
 ## 5. Image References
 
-Exploration renders, rejected variants, and reference shots live in `art/exploration/` (currently: the retained Gemini logo prompt).
+Exploration renders, rejected variants, and reference shots live in `art/exploration/` (currently: the logo regeneration prompt and the procedural pixel-art logo variant).
 
 ---
 

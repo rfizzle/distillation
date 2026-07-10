@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Compose the Distillation hero logo as a full-bleed pixel-art PNG.
+"""Compose the pixel-art exploration variant of the Distillation logo.
+
+The shipped hero master (art/logo.png) is an illustrated Gemini render — see
+design/DESIGN.md §4; this generator's output lives in art/exploration/ as the
+retained procedural alternative.
 
 The suite logo formula (concord design/DESIGN-SYSTEM.md §4): dark stone
 brickwork, one central glowing motif in a circular medallion, the mod name in
@@ -506,26 +510,7 @@ for y in range(H):
             row.extend([PAL[G[y][x]]] * SCALE_OUT)
         px.extend(row)
 pixels = px
-OUT = ROOT / "art/logo.png"
+OUT = ROOT / "art/exploration/logo-pixel.png"
 glyph.write_png(OUT, pixels, W * SCALE_OUT, H * SCALE_OUT)
 print(f"wrote {OUT}  ({W * SCALE_OUT}x{H * SCALE_OUT})")
 
-# OG image (DESIGN-SYSTEM §6): the logo on Ink at 1200×630 — the grid at ×3
-# (960×576, integer nearest-neighbor) centered on the ink field.
-OGW, OGH = 1200, 630
-S3 = 3
-lw, lh = W * S3, H * S3
-ox, oy = (OGW - lw) // 2, (OGH - lh) // 2
-ink = PAL['ink']
-og = [ink] * (OGW * OGH)
-for y in range(H):
-    row3 = []
-    for x in range(W):
-        row3.extend([PAL[G[y][x]]] * S3)
-    for sy in range(S3):
-        base = (oy + y * S3 + sy) * OGW + ox
-        og[base:base + lw] = row3
-OG_OUT = ROOT / "site/assets/og-image.png"
-OG_OUT.parent.mkdir(parents=True, exist_ok=True)
-glyph.write_png(OG_OUT, og, OGW, OGH)
-print(f"wrote {OG_OUT}  ({OGW}x{OGH})")

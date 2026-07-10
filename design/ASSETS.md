@@ -12,8 +12,8 @@
 
 | Asset | Source | Final / derived copies |
 |---|---|---|
-| Full logo 1280×768 | `art/glyphs/logo.gen.py` (deterministic generator over the vendored glyph.py) | `art/logo.png` (master, README masthead) → `site/assets/logo.png` (site hero) |
-| OG image 1200×630 | `art/glyphs/logo.gen.py` (logo grid ×3 on an Ink field) | `site/assets/og-image.png` |
+| Full logo 2784×1504 | Gemini render (regeneration prompt: `art/exploration/logo-gemini-prompt.md`) | `art/logo.png` (master, README masthead) → `site/assets/logo.png` (1392×752 web copy) |
+| OG image 1200×630 | derived from `art/logo.png` (contained on an Ink field, ffmpeg — see `DESIGN.md` §4) | `site/assets/og-image.png` |
 | Mod icon 128×128 | `art/glyphs/icon.gen.py` → `art/glyphs/icon.glyph` | `art/icon-128.png` (master) → `assets/distillation/icon.png` (`fabric.mod.json` icon), `site/assets/icon.png` |
 | Mod icon 512×512 | `art/glyphs/icon.gen.py` (×4 integer upscale of the 128 grid) | `art/icon-512.png` (store galleries) |
 
