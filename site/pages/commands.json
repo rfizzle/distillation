@@ -1,0 +1,27 @@
+{
+  "nav": "Commands",
+  "metaTitle": "Commands — Distillation",
+  "metaDescription": "Distillation's command reference as specced: /distillation recipes, discover, forget, rig, and reload.",
+  "title": "Commands",
+  "lede": "The <code>/distillation</code> command tree, as specced. Distillation is in development; this is the surface the implementation will ship.",
+  "width": "4xl",
+  "sections": [
+    {
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Command", "Permission", "What it does"],
+          "nowrapHeaders": true,
+          "rows": [
+            ["<code>/distillation recipes</code>", "everyone", "Your discovery count and five most recent recipes"],
+            ["<code>/distillation recipes &lt;player&gt;</code>", "op (level 2)", "The same report for another player"],
+            ["<code>/distillation discover &lt;recipe|all&gt; [player]</code>", "op (level 2)", "Grants a discovery (with recipe-id suggestions)"],
+            ["<code>/distillation forget &lt;recipe|all&gt; [player]</code>", "op (level 2)", "Removes discoveries"],
+            ["<code>/distillation rig</code>", "everyone", "Batch-rig status of the stand you're looking at — <code>Rigged: water 2/3, soul campfire.</code> or the first missing piece"],
+            ["<code>/distillation reload</code>", "op (level 2)", "Reloads <code>config/distillation.json</code> and rebuilds the recipe graph"]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "nav": "FAQ",
+  "metaTitle": "FAQ — Distillation",
+  "metaDescription": "Frequently asked questions about Distillation: release status, vanilla compatibility, multiplayer behavior, and mod compatibility.",
+  "title": "FAQ",
+  "lede": "Short answers to the questions the design keeps getting.",
+  "width": "4xl",
+  "sections": [
+    {
+      "blocks": [
+        {
+          "type": "faq",
+          "items": [
+            {
+              "q": "Is Distillation released?",
+              "a": "Not yet — the repo is in development. The full design and behavioral spec are committed (<code>design/VISION.md</code> and <code>design/SPEC.md</code> on GitHub) and features are being built against them. This site describes the first release."
+            },
+            {
+              "q": "Does it break the brewing I already know?",
+              "a": "No. Every vanilla recipe keeps brewing exactly as it does today, milk still cures everything, and golden apples are untouched. On an ordinary potion redstone and glowstone behave exactly as in vanilla. The overhaul adds — it never removes."
+            },
+            {
+              "q": "Do I need a wiki for the new recipes?",
+              "a": "That's the point — you don't. Hold an ingredient over the stand and the vapor's color hints at what it would make; a failed brew bottles a Murky Draught that names one ingredient that would have worked. Everything you brew is recorded permanently in your recipes page."
+            },
+            {
+              "q": "How does discovery work on a server?",
+              "a": "Per player: your recipes page fills only with what you have brewed, and late joiners learn the same way the founders did. Batch brewing scales only recipes the brewer has personally discovered. A server can start everyone fully unlocked with <code>startDiscovered</code>."
+            },
+            {
+              "q": "Won't EMI/REI/JEI spoil the discovery game?",
+              "a": "By default the recipe viewers list only conversions you've already discovered. Veterans can flip <code>recipeViewerShowsUndiscovered</code> and have the full index."
+            },
+            {
+              "q": "Does it add new ingredients, plants, or mobs?",
+              "a": "No. Every recipe brews from items vanilla already ships — shulker shells, honey, golden apples, nautilus shells, glow ink, wither roses. No new dimensions either, and nothing on your HUD."
+            },
+            {
+              "q": "Is it compatible with other brewing mods?",
+              "a": "Anything registered through the vanilla brewing registry enters Distillation's recipe graph automatically — discoverable, hintable, and batchable. Mods that replace the brewing stand or its screen outright may conflict; Distillation itself never replaces either."
+            },
+            {
+              "q": "Client, server, or both?",
+              "a": "Both. All gameplay decisions run on the server; the client side renders the hints, the recipes page, and the item models."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

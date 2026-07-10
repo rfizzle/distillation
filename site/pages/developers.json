@@ -1,0 +1,63 @@
+{
+  "nav": "Developers",
+  "metaTitle": "Developers — Distillation",
+  "metaDescription": "Distillation's public API as specced: com.rfizzle.distillation.api — discovery accessors, the antidote registration point, and the brew/discovery events.",
+  "title": "Developers",
+  "lede": "The stable integration surface, as specced (<a href='https://github.com/rfizzle/distillation/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> §Public API). The only stable package is <code>com.rfizzle.distillation.api</code>, per the <a href='https://github.com/rfizzle/concord/blob/master/API-STANDARD.md' class='text-accent hover:text-accent2 underline'>Concord API Standard</a>: read-only by default, server-authoritative, consumed via <code>modCompileOnly</code> + <code>isModLoaded</code> guards.",
+  "width": "5xl",
+  "sections": [
+    {
+      "title": "Accessors",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Accessor", "Returns"],
+          "nowrapHeaders": true,
+          "rows": [
+            ["<code>DistillationAPI.isDiscovered(ServerPlayer, ResourceLocation)</code>", "Whether the player has discovered the recipe"],
+            ["<code>DistillationAPI.getDiscoveredRecipes(ServerPlayer)</code>", "Immutable copy of the player's discovery set"],
+            ["<code>DistillationAPI.getRecipeIds()</code>", "The current recipe graph's ids, immutable"]
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Registration",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "<code>DistillationAPI.registerAntidote(ResourceLocation effectId, Ingredient reagent)</code> is the sanctioned additive-registration point: it adds an Awkward-based antidote line for the given effect (returns <code>false</code> and no-ops if the effect already has one). Call it during mod init; the recipe graph builds after all registrations. This is how any mod's debuff — sibling or third-party — gets a brewable cure that participates in discovery, hints, and batching like a native recipe.",
+            "Anything registered through the vanilla brewing registry also enters the recipe graph automatically — discoverable, hintable, and batchable with zero Distillation-specific code."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Events",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Event", "Fires"],
+          "nowrapHeaders": true,
+          "rows": [
+            ["<code>DistillationBrewCallback</code>", "Server-side after a brew cycle completes — level, stand position, ingredient, immutable results view, batch owner, batch flag"],
+            ["<code>DistillationDiscoveryCallback</code>", "Server-side when a player first discovers a recipe"]
+          ],
+          "note": "Deliberate absences: no HUD accessors (Distillation holds no HUD slot), no discovery mutators (commands are the admin path), and no brew-result mutation (register a real conversion instead)."
+        }
+      ]
+    },
+    {
+      "title": "IDs for integrations",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Potion lines register under the <code>distillation:</code> namespace (e.g. <code>distillation:resistance</code>, <code>distillation:haste</code>, the <code>long_</code>/<code>strong_</code> variants, the concentrated/premium forms, and the six antidotes), plus the <code>distillation:murky_draught</code> item. Sibling trade packs and loot injections key on these ids; the exact list ships with the implementation."
+          ]
+        }
+      ]
+    }
+  ]
+}

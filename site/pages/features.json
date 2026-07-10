@@ -1,0 +1,135 @@
+{
+  "nav": "Features",
+  "metaTitle": "Features — Distillation",
+  "metaDescription": "Distillation's feature set as specced: recipe discovery at the stand, the missing brews, batch brewing, honest durations and draughts, premium potions, antidotes, and rebalanced thrown potions.",
+  "title": "Features",
+  "lede": "The seven headline systems, as specced in <a href='https://github.com/rfizzle/distillation/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Distillation is in development — these are commitments, not yet a shipped jar.",
+  "width": "5xl",
+  "scale": "lg",
+  "sections": [
+    {
+      "id": "discovery",
+      "title": "Brew by Discovery",
+      "intro": "The stand teaches its own recipes — no wiki required.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Hold an ingredient over the stand's ingredient slot and the vapor clouds with a color hint of what it would become; once you know a recipe, the hint names the output outright. A failed combination still bottles: a <strong class='text-bone'>Murky Draught</strong> whose tooltip names one ingredient that would have worked with that base — a failure that teaches. Every successful brew you take from the stand is written permanently into your recipes page, right in the brewing screen, with a running count.",
+            "Discovery is per player and survives death and relog. Recipe viewers (EMI/REI/JEI) show only what you've discovered by default, so they never spoil what the stand wants to teach — a server can open them up, or start everyone fully unlocked."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "missing-brews",
+      "title": "The Missing Brews",
+      "intro": "Every vanilla effect that shipped without a recipe becomes brewable.",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Effect", "Recipe", "Base", "+ Redstone", "+ Glowstone"],
+          "nowrapHeaders": true,
+          "rows": [
+            ["Resistance", "Awkward + Shulker Shell", "3:00", "8:00", "II · 1:30"],
+            ["Haste", "Potion of Swiftness + Honey Bottle", "8:00", "20:00", "II · 4:00"],
+            ["Absorption", "Awkward + Golden Apple", "3:00", "8:00", "II · 1:30"],
+            ["Luck", "Awkward + Nautilus Shell", "8:00", "20:00", "—"],
+            ["Glowing", "Awkward + Glow Ink Sac", "3:00", "8:00", "—"]
+          ],
+          "note": "Haste routes through Swiftness deliberately — honey over a sugar brew. Fermented spider eye corrupts Haste into Mining Fatigue and Luck into Bad Luck; all five lines take gunpowder and dragon's breath as usual."
+        }
+      ]
+    },
+    {
+      "id": "batch",
+      "title": "Batch Brewing",
+      "intro": "Recipes you have discovered scale past three bottles.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Set your brewing stand on a water cauldron heated from below — a campfire, fire, a lava source, or a magma block — and the stand's screen grows a second row of three bottle slots. Brewing a recipe from <em>your</em> recipes page fills all six bottles in one pass, consuming 3 ingredients (against 2 for two normal passes — the 1.5× cost), 2 fuel charges, and 1 water level from the cauldron.",
+            "The shortcut is earned: bottles whose recipe you haven't discovered are skipped untouched, hoppers can neither see nor fill the batch row, and an automated stand never batch-brews."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "durations",
+      "title": "Honest Durations & Draughts",
+      "intro": "Durations sized to how people actually play, and potions drinkable in halves.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Utility potions stop expiring in transit: Fire Resistance, Water Breathing, Night Vision, and Invisibility base at <strong class='text-bone'>8:00</strong> instead of 3:00 (20:00 extended), and Slow Falling at 4:00. Combat potions — Strength, Swiftness, Poison, and the rest — keep their short vanilla timers.",
+            "Sneak-drink any duration potion to sip half: 4:00 of an 8:00 potion now, and the bottle stays in your hand as a stoppered half for later. Drinking the half returns the glass bottle as usual."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "premium",
+      "title": "Premium Brews",
+      "intro": "Redstone and glowstone stop being mutually exclusive.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Brew a potion's own reagent onto it a second time — two blaze powder total for Strength — and it becomes <strong class='text-bone'>Concentrated</strong>. A concentrated potion accepts both dusts, in either order, and comes out extended <em>and</em> amplified: Strength II for 4:00 instead of choosing between II at 1:30 or I at 8:00. The rule is uniform: a premium potion runs at level II for half its extended duration.",
+            "On an ordinary potion the dusts behave exactly as in vanilla, so nothing you already know changes."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "antidotes",
+      "title": "Antidotes",
+      "intro": "Surgical cures, brewed from the affliction's own source.",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Antidote", "Brewed from (Awkward +)", "Cures"],
+          "nowrapHeaders": true,
+          "rows": [
+            ["Poison Antidote", "Fermented Spider Eye", "Poison"],
+            ["Wither Antidote", "Wither Rose", "Wither"],
+            ["Mining Fatigue Antidote", "Prismarine Crystals", "Mining Fatigue"],
+            ["Blindness Antidote", "Ink Sac", "Blindness"],
+            ["Darkness Antidote", "Echo Shard", "Darkness"],
+            ["Levitation Antidote", "Popped Chorus Fruit", "Levitation"]
+          ],
+          "note": "Each strips exactly one effect and nothing else — your 8-minute buffs stay. Milk is untouched and still clears everything. Antidotes throw as splash and lingering, so a cleansing cloud is a real support play."
+        }
+      ]
+    },
+    {
+      "id": "thrown",
+      "title": "Lingering Worth Throwing",
+      "intro": "Splash and lingering potions rebalanced as support tools.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Lingering clouds last <strong class='text-bone'>60 seconds</strong> instead of 30 and open at a 4½-block radius instead of 3. A splash potion applies 87.5% of the drinkable duration instead of 75%. Throw a cloud where the fight is and it is still working when the second wave arrives — a dedicated brewer becomes a viable support role."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Better Together",
+      "intro": "With siblings from the Concord collection installed, Distillation lights up further — never required, and with none installed nothing is missing.",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "<strong class='text-bone'>Tribulation</strong> — the afflictions its hardened mobs inflict gain brewable antidotes made from the shard items themselves.",
+            "<strong class='text-bone'>Mercantile</strong> — the cleric's stock deepens with your reputation: rare brewing reagents for emeralds.",
+            "<strong class='text-bone'>Prosperity</strong> — far-tier chests turn up reagents you have never held over a stand."
+          ]
+        }
+      ]
+    }
+  ]
+}
