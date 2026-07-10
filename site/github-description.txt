@@ -1,0 +1,1 @@
+Alchemy overhaul for Minecraft 1.21.1 (Fabric) — the brewing stand teaches its own recipes, every vanilla effect becomes brewable, and curing becomes a decision. Part of Concord.

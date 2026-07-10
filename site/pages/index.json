@@ -1,0 +1,64 @@
+{
+  "type": "home",
+  "nav": "Home",
+  "metaTitle": "Distillation — Alchemy Overhaul for Minecraft",
+  "metaDescription": "Distillation is a Minecraft 1.21.1 Fabric mod that makes brewing a system you learn by playing: the stand teaches its own recipes, every vanilla effect becomes brewable, known recipes batch to six bottles, and antidotes cure one affliction at a time.",
+  "ogTitle": "Distillation — Alchemy Overhaul for Minecraft",
+  "ogDescription": "An alchemy overhaul for Minecraft 1.21.1 Fabric. Recipe discovery at the stand, the missing brews, batch brewing, honest durations, premium potions, and antidotes.",
+  "hero": {
+    "lede": "Every drop counts.",
+    "sub": "Distillation makes brewing a craft you learn instead of a chart you look up — a stand that teaches, potions worth planning around, cures that are decisions. Every recipe brews from items vanilla already ships.",
+    "buttons": [
+      { "label": "GitHub", "href": "https://github.com/rfizzle/distillation", "primary": true, "external": true }
+    ]
+  },
+  "sections": [
+    {
+      "title": "In Development",
+      "band": true,
+      "lede": "Distillation is fully designed and specced — implementation is underway. Nothing is released yet; everything below describes the design.",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "lgColumns": 4,
+          "hoverAccent": true,
+          "items": [
+            {
+              "icon": "&#129514;",
+              "title": "Brew by Discovery",
+              "html": ["Hold an ingredient over the stand and the vapor clouds with a color hint. A failed brew bottles a Murky Draught that names one ingredient that would have worked — and every success is written into your recipes page, permanently."]
+            },
+            {
+              "icon": "&#10024;",
+              "title": "The Missing Brews",
+              "html": ["Resistance, Haste, Absorption, Luck, and Glowing — every effect vanilla shipped without a recipe becomes brewable, from a shulker shell, honey over a sugar brew, a golden apple, a nautilus shell, a glow ink sac."]
+            },
+            {
+              "icon": "&#128293;",
+              "title": "Batch Brewing",
+              "html": ["Set the stand on a cauldron heated from below and a recipe you've discovered fills six bottles in one pass at 1.5× the ingredient cost. One session kits the whole raid party."]
+            },
+            {
+              "icon": "&#9877;&#65039;",
+              "title": "Antidotes",
+              "html": ["Surgical cures brewed from the affliction's own source — a poison antidote from a fermented spider eye, a wither antidote from a wither rose. Each strips exactly one effect; your 8-minute buffs stay."]
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "html": "Also in the design: utility potions at honest 8:00 durations you can sip in halves, an extended-<em>and</em>-amplified premium path at double the reagent, and 60-second lingering clouds that make a support brewer viable. Read the full promise in <a href='https://github.com/rfizzle/distillation/blob/master/design/VISION.md' class='text-accent hover:text-accent2 underline'>design/VISION.md</a>.",
+          "center": true
+        }
+      ]
+    },
+    {
+      "title": "Part of Concord",
+      "width": "4xl",
+      "lede": "Distillation is a member of Concord — a modular collection of system overhauls. Install any, combine all: every mod stands entirely on its own, and siblings light up together without ever being required.",
+      "ledeNarrow": true,
+      "blocks": []
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "distillation",
+  "name": "Distillation",
+  "domain": "distillation.rfizzle.com",
+  "url": "https://distillation.rfizzle.com",
+  "description": "An alchemy overhaul for Minecraft 1.21.1 (Fabric).",
+  "metaKeywords": "Minecraft, Fabric mod, brewing mod, alchemy, potions, brewing stand, recipe discovery, antidotes, batch brewing, 1.21.1",
+  "github": "https://github.com/rfizzle/distillation",
+  "defaultBranch": "master",
+  "copyright": "© 2026 rfizzle. Distillation is not affiliated with Mojang Studios or Microsoft.",
+  "footerMeta": "Minecraft 1.21.1 · Fabric",
+  "nav": [
+    "index"
+  ],
+  "theme": {
+    "accent": "#C44DCC",
+    "accentDark": "#7C2E85",
+    "accent2": "#E77C56",
+    "accent2Bright": "#F09B7A",
+    "glowRgb": "196, 77, 204"
+  }
+}
