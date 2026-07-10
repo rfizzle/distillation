@@ -13,7 +13,8 @@ shipped without them, six-bottle batch brewing over a heated cauldron, honest
 utility durations with half-drinkable draughts, an extended-and-amplified
 premium path, targeted antidotes, and rebalanced splash/lingering potions.
 
-**The repo is in the design phase: no code exists yet.** The player promise is
+**The repo is in the design phase: the Gradle skeleton builds and launches,
+but no feature code exists yet.** The player promise is
 [`design/VISION.md`](design/VISION.md), the behavioral contract is
 [`design/SPEC.md`](design/SPEC.md), and the brand is
 [`design/DESIGN.md`](design/DESIGN.md). Implementation follows the spec — an
@@ -34,13 +35,16 @@ in the local workspace. Normative for this repo:
 
 ## Build
 
-There is no Gradle scaffold yet — it lands with the first implementation work,
-following the suite standard: Loom with `splitEnvironmentSourceSets()` (`main` /
-`client` / `gametest` source sets plus JUnit in `src/test/java`), Java 21,
-Fabric Loader 0.16.10+. Until then, this repo is documentation-only and there
-is nothing to build. When Gradle lands, read
+Gradle/Loom per the suite standard: Loom with `splitEnvironmentSourceSets()`
+(`main` / `client` / `gametest` source sets plus JUnit in `src/test/java`),
+Java 21, Fabric Loader 0.16.10+, official Mojang mappings. Read
 [`.ai/skills/mc-gradle-builds/SKILL.md`](.ai/skills/mc-gradle-builds/SKILL.md)
 before running any Gradle command.
+
+- `make build` — compile, run unit tests, assemble the jar
+- `make test` — JUnit only
+- `./gradlew runGametest` — the Fabric gametest server
+- `make run-client` / `make run-server` — dev launches
 
 ## Key conventions
 

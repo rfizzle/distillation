@@ -60,3 +60,6 @@ art/audio/**/*.ogg
 art/audio/**/*.wav
 art/audio/**/*.report.png
 # concord:gitignore:end
+
+# Repo-specific (outside the concord-managed block)
+__pycache__/

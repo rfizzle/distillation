@@ -1,0 +1,41 @@
+{
+    "schemaVersion": 1,
+    "id": "distillation",
+    "version": "${version}",
+    "name": "Distillation",
+    "description": "An alchemy overhaul for Minecraft. The brewing stand teaches its own recipes, every vanilla effect becomes brewable, known recipes batch to six bottles over a heated cauldron, utility potions last honest durations, and antidotes cure one affliction at a time.",
+    "authors": ["rfizzle"],
+    "contact": {
+        "homepage": "https://distillation.rfizzle.com",
+        "sources": "https://github.com/rfizzle/distillation",
+        "issues": "https://github.com/rfizzle/distillation/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/distillation/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": ["com.rfizzle.distillation.Distillation"],
+        "client": ["com.rfizzle.distillation.client.DistillationClient"],
+        "fabric-gametest": [
+            "com.rfizzle.distillation.gametest.SmokeGameTest"
+        ]
+    },
+    "suggests": {
+        "modmenu": "*",
+        "jade": "*",
+        "wthit": "*",
+        "emi": "*",
+        "roughlyenoughitems": "*",
+        "jei": "*",
+        "tribulation": "*"
+    },
+    "mixins": [
+        "distillation.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.16.10",
+        "minecraft": "~1.21.1",
+        "java": ">=21",
+        "fabric-api": "*"
+    }
+}

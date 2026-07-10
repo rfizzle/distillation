@@ -1,0 +1,18 @@
+# Thin stub — logic lives in rfizzle/concord (mod-release.yml).
+# Store ids (modrinth-id / curseforge-id) are added via `with:` once the
+# distillation-alchemy-overhaul projects are registered.
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    uses: rfizzle/concord/.github/workflows/mod-release.yml@master
+    secrets: inherit
