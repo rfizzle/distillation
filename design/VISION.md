@@ -28,19 +28,27 @@ line.
 - **What it is** — The stand teaches its own recipes; no wiki required.
 - **How you use it** — Hold an ingredient over the stand and the brew clouds
   with a color hint. A failed combination bottles a Murky Draught whose
-  tooltip names one ingredient that would have worked; every success is
-  written permanently into the recipes page of your brewing screen.
+  tooltip names one ingredient that would have worked — and drinking it,
+  through 15 seconds of nausea, gives you a 20-second taste of the potion it
+  wanted to be. Every success is written permanently into the recipes page
+  of your brewing screen; land the last one and the count gilds — every
+  drop, accounted for.
 - **What changes for you** — Brewing becomes a system you learn by playing.
   Your first Night Vision costs a few murky bottles, not a browser tab.
 
 ### The missing brews
 - **What it is** — Every effect vanilla shipped without a recipe becomes
-  brewable from ingredients you already gather.
+  brewable from ingredients you already gather, and vanilla's two dead-end
+  bottles finally get jobs.
 - **How you use it** — Brew them like any potion: Resistance from a shulker
-  shell, Haste from honey and sugar, Absorption from a golden apple, Luck
-  from a nautilus shell, Glowing from a glow ink sac.
+  shell, Haste from honey and sugar, Absorption from a golden apple. Luck
+  from a nautilus shell is the angler's brew — junk leaves your line,
+  treasure climbs onto it, and it stacks with Luck of the Sea. Glowing from
+  a glow ink sac is a marker made for throwing: splash it on what you can't
+  afford to lose track of in the dark. A Mundane Potion ferments into
+  Weakness, and the Thick Potion is where every antidote begins.
 - **What changes for you** — The effect roster vanilla already ships stops
-  being creative-mode-only.
+  being creative-mode-only, and nothing the stand teaches leads nowhere.
 
 ### Batch brewing
 - **What it is** — Recipes you have discovered scale past three bottles.
@@ -69,8 +77,9 @@ line.
 
 ### Antidotes
 - **What it is** — Surgical cures, brewed from the affliction's own source.
-- **How you use it** — A poison antidote from a fermented spider eye, a
-  wither antidote from a wither rose; each strips exactly that effect and
+- **How you use it** — Brew a Thick Potion — glowstone's body carries the
+  cure — then add the affliction's own source: a fermented spider eye for
+  poison, a wither rose for wither; each strips exactly that effect and
   nothing else. Milk still clears everything — your buffs included.
 - **What changes for you** — Keeping your 8-minute Strength while shaking
   off a poison is a brewing decision, not a sacrifice.
