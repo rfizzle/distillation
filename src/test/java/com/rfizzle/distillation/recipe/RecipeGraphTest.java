@@ -129,6 +129,69 @@ class RecipeGraphTest {
     }
 
     @Test
+    void receptiveMeansAPotionBearingContainer() {
+        RecipeGraph graph = RecipeGraph.fromBrewing(syntheticRegistry(), Set.of());
+
+        assertTrue(graph.isReceptive(bottleOf(Potions.WATER)));
+        assertTrue(graph.isReceptive(bottleOf(Potions.AWKWARD)),
+                "receptivity is about the container, not whether any pair is valid");
+        assertFalse(graph.isReceptive(ItemStack.EMPTY));
+        assertFalse(graph.isReceptive(new ItemStack(Items.GLASS_BOTTLE)),
+                "a contentless non-container never gates a cycle");
+        assertFalse(graph.isReceptive(new ItemStack(Items.POTION)),
+                "a container item stripped of potion contents is not receptive");
+        assertFalse(graph.isReceptive(PotionContents.createItemStack(Items.SPLASH_POTION, Potions.WATER)),
+                "an item outside the registry's containers list is not receptive");
+    }
+
+    @Test
+    void hintCandidatesAreExactlyTheConversionsThatWouldTake() {
+        RecipeGraph graph = RecipeGraph.fromBrewing(syntheticRegistry(), Set.of());
+
+        var waterCandidates = graph.conversionsFor(bottleOf(Potions.WATER));
+        assertEquals(2, waterCandidates.size(),
+                "water takes the nether-wart mix and the gunpowder container conversion");
+        assertTrue(waterCandidates.stream().allMatch(conversion ->
+                        conversion.ingredient() == Items.NETHER_WART || conversion.ingredient() == Items.GUNPOWDER),
+                "every candidate's ingredient genuinely would have taken");
+
+        var splashCandidates = graph.conversionsFor(
+                PotionContents.createItemStack(Items.SPLASH_POTION, Potions.WATER));
+        assertEquals(1, splashCandidates.size(),
+                "a splash bottle keeps the potion mix but not the potion-item container conversion");
+        assertSame(Items.NETHER_WART, splashCandidates.get(0).ingredient());
+
+        // A drinkable awkward bottle still takes gunpowder (the container conversion); the truly
+        // hintless shape is a bottle whose item has no container conversions AND whose potion has
+        // no onward mixes.
+        assertTrue(graph.conversionsFor(
+                        PotionContents.createItemStack(Items.SPLASH_POTION, Potions.AWKWARD)).isEmpty(),
+                "a bottle nothing brews onward from has no candidates — the hintless draught");
+        assertTrue(graph.conversionsFor(ItemStack.EMPTY).isEmpty());
+        assertTrue(graph.conversionsFor(new ItemStack(Items.STICK)).isEmpty());
+    }
+
+    @Test
+    void flickerResolvesTheHintedConversionsOutput() {
+        RecipeGraph graph = RecipeGraph.fromBrewing(syntheticRegistry(), Set.of());
+        ResourceLocation water = ResourceLocation.parse("minecraft:water");
+
+        var potionHint = MurkyHints.flickerPotion(graph, water, ResourceLocation.parse("minecraft:nether_wart"));
+        assertTrue(potionHint.isPresent() && potionHint.get().is(Potions.AWKWARD),
+                "a potion-conversion hint flickers as that conversion's output");
+
+        var containerHint = MurkyHints.flickerPotion(graph, water, ResourceLocation.parse("minecraft:gunpowder"));
+        assertTrue(containerHint.isPresent() && containerHint.get().is(Potions.WATER),
+                "a container-conversion hint keeps the input potion — the liquid never changed");
+
+        assertTrue(MurkyHints.flickerPotion(graph, ResourceLocation.parse("minecraft:awkward"),
+                        ResourceLocation.parse("minecraft:nether_wart")).isEmpty(),
+                "a hint the graph no longer resolves for this input flickers as nothing");
+        assertTrue(MurkyHints.flickerPotion(graph, water, ResourceLocation.parse("minecraft:stick")).isEmpty(),
+                "an ingredient with no conversions flickers as nothing");
+    }
+
+    @Test
     void excludedIdsLeaveTheGraph() {
         RecipeGraph graph = RecipeGraph.fromBrewing(syntheticRegistry(),
                 Set.of(ResourceLocation.parse("distillation:nether_wart/water")));

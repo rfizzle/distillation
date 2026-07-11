@@ -52,6 +52,30 @@ class MurkyCueContractTest {
         assertShippedResource("/assets/" + parts[0] + "/sounds/" + parts[1] + ".ogg");
     }
 
+    @Test
+    void itemAndTooltipLangKeysExist() {
+        JsonObject lang = shippedJson("/assets/distillation/lang/en_us.json",
+                Path.of("src/main/resources/assets/distillation/lang/en_us.json"));
+        assertTrue(lang.has("item.distillation.murky_draught"), "missing item name key");
+        assertTrue(lang.has("tooltip.distillation.murky.hint"), "missing hint tooltip key");
+        assertTrue(lang.get("tooltip.distillation.murky.hint").getAsString().contains("%s"),
+                "the hint line names the ingredient through an argument");
+        assertTrue(lang.has("tooltip.distillation.murky.hintless"), "missing hintless tooltip key");
+        assertFalse(lang.get("tooltip.distillation.murky.hintless").getAsString().contains("%s"),
+                "the hintless line takes no argument");
+    }
+
+    @Test
+    void itemModelParentsGeneratedAndItsTextureShips() {
+        JsonObject model = shippedJson("/assets/distillation/models/item/murky_draught.json",
+                Path.of("src/main/resources/assets/distillation/models/item/murky_draught.json"));
+        assertEquals("minecraft:item/generated", model.get("parent").getAsString(),
+                "a flat 2D item sprite parents item/generated");
+        String layer0 = model.getAsJsonObject("textures").get("layer0").getAsString();
+        String[] parts = layer0.split(":", 2);
+        assertShippedResource("/assets/" + parts[0] + "/textures/" + parts[1] + ".png");
+    }
+
     static void assertShippedResource(String resourcePath) {
         try (InputStream in = MurkyCueContractTest.class.getResourceAsStream(resourcePath)) {
             if (in != null) {
