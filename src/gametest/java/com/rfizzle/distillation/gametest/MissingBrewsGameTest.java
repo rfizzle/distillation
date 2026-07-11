@@ -1,6 +1,8 @@
 package com.rfizzle.distillation.gametest;
 
 import com.rfizzle.distillation.brew.DistillationPotions;
+import com.rfizzle.distillation.item.DistillationItems;
+import com.rfizzle.distillation.item.MurkyDraughtContents;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -8,7 +10,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
@@ -107,7 +108,7 @@ public class MissingBrewsGameTest implements FabricGameTest {
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
     public void glowstoneOnLuckIsAnInvalidPair(GameTestHelper helper) {
-        assertNothingBrews(helper, distillationBottle("luck"), new ItemStack(Items.GLOWSTONE_DUST),
+        assertMurks(helper, distillationBottle("luck"), new ItemStack(Items.GLOWSTONE_DUST),
                 "distillation:luck");
     }
 
@@ -126,7 +127,7 @@ public class MissingBrewsGameTest implements FabricGameTest {
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
     public void glowstoneOnGlowingIsAnInvalidPair(GameTestHelper helper) {
-        assertNothingBrews(helper, distillationBottle("glowing"), new ItemStack(Items.GLOWSTONE_DUST),
+        assertMurks(helper, distillationBottle("glowing"), new ItemStack(Items.GLOWSTONE_DUST),
                 "distillation:glowing");
     }
 
@@ -184,15 +185,21 @@ public class MissingBrewsGameTest implements FabricGameTest {
         });
     }
 
-    /** The pair is invalid: no cycle starts, the bottle and the ingredient survive untouched. */
-    private static void assertNothingBrews(GameTestHelper helper, ItemStack bottle, ItemStack ingredient,
-                                           String unchangedPotionId) {
-        Item ingredientItem = ingredient.getItem();
+    /**
+     * The pair is invalid: under default config the failed pass bottles a Murky Draught recording
+     * the input potion ({@code design/SPEC.md} §1 — the §2 lines' invalid pairs murk like any
+     * other; the draughts-off pass-through lives in {@code MurkyDraughtGameTest}).
+     */
+    private static void assertMurks(GameTestHelper helper, ItemStack bottle, ItemStack ingredient,
+                                    String inputPotionId) {
         BrewingStandBlockEntity stand = placeStand(helper, bottle, ingredient);
         helper.runAfterDelay(BREW_WAIT, () -> {
-            assertPotion(helper, stand.getItem(0), unchangedPotionId);
-            helper.assertTrue(stand.getItem(3).is(ingredientItem) && stand.getItem(3).getCount() == 1,
-                    "an invalid pair must not consume the ingredient");
+            ItemStack murked = stand.getItem(0);
+            helper.assertTrue(murked.is(DistillationItems.MURKY_DRAUGHT),
+                    "an invalid pair must bottle a Murky Draught, but found " + murked);
+            MurkyDraughtContents contents = murked.get(DistillationItems.MURKY_DRAUGHT_CONTENTS);
+            helper.assertTrue(contents != null && contents.inputPotion().toString().equals(inputPotionId),
+                    "the draught must record the input potion " + inputPotionId);
             helper.succeed();
         });
     }

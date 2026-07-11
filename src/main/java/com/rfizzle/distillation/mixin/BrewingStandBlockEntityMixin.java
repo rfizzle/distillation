@@ -37,8 +37,9 @@ abstract class BrewingStandBlockEntityMixin {
     private static void distillation$gateCycleStart(PotionBrewing brewing, NonNullList<ItemStack> items,
                                                     CallbackInfoReturnable<Boolean> cir) {
         // Only vanilla's serverTick calls this, so the local (server) config is authoritative.
+        var config = Distillation.getConfig();
         cir.setReturnValue(BrewSeam.isBrewable(
-                RecipeGraphs.lookup(brewing, Distillation.getConfig().enableMissingBrews), items));
+                RecipeGraphs.lookup(brewing, config.enableMissingBrews), items, config.enableMurkyDraughts));
     }
 
     @Inject(method = "canPlaceItem", at = @At("HEAD"), cancellable = true)

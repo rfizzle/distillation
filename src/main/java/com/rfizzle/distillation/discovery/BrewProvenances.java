@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The write choke point for a stand's {@link BrewProvenance} attachment: every mutation lands
@@ -19,13 +20,17 @@ public final class BrewProvenances {
 
     /**
      * The brew seam's per-cycle write: slots this cycle converted record their new conversion;
-     * other slots keep any existing record — an unmatched bottle passes through a cycle
-     * unchanged, so an earlier brew's untaken output is still exactly what its record says.
+     * slots it murked drop any earlier record — the bottle there is a Murky Draught now, not the
+     * old brew's untaken output; other slots keep any existing record — an unmatched bottle
+     * passes through a cycle unchanged, so an earlier brew's untaken output is still exactly what
+     * its record says.
      */
-    public static void recordBrew(BrewingStandBlockEntity stand, Map<Integer, ResourceLocation> produced) {
+    public static void recordBrew(BrewingStandBlockEntity stand, Map<Integer, ResourceLocation> produced,
+                                  Set<Integer> murked) {
         BrewProvenance existing = stand.getAttached(DistillationAttachments.BREW_PROVENANCE);
         Map<Integer, ResourceLocation> merged = new LinkedHashMap<>(
                 existing == null ? Map.of() : existing.bySlot());
+        murked.forEach(merged::remove);
         merged.putAll(produced);
         set(stand, new BrewProvenance(merged));
     }
