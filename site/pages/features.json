@@ -15,7 +15,7 @@
         {
           "type": "prose",
           "html": [
-            "Hold an ingredient over the stand's ingredient slot and the vapor clouds with a color hint of what it would become; once you know a recipe, the hint names the output outright. A failed combination still bottles: a <strong class='text-bone'>Murky Draught</strong> whose tooltip names one ingredient that would have worked with that base — a failure that teaches. Every successful brew you take from the stand is written permanently into your recipes page, right in the brewing screen, with a running count.",
+            "Hold an ingredient over the stand's ingredient slot and the vapor clouds with a color hint of what it would become; once you know a recipe, the hint names the output outright. A failed combination still bottles: a <strong class='text-bone'>Murky Draught</strong> whose tooltip names one ingredient that would have worked with that base — a failure that teaches. Every successful brew you take from the stand is written permanently into your recipes page, right in the brewing screen, with a running count that gilds when you have learned them all.",
             "Discovery is per player and survives death and relog. Recipe viewers (EMI/REI/JEI) show only what you've discovered by default, so they never spoil what the stand wants to teach — a server can open them up, or start everyone fully unlocked."
           ]
         }
