@@ -135,6 +135,20 @@ class DistillationConfigTest {
     }
 
     @Test
+    void nonObjectJsonFileFallsBackToDefaultsAndIsLeftUntouched() throws IOException {
+        Path path = configFile();
+        // Valid JSON, but not an object — same contract as the unparseable case: defaults in
+        // memory, the user's file preserved for them to fix.
+        String nonObject = "[1, 2, 3]";
+        Files.writeString(path, nonObject);
+
+        DistillationConfig loaded = DistillationConfig.load(path);
+        assertTrue(loaded.enableDiscovery, "fallback runs on defaults");
+        assertEquals(nonObject, Files.readString(path),
+                "a valid-JSON-but-non-object file must be left byte-identical for the user to fix");
+    }
+
+    @Test
     void missingConfigVersionMigratesAndPersistsTheStamp() throws IOException {
         Path path = configFile();
         // A pre-versioned file: valid JSON object, no configVersion. Migration stamps it to the

@@ -89,10 +89,14 @@ public class DistillationConfig {
         try {
             JsonElement element = JsonParser.parseString(Files.readString(path));
             if (element == null || !element.isJsonObject()) {
-                Distillation.LOGGER.warn("Config file at {} was empty or not a JSON object; using defaults", path);
-                DistillationConfig fresh = new DistillationConfig();
-                fresh.save(path);
-                return fresh;
+                // Same contract as the unparseable branch below: the user's file — however
+                // malformed — is theirs to fix; run on defaults and leave it untouched.
+                Distillation.LOGGER.warn(
+                        "Config file at {} was empty or not a JSON object; using defaults (existing file left untouched)", path);
+                DistillationConfig fallback = new DistillationConfig();
+                fallback.fillDefaults();
+                fallback.clamp();
+                return fallback;
             }
             // Migrate the raw JSON tree before deserialize so a renamed key survives (a lenient
             // Gson deserialize would drop it). A file without configVersion is treated as v0.
