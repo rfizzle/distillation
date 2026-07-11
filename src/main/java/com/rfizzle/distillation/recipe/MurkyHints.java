@@ -68,7 +68,8 @@ public final class MurkyHints {
         if (!containerHint) {
             return Optional.empty();
         }
+        // Optional<Holder.Reference<Potion>> widens to Optional<Holder<Potion>>.
         return BuiltInRegistries.POTION.getHolder(ResourceKey.create(Registries.POTION, inputPotionId))
-                .map(holder -> holder);
+                .map(holder -> (Holder<Potion>) holder);
     }
 }
