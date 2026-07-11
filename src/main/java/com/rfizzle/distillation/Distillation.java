@@ -2,6 +2,7 @@ package com.rfizzle.distillation;
 
 import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.brew.DistillationPotions;
+import com.rfizzle.distillation.command.DistillationCommand;
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.discovery.DistillationAttachments;
 import com.rfizzle.distillation.network.DistillationNetworking;
@@ -35,6 +36,7 @@ public class Distillation implements ModInitializer {
         RecipeGraphs.registerLifecycleHandlers();
         DistillationNetworking.registerPayloads();
         DistillationNetworking.registerLifecycleHandlers();
+        DistillationCommand.register();
         LOGGER.info("Distillation initialized");
     }
 

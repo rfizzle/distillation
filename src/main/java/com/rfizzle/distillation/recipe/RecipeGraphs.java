@@ -53,6 +53,18 @@ public final class RecipeGraphs {
         });
     }
 
+    /**
+     * Drops every cached graph so the very next lookup rebuilds from the live brewing registry —
+     * {@code /distillation reload}'s explicit rebuild. The cache key only tracks the
+     * {@code enableMissingBrews} value, so without this a reload that changes nothing else would
+     * silently serve the stale graph.
+     */
+    public static void invalidate() {
+        synchronized (CACHE) {
+            CACHE.clear();
+        }
+    }
+
     /** Wires the client's synced-first config view in; called from client init only. */
     public static void setClientConfigSupplier(Supplier<DistillationConfig> supplier) {
         clientConfigSupplier = supplier;
