@@ -4,9 +4,14 @@ import com.rfizzle.distillation.Distillation;
 import com.rfizzle.distillation.network.DistillationNetworking;
 import com.rfizzle.distillation.recipe.RecipeGraph;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
+import com.rfizzle.distillation.sound.DistillationSounds;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,10 +47,27 @@ public final class DiscoveryManager {
         }
         BrewProvenances.take(stand, slot).ifPresent(recipeId -> {
             Level level = stand.getLevel();
-            if (matchesRecordedOutput(RecipeGraphs.forLevel(level), recipeId, taken)) {
-                record(serverPlayer, recipeId);
+            if (matchesRecordedOutput(RecipeGraphs.forLevel(level), recipeId, taken)
+                    && record(serverPlayer, recipeId)) {
+                celebrate(serverPlayer, taken);
             }
         });
+    }
+
+    /**
+     * The first-time teaching moment ({@code design/SPEC.md} §1): the ✦ action-bar toast naming
+     * the output, and the discovery chime sent straight to the player's connection — a level
+     * broadcast would turn one player's discovery into an area-wide mystery noise. Extraction
+     * only: command and join grants record silently.
+     */
+    private static void celebrate(ServerPlayer player, ItemStack taken) {
+        player.displayClientMessage(Component.translatable(
+                "notification.distillation.recipe_learned", taken.getHoverName()), true);
+        player.connection.send(new ClientboundSoundPacket(
+                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(DistillationSounds.RECIPE_LEARNED),
+                SoundSource.PLAYERS,
+                player.getX(), player.getY(), player.getZ(),
+                1.0f, 1.0f, player.getRandom().nextLong()));
     }
 
     /**

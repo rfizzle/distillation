@@ -36,6 +36,8 @@
   "config.distillation.show_vapor_hints.tooltip": "Color hints over the brewing stand's ingredient slot.",
   "config.distillation.recipe_viewer_shows_undiscovered": "Recipe Viewers Show Undiscovered",
   "config.distillation.recipe_viewer_shows_undiscovered.tooltip": "Recipe viewers list conversions you haven't discovered yet.",
+  "notification.distillation.recipe_learned": "✦ Recipe learned: %s",
+  "subtitles.distillation.recipe_learned": "Recipe learned",
   "item.minecraft.potion.effect.resistance": "Potion of Resistance",
   "item.minecraft.splash_potion.effect.resistance": "Splash Potion of Resistance",
   "item.minecraft.lingering_potion.effect.resistance": "Lingering Potion of Resistance",

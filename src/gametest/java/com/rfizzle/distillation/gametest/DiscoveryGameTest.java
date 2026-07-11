@@ -69,6 +69,11 @@ public class DiscoveryGameTest implements FabricGameTest {
                 helper.assertTrue(!DiscoveryManager.record(player, WATER_TO_AWKWARD),
                         "re-discovery must be silently idempotent");
                 helper.assertTrue(data.orderedIds().size() == 1, "re-discovery must not grow the set");
+                // The take above walked the celebrate path (toast + chime to a live connection);
+                // pin the chime's registration so a renamed id can't silently mute it.
+                helper.assertTrue(net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT
+                                .containsKey(Distillation.id("ui.recipe_learned")),
+                        "the discovery chime SoundEvent must be registered");
             } finally {
                 player.discard();
             }
