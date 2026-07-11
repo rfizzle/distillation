@@ -18,7 +18,9 @@
         "client": ["com.rfizzle.distillation.client.DistillationClient"],
         "modmenu": ["com.rfizzle.distillation.compat.modmenu.ModMenuIntegration"],
         "fabric-gametest": [
-            "com.rfizzle.distillation.gametest.SmokeGameTest"
+            "com.rfizzle.distillation.gametest.SmokeGameTest",
+            "com.rfizzle.distillation.gametest.MissingBrewsGameTest",
+            "com.rfizzle.distillation.gametest.RecipeGraphGameTest"
         ]
     },
     "suggests": {
@@ -34,6 +36,7 @@
     "mixins": [
         "distillation.mixins.json"
     ],
+    "accessWidener": "distillation.accesswidener",
     "depends": {
         "fabricloader": ">=0.16.10",
         "minecraft": "~1.21.1",

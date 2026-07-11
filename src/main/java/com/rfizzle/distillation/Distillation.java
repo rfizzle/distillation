@@ -1,7 +1,10 @@
 package com.rfizzle.distillation;
 
+import com.rfizzle.distillation.brew.DistillationBrews;
+import com.rfizzle.distillation.brew.DistillationPotions;
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.network.DistillationNetworking;
+import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -23,6 +26,9 @@ public class Distillation implements ModInitializer {
     @Override
     public void onInitialize() {
         getConfig(); // eager first load, so later callers never pay the lazy path in play
+        DistillationPotions.register();
+        DistillationBrews.registerConversions();
+        RecipeGraphs.registerLifecycleHandlers();
         DistillationNetworking.registerPayloads();
         DistillationNetworking.registerLifecycleHandlers();
         LOGGER.info("Distillation initialized");
