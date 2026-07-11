@@ -16,6 +16,7 @@
     "entrypoints": {
         "main": ["com.rfizzle.distillation.Distillation"],
         "client": ["com.rfizzle.distillation.client.DistillationClient"],
+        "modmenu": ["com.rfizzle.distillation.compat.modmenu.ModMenuIntegration"],
         "fabric-gametest": [
             "com.rfizzle.distillation.gametest.SmokeGameTest"
         ]
