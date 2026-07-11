@@ -58,17 +58,20 @@ public final class RecipeGraph {
     private final Map<Item, List<ContainerConversion>> containerByIngredient;
     private final Map<Item, List<PotionConversion>> potionByIngredient;
     private final List<Conversion> conversions;
+    private final Map<ResourceLocation, Conversion> byId;
     private final Set<ResourceLocation> ids;
 
     private RecipeGraph(Set<Item> containerItems,
                         Map<Item, List<ContainerConversion>> containerByIngredient,
                         Map<Item, List<PotionConversion>> potionByIngredient,
                         List<Conversion> conversions,
+                        Map<ResourceLocation, Conversion> byId,
                         Set<ResourceLocation> ids) {
         this.containerItems = containerItems;
         this.containerByIngredient = containerByIngredient;
         this.potionByIngredient = potionByIngredient;
         this.conversions = conversions;
+        this.byId = byId;
         this.ids = ids;
     }
 
@@ -215,14 +218,9 @@ public final class RecipeGraph {
         return List.copyOf(matches);
     }
 
-    /** The conversion carrying this recipe id, if the current graph has one. */
+    /** The conversion carrying this recipe id, if the current graph has one — an O(1) lookup. */
     public Optional<Conversion> conversionById(ResourceLocation recipeId) {
-        for (Conversion conversion : conversions) {
-            if (conversion.id().equals(recipeId)) {
-                return Optional.of(conversion);
-            }
-        }
-        return Optional.empty();
+        return Optional.ofNullable(byId.get(recipeId));
     }
 
     /** Every conversion, in registration order. */
@@ -289,9 +287,12 @@ public final class RecipeGraph {
         public RecipeGraph build() {
             Map<Item, List<ContainerConversion>> containerByIngredient = new LinkedHashMap<>();
             Map<Item, List<PotionConversion>> potionByIngredient = new LinkedHashMap<>();
+            Map<ResourceLocation, Conversion> byId = new LinkedHashMap<>();
             Set<ResourceLocation> ids = new LinkedHashSet<>();
             for (Conversion conversion : conversions) {
                 ids.add(conversion.id());
+                // First-wins, matching the resolution order resolve/matchConversion walk.
+                byId.putIfAbsent(conversion.id(), conversion);
                 if (conversion instanceof ContainerConversion container) {
                     containerByIngredient.computeIfAbsent(container.ingredient(), item -> new ArrayList<>())
                             .add(container);
@@ -307,6 +308,7 @@ public final class RecipeGraph {
                     Collections.unmodifiableMap(containerByIngredient),
                     Collections.unmodifiableMap(potionByIngredient),
                     List.copyOf(conversions),
+                    Collections.unmodifiableMap(byId),
                     Collections.unmodifiableSet(ids));
         }
 

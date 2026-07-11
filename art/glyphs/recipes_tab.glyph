@@ -1,0 +1,37 @@
+# distillation — recipes-page tab button, 16×16 (design/SPEC.md §1: a small bottle-glyph
+# tab, top-right of the brewing screen, opening the discovered-recipes overlay). Shares the
+# bottle-16 silhouette so the discovery family reads together, on a faint vanilla-grey GUI
+# plate so it registers as a clickable tab over the stand's stone panel (design/DESIGN.md §3).
+# Palette maps to design/DESIGN.md: Potion Magenta #C44DCC, Elixir #DA79E3, Glass #AFC6CE,
+# Copper #E77C56 (cork); the plate uses vanilla's GUI greys. distillation.* tokens are not yet
+# registered in the concord glyph palette — hex used with the DESIGN.md role named beside each.
+size: 16
+
+legend:
+  . transparent
+  l #c6c6c6        # vanilla GUI light bevel (top/left)
+  f #8b8b8b        # vanilla GUI button face
+  s #373737        # vanilla GUI shadow bevel (bottom/right)
+  K ink            # #0a0a0a bottle outline
+  m #c44dcc        # Potion Magenta — liquid body
+  e #da79e3        # Elixir — meniscus rim, glow
+  g #afc6ce        # Glass — pale glass highlight
+  c #e77c56        # Copper — cork stopper
+
+frame:
+  .llllllllllllll.
+  lffffffKKffffffs
+  lfffffKccKfffffs
+  lfffffKggKfffffs
+  lfffffKggKfffffs
+  lfffKeeeeeeKfffs
+  lfffKgmeemmKfffs
+  lfffKgmmmmmKfffs
+  lfffKmmmmmmKfffs
+  lfffKmmmmmmKfffs
+  lffffKmmmmKffffs
+  lfffffKKKKfffffs
+  lffffffffffffffs
+  lffffffffffffffs
+  .ssssssssssssss.
+  ................

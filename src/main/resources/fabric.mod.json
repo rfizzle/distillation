@@ -37,7 +37,11 @@
         "tribulation": "*"
     },
     "mixins": [
-        "distillation.mixins.json"
+        "distillation.mixins.json",
+        {
+            "config": "distillation.client.mixins.json",
+            "environment": "client"
+        }
     ],
     "accessWidener": "distillation.accesswidener",
     "depends": {
