@@ -38,6 +38,7 @@
   "config.distillation.recipe_viewer_shows_undiscovered.tooltip": "Recipe viewers list conversions you haven't discovered yet.",
   "notification.distillation.recipe_learned": "✦ Recipe learned: %s",
   "subtitles.distillation.recipe_learned": "Recipe learned",
+  "subtitles.distillation.murky": "Brew goes murky",
   "command.distillation.recipes.count": "%s / %s recipes discovered.",
   "command.distillation.recipes.count.other": "%s: %s / %s recipes discovered.",
   "command.distillation.recipes.latest": "Latest: %s",
