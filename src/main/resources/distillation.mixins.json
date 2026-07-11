@@ -3,7 +3,10 @@
     "minVersion": "0.8",
     "package": "com.rfizzle.distillation.mixin",
     "compatibilityLevel": "JAVA_21",
-    "mixins": [],
+    "mixins": [
+        "BrewingStandBlockEntityMixin",
+        "BrewingStandMenuIngredientsSlotMixin"
+    ],
     "client": [],
     "injectors": {
         "defaultRequire": 1
