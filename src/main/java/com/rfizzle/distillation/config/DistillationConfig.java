@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.rfizzle.distillation.Distillation;
@@ -172,7 +173,7 @@ public class DistillationConfig {
         DistillationConfig config;
         try {
             config = GSON.fromJson(json, DistillationConfig.class);
-        } catch (JsonSyntaxException e) {
+        } catch (JsonParseException e) {
             Distillation.LOGGER.warn("Failed to parse synced config JSON; using defaults", e);
             config = null;
         }
@@ -182,6 +183,15 @@ public class DistillationConfig {
         config.fillDefaults();
         config.clamp();
         return config;
+    }
+
+    /**
+     * A deep, independent copy — the ModMenu screen edits one of these so the live config is
+     * never mutated in place; the clamped copy is published back with a single reference swap
+     * ({@link com.rfizzle.distillation.Distillation#updateConfig}).
+     */
+    public DistillationConfig copy() {
+        return GSON.fromJson(GSON.toJson(this), DistillationConfig.class);
     }
 
     private void fillDefaults() {

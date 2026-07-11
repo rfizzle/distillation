@@ -169,6 +169,27 @@ class DistillationConfigTest {
     }
 
     @Test
+    void copyIsDeepAndIndependentOfTheOriginal() {
+        DistillationConfig original = new DistillationConfig();
+        original.enableAntidotes = false;
+        original.batchFuelCost = 4;
+        original.client.showVaporHints = false;
+
+        DistillationConfig copy = original.copy();
+        assertFalse(copy.enableAntidotes, "the copy carries the original's values");
+        assertEquals(4, copy.batchFuelCost, "the copy carries the original's values");
+        assertFalse(copy.client.showVaporHints, "the nested client block is copied too");
+
+        // Mutating the copy (as the ModMenu screen does) must never touch the live original.
+        copy.enableAntidotes = true;
+        copy.batchFuelCost = 1;
+        copy.client.showVaporHints = true;
+        assertFalse(original.enableAntidotes, "the original is isolated from copy edits");
+        assertEquals(4, original.batchFuelCost, "the original is isolated from copy edits");
+        assertFalse(original.client.showVaporHints, "the nested client block is deep-copied, not shared");
+    }
+
+    @Test
     void fromJsonClampsHostileValuesAndDefaultsOnGarbage() {
         DistillationConfig hostile = DistillationConfig.fromJson(
                 "{\"batchIngredientCost\": 9999, \"splashDurationFactor\": -5.0}");

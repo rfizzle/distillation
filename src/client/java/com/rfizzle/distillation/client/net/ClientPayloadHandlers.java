@@ -18,8 +18,9 @@ public final class ClientPayloadHandlers {
     public static void register() {
         ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPayload.TYPE,
                 (payload, context) -> {
-                    // Decode off the client thread — GSON parsing is pure and has no client-state
-                    // dependency — then publish the immutable result on the client thread.
+                    // Parse before scheduling the publish — fromJson is pure (no client state), so
+                    // it is safe on whatever thread Fabric dispatches this handler on. The result
+                    // is never mutated after the volatile store, so readers see a stable snapshot.
                     DistillationConfig synced = DistillationConfig.fromJson(payload.configJson());
                     context.client().execute(() -> ClientDistillationConfig.setServerConfig(synced));
                 });

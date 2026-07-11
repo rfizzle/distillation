@@ -23,6 +23,7 @@
     },
     "suggests": {
         "modmenu": "*",
+        "cloth-config": "*",
         "jade": "*",
         "wthit": "*",
         "emi": "*",

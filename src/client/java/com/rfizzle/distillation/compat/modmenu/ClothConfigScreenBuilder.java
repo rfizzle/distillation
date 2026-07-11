@@ -12,7 +12,10 @@ import net.minecraft.network.chat.Component;
  * Builds the Cloth Config screen: two categories mirroring the SPEC §Configuration tables (Server /
  * Client), every key with a {@code config.distillation.*} label and tooltip, sliders and fields
  * carrying the same ranges {@link DistillationConfig#clamp()} enforces, and a re-clamp before save
- * so the screen can never persist an out-of-range value. Only classloaded when Cloth Config is
+ * so the screen can never persist an out-of-range value. The screen edits a working copy of the
+ * live config; saving clamps the copy, publishes it with a single volatile reference swap, and
+ * writes it to disk — the live object is never mutated in place, so a concurrent reader (e.g. the
+ * integrated-server thread) only ever sees whole snapshots. Only classloaded when Cloth Config is
  * present (see {@link ModMenuIntegration}).
  */
 final class ClothConfigScreenBuilder {
@@ -21,8 +24,7 @@ final class ClothConfigScreenBuilder {
     }
 
     static Screen build(Screen parent) {
-        DistillationConfig loaded = Distillation.getConfig();
-        DistillationConfig config = loaded != null ? loaded : new DistillationConfig();
+        DistillationConfig config = Distillation.getConfig().copy();
         DistillationConfig defaults = new DistillationConfig();
 
         ConfigBuilder builder = ConfigBuilder.create()
@@ -30,6 +32,7 @@ final class ClothConfigScreenBuilder {
                 .setTitle(Component.translatable("config.distillation.title"))
                 .setSavingRunnable(() -> {
                     config.clamp();
+                    Distillation.updateConfig(config);
                     config.save();
                 });
 
