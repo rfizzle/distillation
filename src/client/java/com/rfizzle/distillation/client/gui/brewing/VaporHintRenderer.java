@@ -29,6 +29,11 @@ public final class VaporHintRenderer {
     private static final ResourceLocation BUBBLES_SPRITE =
             ResourceLocation.withDefaultNamespace("container/brewing_stand/bubbles");
 
+    // Vanilla BrewingStandScreen.BUBBLELENGTHS — the rising-bubble frame heights the stand cycles
+    // through. Reused so the hint's vapor animates exactly like a live brew's, driven off a
+    // free-running client tick (there is no brew cycle to source progress from).
+    private static final int[] BUBBLE_HEIGHTS = {29, 24, 20, 16, 11, 6, 0};
+
     private VaporHintRenderer() {
     }
 
@@ -83,17 +88,30 @@ public final class VaporHintRenderer {
         return new HintResult(colorArray, true, allDiscovered, List.copyOf(names.values()));
     }
 
-    /** Paints the blended tint over the vapor column at 60% opacity (§1). */
-    public static void renderTint(GuiGraphics guiGraphics, int leftPos, int topPos, HintResult hint) {
+    /**
+     * Paints the blended tint over the vapor column at 60% opacity (§1). The bubbles rise on a
+     * free-running loop keyed by {@code animTick} (client game time), echoing vanilla's brewing
+     * animation — the same partial-sprite draw the stand uses for a live cycle. On the frame the
+     * loop pops to zero height nothing draws, exactly as vanilla's bubbles pop.
+     */
+    public static void renderTint(GuiGraphics guiGraphics, int leftPos, int topPos, HintResult hint,
+                                  long animTick) {
         if (!hint.anyValid()) {
+            return;
+        }
+        int height = BUBBLE_HEIGHTS[(int) (animTick / 2 % BUBBLE_HEIGHTS.length)];
+        if (height <= 0) {
             return;
         }
         int blended = VaporHintColors.blend(hint.colors());
         guiGraphics.setColor(VaporHintColors.red(blended), VaporHintColors.green(blended),
                 VaporHintColors.blue(blended), VaporHintColors.HINT_OPACITY);
         guiGraphics.blitSprite(BUBBLES_SPRITE,
-                leftPos + BrewingStandRecipesLayout.VAPOR_X, topPos + BrewingStandRecipesLayout.VAPOR_Y,
-                BrewingStandRecipesLayout.VAPOR_W, BrewingStandRecipesLayout.VAPOR_H);
+                BrewingStandRecipesLayout.VAPOR_W, BrewingStandRecipesLayout.VAPOR_H,
+                0, BrewingStandRecipesLayout.VAPOR_H - height,
+                leftPos + BrewingStandRecipesLayout.VAPOR_X,
+                topPos + BrewingStandRecipesLayout.VAPOR_Y + BrewingStandRecipesLayout.VAPOR_H - height,
+                BrewingStandRecipesLayout.VAPOR_W, height);
         guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

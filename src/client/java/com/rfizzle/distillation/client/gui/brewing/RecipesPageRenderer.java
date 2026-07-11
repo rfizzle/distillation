@@ -11,7 +11,9 @@ import net.minecraft.world.item.alchemy.PotionContents;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * The in-stand recipes page of {@code design/SPEC.md} §1: a centered overlay listing every recipe
@@ -42,6 +44,11 @@ public final class RecipesPageRenderer {
     private static final int EMPTY_COLOR = 0xFF9A8FA0;
     private static final int ARROW_COLOR = 0xFFEDE7F0;
     private static final int ARROW_DISABLED = 0xFF5E5548;
+
+    // The three display stacks per conversion, cached by conversion identity so an open overlay
+    // doesn't rebuild them every frame. Conversions are immutable and graph-scoped; a weak key lets
+    // an entry die with its graph on reload. Render-thread only, so no synchronization.
+    private static final Map<RecipeGraph.Conversion, ItemStack[]> ROW_STACKS = new WeakHashMap<>();
 
     private RecipesPageRenderer() {
     }
@@ -105,16 +112,17 @@ public final class RecipesPageRenderer {
                 }
                 RecipeGraph.Conversion conversion = visible.get(index);
                 int rowTop = BrewingStandRecipesLayout.rowTop(oy, row);
-                guiGraphics.renderItem(inputStack(conversion), ox + BrewingStandRecipesLayout.ROW_INPUT_DX, rowTop);
+                ItemStack[] stacks = rowStacks(conversion);
+                guiGraphics.renderItem(stacks[0], ox + BrewingStandRecipesLayout.ROW_INPUT_DX, rowTop);
                 drawSymbol(guiGraphics, font, "+", ox + BrewingStandRecipesLayout.ROW_PLUS_DX, rowTop);
-                guiGraphics.renderItem(ingredientStack(conversion), ox + BrewingStandRecipesLayout.ROW_INGREDIENT_DX, rowTop);
+                guiGraphics.renderItem(stacks[1], ox + BrewingStandRecipesLayout.ROW_INGREDIENT_DX, rowTop);
                 drawSymbol(guiGraphics, font, "→", ox + BrewingStandRecipesLayout.ROW_ARROW_DX, rowTop);
-                guiGraphics.renderItem(outputStack(conversion), ox + BrewingStandRecipesLayout.ROW_OUTPUT_DX, rowTop);
+                guiGraphics.renderItem(stacks[2], ox + BrewingStandRecipesLayout.ROW_OUTPUT_DX, rowTop);
             }
         }
 
         // Footer: page arrows and indicator (only when paging is possible).
-        int pageCount = BrewingStandRecipesLayout.pageCount(total == 0 ? 0 : visible.size());
+        int pageCount = BrewingStandRecipesLayout.pageCount(visible.size());
         if (pageCount > 1) {
             int arrowY = BrewingStandRecipesLayout.arrowY(screenHeight);
             int prevX = BrewingStandRecipesLayout.prevArrowX(screenWidth);
@@ -154,18 +162,24 @@ public final class RecipesPageRenderer {
                 break;
             }
             int rowTop = BrewingStandRecipesLayout.rowTop(oy, row);
-            RecipeGraph.Conversion conversion = visible.get(index);
+            ItemStack[] stacks = rowStacks(visible.get(index));
             if (overIcon(mouseX, mouseY, ox + BrewingStandRecipesLayout.ROW_INPUT_DX, rowTop)) {
-                return inputStack(conversion);
+                return stacks[0];
             }
             if (overIcon(mouseX, mouseY, ox + BrewingStandRecipesLayout.ROW_INGREDIENT_DX, rowTop)) {
-                return ingredientStack(conversion);
+                return stacks[1];
             }
             if (overIcon(mouseX, mouseY, ox + BrewingStandRecipesLayout.ROW_OUTPUT_DX, rowTop)) {
-                return outputStack(conversion);
+                return stacks[2];
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    /** The {@code [input, ingredient, output]} display stacks for a conversion, cached by identity. */
+    private static ItemStack[] rowStacks(RecipeGraph.Conversion conversion) {
+        return ROW_STACKS.computeIfAbsent(conversion,
+                c -> new ItemStack[]{inputStack(c), ingredientStack(c), outputStack(c)});
     }
 
     private static boolean overIcon(int mouseX, int mouseY, int x, int y) {

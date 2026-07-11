@@ -73,12 +73,17 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
             return;
         }
 
-        VaporHintRenderer.HintResult hint = distillation$hint(graph);
-        boolean overSlot = distillation$overIngredientSlot(mouseX, mouseY);
-        boolean showHint = hint.anyValid() && distillation$vaporHintsEnabled()
-                && !distillation$overlayOpen && overSlot;
+        // Vapor hint — resolved only when it could actually show (not under the overlay, hovering
+        // the ingredient slot, hints on), so overlay-open frames skip the graph resolution entirely.
+        VaporHintRenderer.HintResult hint = VaporHintRenderer.HintResult.NONE;
+        boolean showHint = false;
+        if (!distillation$overlayOpen && distillation$vaporHintsEnabled()
+                && distillation$overIngredientSlot(mouseX, mouseY)) {
+            hint = distillation$hint(graph);
+            showHint = hint.anyValid();
+        }
         if (showHint) {
-            VaporHintRenderer.renderTint(guiGraphics, this.leftPos, this.topPos, hint);
+            VaporHintRenderer.renderTint(guiGraphics, this.leftPos, this.topPos, hint, distillation$animTick());
         }
 
         distillation$renderTab(guiGraphics, mouseX, mouseY);
@@ -202,6 +207,12 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     private RecipeGraph distillation$graph() {
         return this.minecraft == null || this.minecraft.level == null
                 ? null : RecipeGraphs.forLevel(this.minecraft.level);
+    }
+
+    @Unique
+    private long distillation$animTick() {
+        return this.minecraft != null && this.minecraft.level != null
+                ? this.minecraft.level.getGameTime() : 0L;
     }
 
     @Unique
