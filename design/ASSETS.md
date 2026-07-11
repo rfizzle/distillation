@@ -23,6 +23,7 @@
 |---|---|---|
 | Bottle brand glyph 16×16 (Jade/recipe viewers, suite footer) | `art/glyphs/bottle-16.glyph` | `assets/distillation/textures/gui/bottle.png` — (not yet shipped) |
 | Murky Draught item 16×16 | `art/glyphs/murky_draught.glyph` | `assets/distillation/textures/item/murky_draught.png` |
+| Recipes-page tab button 16×16 (brewing screen) | `art/glyphs/recipes_tab.glyph` | `assets/distillation/textures/gui/recipes_tab.png` |
 
 ## Audio
 
@@ -37,7 +38,6 @@
 |---|---|---|
 | Half-draught bottle item 16×16 (model override) | `/glyph` → `art/glyphs/draught_half.glyph` | `assets/distillation/textures/item/draught_half.png` — (planned, with implementation) |
 | Antidote bottle item 16×16 (greyscale, tint-layered per cure) | `/glyph` → `art/glyphs/antidote.glyph` | `assets/distillation/textures/item/antidote.png` — (planned, with implementation) |
-| Recipes-page tab button 16×16 | `/glyph` → `art/glyphs/recipes_tab.glyph` | `assets/distillation/textures/gui/recipes_tab.png` — (planned, with implementation) |
 | Batch-row slot/steam sprite | `/glyph` → `art/glyphs/batch_row.glyph` | `assets/distillation/textures/gui/batch_row.png` — (planned, with implementation) |
 | Favicon set | derived from icon-128 | `site/assets/favicon.ico`, `favicon-32.png`, `apple-touch-icon.png` — (planned, branding) |
 | Bottle glyph web copy | rendered from `art/glyphs/bottle-16.glyph` | `site/assets/glyph-16.png` — (planned, with site assets) |
