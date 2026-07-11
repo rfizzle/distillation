@@ -5,6 +5,7 @@ import com.rfizzle.distillation.brew.DistillationPotions;
 import com.rfizzle.distillation.command.DistillationCommand;
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.discovery.DistillationAttachments;
+import com.rfizzle.distillation.item.DistillationItems;
 import com.rfizzle.distillation.network.DistillationNetworking;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import com.rfizzle.distillation.sound.DistillationSounds;
@@ -31,6 +32,7 @@ public class Distillation implements ModInitializer {
         getConfig(); // eager first load, so later callers never pay the lazy path in play
         DistillationPotions.register();
         DistillationBrews.registerConversions();
+        DistillationItems.register();
         DistillationSounds.register();
         DistillationAttachments.init();
         RecipeGraphs.registerLifecycleHandlers();

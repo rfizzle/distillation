@@ -1,0 +1,36 @@
+{
+  "name": "murky_fizzle",
+  "sample_rate": 44100,
+  "peak_dbfs": -1.0,
+  "subtitle": "subtitles.distillation.murky",
+  "seed": 7,
+  "layers": [
+    {
+      "waveform": "noise",
+      "gain": 0.45,
+      "start": 0.0,
+      "duration": 0.45,
+      "env": {"attack": 0.01, "decay": 0.18, "sustain": 0.35, "release": 0.18},
+      "filter": {"type": "lowpass", "cutoff": 550}
+    },
+    {
+      "waveform": "noise",
+      "gain": 0.22,
+      "start": 0.06,
+      "duration": 0.05,
+      "env": {"attack": 0.004, "decay": 0.03, "sustain": 0.2, "release": 0.04},
+      "filter": {"type": "lowpass", "cutoff": 1000},
+      "repeat": {"count": 4, "interval": 0.11}
+    },
+    {
+      "waveform": "sine",
+      "from": 240,
+      "to": 90,
+      "glide": "exp",
+      "gain": 0.7,
+      "start": 0.0,
+      "duration": 0.4,
+      "env": {"attack": 0.008, "decay": 0.12, "sustain": 0.45, "release": 0.2}
+    }
+  ]
+}

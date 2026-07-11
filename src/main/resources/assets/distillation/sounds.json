@@ -4,5 +4,11 @@
             "distillation:ui/recipe_learned"
         ],
         "subtitle": "subtitles.distillation.recipe_learned"
+    },
+    "block.brewing_stand.murky": {
+        "sounds": [
+            "distillation:block/brewing_stand/murky"
+        ],
+        "subtitle": "subtitles.distillation.murky"
     }
 }

@@ -178,6 +178,43 @@ public final class RecipeGraph {
         return PotionContents.createItemStack(bottle.getItem(), potion.to());
     }
 
+    /**
+     * A bottle the stand can work on at all: a recognized brewing container carrying a potion.
+     * This is the murky-era cycle gate ({@code design/SPEC.md} §1 — with murky draughts on, a
+     * receptive bottle starts a cycle whether or not its pair is valid) and is deliberately a
+     * stable predicate on the stack's current contents, because vanilla re-checks
+     * {@code isBrewable} every tick of a running cycle. A Murky Draught is never receptive: it is
+     * not a brewing container and carries no potion contents.
+     */
+    public boolean isReceptive(ItemStack bottle) {
+        return !bottle.isEmpty() && containerItems.contains(bottle.getItem()) && potionOf(bottle).isPresent();
+    }
+
+    /**
+     * Every conversion some ingredient would apply to this exact bottle (item and potion) — the
+     * murky hint-candidate set: each entry's ingredient is one that genuinely "would have taken."
+     * Empty for a bottle nothing brews onward from (the hintless draught).
+     */
+    public List<Conversion> conversionsFor(ItemStack bottle) {
+        if (bottle.isEmpty()) {
+            return List.of();
+        }
+        Optional<Holder<Potion>> potion = potionOf(bottle);
+        if (potion.isEmpty()) {
+            return List.of();
+        }
+        List<Conversion> matches = new ArrayList<>();
+        for (Conversion conversion : conversions) {
+            if (conversion instanceof ContainerConversion container && bottle.is(container.from())) {
+                matches.add(container);
+            } else if (conversion instanceof PotionConversion potionConversion
+                    && potionConversion.from().is(potion.get())) {
+                matches.add(potionConversion);
+            }
+        }
+        return List.copyOf(matches);
+    }
+
     /** The conversion carrying this recipe id, if the current graph has one. */
     public Optional<Conversion> conversionById(ResourceLocation recipeId) {
         for (Conversion conversion : conversions) {
