@@ -1,11 +1,15 @@
 package com.rfizzle.distillation.network;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.discovery.DiscoveryManager;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+
+import java.util.List;
 
 /**
  * Registers the mod's S2C payloads and the server-side lifecycle hooks that keep clients in sync.
@@ -19,16 +23,20 @@ public final class DistillationNetworking {
 
     public static void registerPayloads() {
         PayloadTypeRegistry.playS2C().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(DiscoverySyncPayload.TYPE, DiscoverySyncPayload.CODEC);
     }
 
     /**
-     * Registers the join hook that sends each connecting player the server's gameplay config, so
-     * both sides agree on the rules from the first tick. Must be called during
-     * {@link Distillation#onInitialize} after {@link #registerPayloads()}.
+     * Registers the join hook that sends each connecting player the server's gameplay config —
+     * so both sides agree on the rules from the first tick — and their discovery set (after the
+     * {@code startDiscovered} grant). Must be called during {@link Distillation#onInitialize}
+     * after {@link #registerPayloads()}.
      */
     public static void registerLifecycleHandlers() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
-                sendConfig(handler.player));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            sendConfig(handler.player);
+            DiscoveryManager.onJoin(handler.player);
+        });
     }
 
     /**
@@ -52,6 +60,21 @@ public final class DistillationNetworking {
             if (ServerPlayNetworking.canSend(player, ConfigSyncPayload.TYPE)) {
                 ServerPlayNetworking.send(player, payload);
             }
+        }
+    }
+
+    /** Pushes one newly discovered recipe id to its owner — the common single-discovery delta. */
+    public static void sendDiscoveryAdded(ServerPlayer player, ResourceLocation recipeId) {
+        if (ServerPlayNetworking.canSend(player, DiscoverySyncPayload.TYPE)) {
+            ServerPlayNetworking.send(player, new DiscoverySyncPayload(false, List.of(recipeId)));
+        }
+    }
+
+    /** Pushes the player's full stored discovery set — join, {@code forget}, {@code discover all}. */
+    public static void sendDiscoverySet(ServerPlayer player) {
+        if (ServerPlayNetworking.canSend(player, DiscoverySyncPayload.TYPE)) {
+            ServerPlayNetworking.send(player, new DiscoverySyncPayload(true,
+                    DiscoveryManager.data(player).orderedIds()));
         }
     }
 

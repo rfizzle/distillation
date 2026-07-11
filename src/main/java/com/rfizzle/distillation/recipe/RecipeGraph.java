@@ -11,6 +11,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.Ingredient;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -130,25 +131,61 @@ public final class RecipeGraph {
      * with no matching conversion (or no potion contents) passes through unchanged, same reference.
      */
     public ItemStack resolve(ItemStack ingredient, ItemStack bottle) {
+        Conversion conversion = matchConversion(ingredient, bottle);
+        return conversion == null ? bottle : outputOf(conversion, bottle);
+    }
+
+    /**
+     * The conversion {@link #resolve} would apply to this {@code (ingredient, bottle)} pair —
+     * container conversions first, then potion conversions, first match wins — or {@code null}
+     * when the bottle passes through unchanged. Exposed so the brew seam can record which recipe
+     * id produced each bottle (discovery provenance) alongside the resolution itself.
+     */
+    @Nullable
+    public Conversion matchConversion(ItemStack ingredient, ItemStack bottle) {
         if (bottle.isEmpty()) {
-            return bottle;
+            return null;
         }
         Optional<Holder<Potion>> potion = potionOf(bottle);
         if (potion.isEmpty()) {
-            return bottle;
+            return null;
         }
         Item ingredientItem = ingredient.getItem();
         for (ContainerConversion conversion : containerByIngredient.getOrDefault(ingredientItem, List.of())) {
             if (bottle.is(conversion.from())) {
-                return PotionContents.createItemStack(conversion.to(), potion.get());
+                return conversion;
             }
         }
         for (PotionConversion conversion : potionByIngredient.getOrDefault(ingredientItem, List.of())) {
             if (conversion.from().is(potion.get())) {
-                return PotionContents.createItemStack(bottle.getItem(), conversion.to());
+                return conversion;
             }
         }
-        return bottle;
+        return null;
+    }
+
+    /**
+     * The output stack a conversion produces from this bottle. Callers must pass a bottle the
+     * conversion {@linkplain #matchConversion matched} — a container conversion keeps the bottle's
+     * potion, so the bottle must carry one.
+     */
+    public ItemStack outputOf(Conversion conversion, ItemStack bottle) {
+        if (conversion instanceof ContainerConversion container) {
+            return PotionContents.createItemStack(container.to(), potionOf(bottle).orElseThrow(
+                    () -> new IllegalArgumentException("container conversion applied to a potionless bottle")));
+        }
+        PotionConversion potion = (PotionConversion) conversion;
+        return PotionContents.createItemStack(bottle.getItem(), potion.to());
+    }
+
+    /** The conversion carrying this recipe id, if the current graph has one. */
+    public Optional<Conversion> conversionById(ResourceLocation recipeId) {
+        for (Conversion conversion : conversions) {
+            if (conversion.id().equals(recipeId)) {
+                return Optional.of(conversion);
+            }
+        }
+        return Optional.empty();
     }
 
     /** Every conversion, in registration order. */

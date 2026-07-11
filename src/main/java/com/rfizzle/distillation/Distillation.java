@@ -3,6 +3,7 @@ package com.rfizzle.distillation;
 import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.brew.DistillationPotions;
 import com.rfizzle.distillation.config.DistillationConfig;
+import com.rfizzle.distillation.discovery.DistillationAttachments;
 import com.rfizzle.distillation.network.DistillationNetworking;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.fabricmc.api.ModInitializer;
@@ -28,6 +29,7 @@ public class Distillation implements ModInitializer {
         getConfig(); // eager first load, so later callers never pay the lazy path in play
         DistillationPotions.register();
         DistillationBrews.registerConversions();
+        DistillationAttachments.init();
         RecipeGraphs.registerLifecycleHandlers();
         DistillationNetworking.registerPayloads();
         DistillationNetworking.registerLifecycleHandlers();
