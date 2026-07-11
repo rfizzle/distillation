@@ -1,0 +1,10 @@
+accessWidener v2 named
+
+# The recipe graph (design/SPEC.md §1) is built over vanilla's own brewing registry: the
+# graph builder reads PotionBrewing's conversion lists and their Mix entries (record
+# accessors are public once the class is). Widened for reads only — nothing is mutated;
+# synthetic test registries go through the public PotionBrewing.Builder instead.
+accessible class net/minecraft/world/item/alchemy/PotionBrewing$Mix
+accessible field net/minecraft/world/item/alchemy/PotionBrewing containers Ljava/util/List;
+accessible field net/minecraft/world/item/alchemy/PotionBrewing potionMixes Ljava/util/List;
+accessible field net/minecraft/world/item/alchemy/PotionBrewing containerMixes Ljava/util/List;
