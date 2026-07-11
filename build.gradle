@@ -146,6 +146,15 @@ sourceSets {
         compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
         runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
     }
+    // Put the client source set's compiled output (not its dependency configurations) on the
+    // test classpath so unit tests can reach client-only classes such as ClientDistillationConfig.
+    // Only .output is added — never client.compileClasspath/runtimeClasspath — so the unmapped
+    // fabric-api sibling access widener that the testRuntimeClasspath exclusion below guards
+    // against is never pulled in.
+    test {
+        compileClasspath += sourceSets.client.output
+        runtimeClasspath += sourceSets.client.output
+    }
 }
 
 configurations {

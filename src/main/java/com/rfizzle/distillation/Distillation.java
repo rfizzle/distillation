@@ -1,7 +1,10 @@
 package com.rfizzle.distillation;
 
+import com.rfizzle.distillation.config.DistillationConfig;
+import com.rfizzle.distillation.network.DistillationNetworking;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,12 +12,56 @@ public class Distillation implements ModInitializer {
     public static final String MOD_ID = "distillation";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    // The active config, published only by whole-reference swap (lazy first load, reload, or the
+    // ModMenu screen's commit). Volatile so every reader sees the swap atomically.
+    private static volatile DistillationConfig config;
+
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     @Override
     public void onInitialize() {
+        getConfig(); // eager first load, so later callers never pay the lazy path in play
+        DistillationNetworking.registerPayloads();
+        DistillationNetworking.registerLifecycleHandlers();
         LOGGER.info("Distillation initialized");
+    }
+
+    public static DistillationConfig getConfig() {
+        DistillationConfig local = config;
+        if (local == null) {
+            synchronized (Distillation.class) {
+                local = config;
+                if (local == null) {
+                    config = local = DistillationConfig.load();
+                }
+            }
+        }
+        return local;
+    }
+
+    /**
+     * Publishes a fully-built replacement config with a single volatile reference swap — the
+     * ModMenu screen's commit point for its clamped working copy. Readers switch snapshots
+     * atomically; the live object is never mutated in place.
+     */
+    public static void updateConfig(DistillationConfig updated) {
+        config = updated;
+    }
+
+    /** Re-reads {@code config/distillation.json}; readers see the reference swap atomically. */
+    public static void reloadConfig() {
+        config = DistillationConfig.load();
+    }
+
+    /**
+     * Re-reads the config and re-broadcasts the gameplay surface to every connected client, so a
+     * live change reaches them without a reconnect. The future {@code /distillation reload}
+     * command wires here.
+     */
+    public static void reloadConfig(MinecraftServer server) {
+        reloadConfig();
+        DistillationNetworking.syncConfigToAll(server);
     }
 }
