@@ -1,11 +1,17 @@
 package com.rfizzle.distillation.recipe;
 
 import com.rfizzle.distillation.brew.DistillationBrews;
+import com.rfizzle.distillation.discovery.BrewProvenances;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * The single brew-completion choke point ({@code design/SPEC.md} §1 Implementation Notes): every
@@ -27,8 +33,19 @@ public final class BrewSeam {
     public static void completeBrew(Level level, BlockPos pos, NonNullList<ItemStack> items) {
         RecipeGraph graph = RecipeGraphs.forLevel(level);
         ItemStack ingredient = items.get(3);
+        Map<Integer, ResourceLocation> produced = new LinkedHashMap<>();
         for (int slot = 0; slot < 3; slot++) {
-            items.set(slot, graph.resolve(ingredient, items.get(slot)));
+            RecipeGraph.Conversion conversion = graph.matchConversion(ingredient, items.get(slot));
+            if (conversion != null) {
+                items.set(slot, graph.outputOf(conversion, items.get(slot)));
+                produced.put(slot, conversion.id());
+            }
+        }
+        // Matched slots record the conversion that just produced their bottle; discovery reads
+        // the record back when a player takes the output. Unmatched slots keep any earlier
+        // record — their bottle passed through this cycle unchanged.
+        if (level.getBlockEntity(pos) instanceof BrewingStandBlockEntity stand) {
+            BrewProvenances.recordBrew(stand, produced);
         }
 
         boolean consumedWhole = DistillationBrews.isConsumedWhole(ingredient);

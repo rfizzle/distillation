@@ -1,0 +1,8 @@
+{
+    "ui.recipe_learned": {
+        "sounds": [
+            "distillation:ui/recipe_learned"
+        ],
+        "subtitle": "subtitles.distillation.recipe_learned"
+    }
+}

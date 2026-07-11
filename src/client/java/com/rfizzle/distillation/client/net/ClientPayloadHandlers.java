@@ -1,14 +1,17 @@
 package com.rfizzle.distillation.client.net;
 
 import com.rfizzle.distillation.client.config.ClientDistillationConfig;
+import com.rfizzle.distillation.client.discovery.ClientDiscoveryState;
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.network.ConfigSyncPayload;
+import com.rfizzle.distillation.network.DiscoverySyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 /**
  * S2C receivers. The config sync payload stores the server's authoritative gameplay config into
  * {@link ClientDistillationConfig} so gameplay-affecting client readers prefer it over the local
- * file.
+ * file; the discovery sync payload keeps {@link ClientDiscoveryState} mirroring the player's
+ * server-side discovery set.
  */
 public final class ClientPayloadHandlers {
 
@@ -24,5 +27,13 @@ public final class ClientPayloadHandlers {
                     DistillationConfig synced = DistillationConfig.fromJson(payload.configJson());
                     context.client().execute(() -> ClientDistillationConfig.setServerConfig(synced));
                 });
+        ClientPlayNetworking.registerGlobalReceiver(DiscoverySyncPayload.TYPE,
+                (payload, context) -> context.client().execute(() -> {
+                    if (payload.replace()) {
+                        ClientDiscoveryState.setAll(payload.recipeIds());
+                    } else {
+                        ClientDiscoveryState.addAll(payload.recipeIds());
+                    }
+                }));
     }
 }

@@ -2,9 +2,12 @@ package com.rfizzle.distillation;
 
 import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.brew.DistillationPotions;
+import com.rfizzle.distillation.command.DistillationCommand;
 import com.rfizzle.distillation.config.DistillationConfig;
+import com.rfizzle.distillation.discovery.DistillationAttachments;
 import com.rfizzle.distillation.network.DistillationNetworking;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
+import com.rfizzle.distillation.sound.DistillationSounds;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -28,9 +31,12 @@ public class Distillation implements ModInitializer {
         getConfig(); // eager first load, so later callers never pay the lazy path in play
         DistillationPotions.register();
         DistillationBrews.registerConversions();
+        DistillationSounds.register();
+        DistillationAttachments.init();
         RecipeGraphs.registerLifecycleHandlers();
         DistillationNetworking.registerPayloads();
         DistillationNetworking.registerLifecycleHandlers();
+        DistillationCommand.register();
         LOGGER.info("Distillation initialized");
     }
 

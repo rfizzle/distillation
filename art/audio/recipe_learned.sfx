@@ -1,0 +1,27 @@
+{
+  "name": "recipe_learned",
+  "sample_rate": 44100,
+  "peak_dbfs": -1.0,
+  "subtitle": "subtitles.distillation.recipe_learned",
+  "seed": 6,
+  "layers": [
+    {
+      "waveform": "sine",
+      "gain": 0.85,
+      "env": {"attack": 0.004, "decay": 0.06, "sustain": 0.55, "release": 0.32},
+      "notes": [
+        {"freq": 880, "start": 0.0, "duration": 0.12},
+        {"freq": 1318.5, "start": 0.14, "duration": 0.2}
+      ]
+    },
+    {
+      "waveform": "triangle",
+      "gain": 0.22,
+      "env": {"attack": 0.004, "decay": 0.05, "sustain": 0.4, "release": 0.22},
+      "notes": [
+        {"freq": 1760, "start": 0.0, "duration": 0.1},
+        {"freq": 2637, "start": 0.14, "duration": 0.16}
+      ]
+    }
+  ]
+}
