@@ -54,7 +54,7 @@
         {
           "type": "prose",
           "html": [
-            "Potion lines register under the <code>distillation:</code> namespace (e.g. <code>distillation:resistance</code>, <code>distillation:haste</code>, the <code>long_</code>/<code>strong_</code> variants, the concentrated/premium forms, and the six antidotes), plus the <code>distillation:murky_draught</code> item. Sibling trade packs and loot injections key on these ids; the exact list ships with the implementation."
+            "Potion lines register under the <code>distillation:</code> namespace (e.g. <code>distillation:resistance</code>, <code>distillation:haste</code>, the <code>long_</code>/<code>strong_</code> variants, the concentrated/premium forms, and the eight antidotes), plus the <code>distillation:murky_draught</code> item. Sibling trade packs and loot injections key on these ids; the exact list ships with the implementation."
           ]
         }
       ]

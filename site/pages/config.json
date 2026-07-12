@@ -24,7 +24,7 @@
             ["<code>enableHonestDurations</code>", "bool", "true", "The utility-potion duration retune"],
             ["<code>enableDraughts</code>", "bool", "true", "Sneak-drink half potions"],
             ["<code>enablePremiumBrews</code>", "bool", "true", "Concentration and the both-dusts premium path"],
-            ["<code>enableAntidotes</code>", "bool", "true", "The six antidote lines"],
+            ["<code>enableAntidotes</code>", "bool", "true", "The eight antidote lines"],
             ["<code>enableThrownRebalance</code>", "bool", "true", "The splash/lingering rebalance"],
             ["<code>splashDurationFactor</code>", "float (0.5–1.0)", "0.875", "Fraction of drinkable duration a splash applies"],
             ["<code>lingeringCloudDurationTicks</code>", "int (600–2400)", "1200", "Lingering cloud lifetime"],

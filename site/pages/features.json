@@ -16,7 +16,7 @@
           "type": "prose",
           "html": [
             "Hold an ingredient over the stand's ingredient slot and the vapor clouds with a color hint of what it would become; once you know a recipe, the hint names the output outright. A failed combination still bottles: a <strong class='text-bone'>Murky Draught</strong> whose tooltip names one ingredient that would have worked with that base — a failure that teaches. Every successful brew you take from the stand is written permanently into your recipes page, right in the brewing screen, with a running count that gilds when you have learned them all.",
-            "Discovery is per player and survives death and relog. Recipe viewers (EMI/REI/JEI) show only what you've discovered by default, so they never spoil what the stand wants to teach — a server can open them up, or start everyone fully unlocked."
+            "Discovery is per player and survives death and relog. Recipe viewers (EMI/REI/JEI) show only what you've discovered by default, so they never spoil what the stand wants to teach — a server can open them up, or start everyone fully unlocked. Seven advancements branch off vanilla's Local Brewery to mark the milestones: your first Murky Draught, ten recipes learned, all five missing brews, a six-bottle batch, a surgical cure, a premium potion, and the full graph discovered."
           ]
         }
       ]
@@ -50,7 +50,7 @@
           "type": "prose",
           "html": [
             "Set your brewing stand on a water cauldron heated from below — a lit campfire or soul campfire, fire or soul fire, a lava source, or a magma block — and the stand's screen grows a second row of three bottle slots. Brewing a recipe from <em>your</em> recipes page fills all six bottles in one pass, consuming 3 ingredients (against 2 for two normal passes — the 1.5× cost), 2 fuel charges, and 1 water level from the cauldron.",
-            "The shortcut is earned: bottles whose recipe you haven't discovered are skipped untouched, hoppers can neither see nor fill the batch row, and an automated stand never batch-brews."
+            "The shortcut is earned: bottles whose recipe you haven't discovered are skipped untouched, hoppers can neither see nor fill the batch row, and an automated stand never batch-brews. Jade and WTHIT read the rig at a glance — brew progress, water level and heat, and the batch owner on the stand, a batch-rig line on the cauldron below."
           ]
         }
       ]
@@ -104,7 +104,7 @@
     {
       "id": "antidotes",
       "title": "Antidotes",
-      "intro": "Surgical cures, brewed from the affliction's own source.",
+      "intro": "Surgical cures, each brewed from a fitting reagent.",
       "blocks": [
         {
           "type": "table",
@@ -116,9 +116,11 @@
             ["Mining Fatigue Antidote", "Prismarine Crystals", "Mining Fatigue"],
             ["Blindness Antidote", "Ink Sac", "Blindness"],
             ["Darkness Antidote", "Echo Shard", "Darkness"],
-            ["Levitation Antidote", "Popped Chorus Fruit", "Levitation"]
+            ["Levitation Antidote", "Popped Chorus Fruit", "Levitation"],
+            ["Slowness Antidote", "Sugar", "Slowness"],
+            ["Weakness Antidote", "Blaze Powder", "Weakness"]
           ],
-          "note": "Each strips exactly one effect and nothing else — your 8-minute buffs stay. Milk is untouched and still clears everything. Antidotes throw as splash and lingering, so a cleansing cloud is a real support play."
+          "note": "Each strips exactly one effect and nothing else — your 8-minute buffs stay. Milk is untouched and still clears everything. Antidotes throw as splash and lingering, so a cleansing cloud is a real support play. Slowness and Weakness brew from the reagent that makes their opposite — sugar for swiftness, blaze powder for strength."
         }
       ]
     },
@@ -142,7 +144,7 @@
         {
           "type": "list",
           "items": [
-            "<strong class='text-bone'>Tribulation</strong> — the afflictions its hardened mobs inflict gain brewable antidotes made from the shard items themselves.",
+            "<strong class='text-bone'>Tribulation</strong> — its hardened witches throw Distillation's own brews at you; the debuffs its shards inflict (Slowness, Mining Fatigue, Weakness) all have native antidotes, so you are covered with or without it.",
             "<strong class='text-bone'>Mercantile</strong> — the cleric's stock deepens with your reputation: rare brewing reagents for emeralds.",
             "<strong class='text-bone'>Prosperity</strong> — far-tier chests turn up reagents you have never held over a stand."
           ]
