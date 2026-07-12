@@ -1,0 +1,30 @@
+{
+    "parent": "minecraft:nether/brew_potion",
+    "display": {
+        "icon": {
+            "id": "minecraft:experience_bottle"
+        },
+        "title": {
+            "translate": "advancements.distillation.every_drop.title"
+        },
+        "description": {
+            "translate": "advancements.distillation.every_drop.description"
+        },
+        "frame": "challenge",
+        "show_toast": true,
+        "announce_to_chat": true,
+        "hidden": false
+    },
+    "criteria": {
+        "graph_completed": {
+            "trigger": "distillation:graph_completed",
+            "conditions": {}
+        }
+    },
+    "requirements": [
+        [
+            "graph_completed"
+        ]
+    ],
+    "sends_telemetry_event": false
+}

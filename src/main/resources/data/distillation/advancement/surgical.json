@@ -1,0 +1,35 @@
+{
+    "parent": "minecraft:nether/brew_potion",
+    "display": {
+        "icon": {
+            "id": "minecraft:potion",
+            "components": {
+                "minecraft:potion_contents": {
+                    "potion": "distillation:poison_antidote"
+                }
+            }
+        },
+        "title": {
+            "translate": "advancements.distillation.surgical.title"
+        },
+        "description": {
+            "translate": "advancements.distillation.surgical.description"
+        },
+        "frame": "task",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": false
+    },
+    "criteria": {
+        "antidote_surgical": {
+            "trigger": "distillation:antidote_surgical",
+            "conditions": {}
+        }
+    },
+    "requirements": [
+        [
+            "antidote_surgical"
+        ]
+    ],
+    "sends_telemetry_event": false
+}

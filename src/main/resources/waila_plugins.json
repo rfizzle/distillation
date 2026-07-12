@@ -1,0 +1,12 @@
+{
+    "distillation:wthit": {
+        "entrypoints": {
+            "common": "com.rfizzle.distillation.compat.wthit.DistillationWthitCommonPlugin",
+            "client": "com.rfizzle.distillation.compat.wthit.DistillationWthitClientPlugin"
+        },
+        "side": "*",
+        "required": {
+            "wthit": "*"
+        }
+    }
+}

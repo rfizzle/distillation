@@ -38,14 +38,16 @@ class AntidotesTableTest {
     private record Spec(Holder<MobEffect> target, Item reagent, String path) {
     }
 
-    /** SPEC §6: the six antidotes, in the order that fixes their cleanse amplifier index. */
+    /** SPEC §6: the eight antidotes, in the order that fixes their cleanse amplifier index. */
     private static final List<Spec> SPEC = List.of(
             new Spec(MobEffects.POISON, Items.FERMENTED_SPIDER_EYE, "poison_antidote"),
             new Spec(MobEffects.WITHER, Items.WITHER_ROSE, "wither_antidote"),
             new Spec(MobEffects.DIG_SLOWDOWN, Items.PRISMARINE_CRYSTALS, "mining_fatigue_antidote"),
             new Spec(MobEffects.BLINDNESS, Items.INK_SAC, "blindness_antidote"),
             new Spec(MobEffects.DARKNESS, Items.ECHO_SHARD, "darkness_antidote"),
-            new Spec(MobEffects.LEVITATION, Items.POPPED_CHORUS_FRUIT, "levitation_antidote"));
+            new Spec(MobEffects.LEVITATION, Items.POPPED_CHORUS_FRUIT, "levitation_antidote"),
+            new Spec(MobEffects.MOVEMENT_SLOWDOWN, Items.SUGAR, "slowness_antidote"),
+            new Spec(MobEffects.WEAKNESS, Items.BLAZE_POWDER, "weakness_antidote"));
 
     @BeforeAll
     static void bootstrapVanillaRegistries() {

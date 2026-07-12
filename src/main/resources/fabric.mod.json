@@ -17,6 +17,10 @@
         "main": ["com.rfizzle.distillation.Distillation"],
         "client": ["com.rfizzle.distillation.client.DistillationClient"],
         "modmenu": ["com.rfizzle.distillation.compat.modmenu.ModMenuIntegration"],
+        "emi": ["com.rfizzle.distillation.compat.emi.DistillationEmiPlugin"],
+        "rei_client": ["com.rfizzle.distillation.compat.rei.DistillationReiClientPlugin"],
+        "jei_mod_plugin": ["com.rfizzle.distillation.compat.jei.DistillationJeiPlugin"],
+        "jade": ["com.rfizzle.distillation.compat.jade.DistillationJadePlugin"],
         "fabric-gametest": [
             "com.rfizzle.distillation.gametest.SmokeGameTest",
             "com.rfizzle.distillation.gametest.MissingBrewsGameTest",
@@ -28,7 +32,9 @@
             "com.rfizzle.distillation.gametest.DraughtGameTest",
             "com.rfizzle.distillation.gametest.PremiumBrewsGameTest",
             "com.rfizzle.distillation.gametest.AntidoteGameTest",
-            "com.rfizzle.distillation.gametest.ThrownRebalanceGameTest"
+            "com.rfizzle.distillation.gametest.ThrownRebalanceGameTest",
+            "com.rfizzle.distillation.gametest.AdvancementGameTest",
+            "com.rfizzle.distillation.gametest.ProbeTooltipGameTest"
         ]
     },
     "suggests": {

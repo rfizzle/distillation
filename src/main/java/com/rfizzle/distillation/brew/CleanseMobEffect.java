@@ -1,6 +1,9 @@
 package com.rfizzle.distillation.brew;
 
+import com.rfizzle.distillation.advancement.DistillationCriteria;
+import com.rfizzle.distillation.discovery.FakePlayers;
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.InstantenousMobEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -33,8 +36,13 @@ public final class CleanseMobEffect extends InstantenousMobEffect {
             return true;
         }
         Holder<MobEffect> target = Antidotes.targetForIndex(amplifier);
-        if (target != null) {
-            entity.removeEffect(target); // false when absent/un-removable — the fizz plays either way
+        if (target != null && entity.removeEffect(target) && entity instanceof ServerPlayer serverPlayer
+                && !FakePlayers.isFakePlayer(serverPlayer) && serverPlayer.getActiveEffects().size() >= 2) {
+            // Surgical (SPEC §9): the strip landed on a real player who keeps ≥2 other effects — a
+            // dispenser-thrown splash curing a fake player earns nothing. The cleanse is instant
+            // (applied via applyInstantenousEffect, never stored), so the active list here is exactly
+            // the drinker's other effects, with the just-removed target already gone.
+            DistillationCriteria.ANTIDOTE_SURGICAL.trigger(serverPlayer);
         }
         return true;
     }

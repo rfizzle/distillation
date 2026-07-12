@@ -2,6 +2,7 @@ package com.rfizzle.distillation.client.net;
 
 import com.rfizzle.distillation.client.config.ClientDistillationConfig;
 import com.rfizzle.distillation.client.discovery.ClientDiscoveryState;
+import com.rfizzle.distillation.compat.viewer.BrewingViewerRefresh;
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.network.ConfigSyncPayload;
 import com.rfizzle.distillation.network.DiscoverySyncPayload;
@@ -25,7 +26,11 @@ public final class ClientPayloadHandlers {
                     // it is safe on whatever thread Fabric dispatches this handler on. The result
                     // is never mutated after the volatile store, so readers see a stable snapshot.
                     DistillationConfig synced = DistillationConfig.fromJson(payload.configJson());
-                    context.client().execute(() -> ClientDistillationConfig.setServerConfig(synced));
+                    context.client().execute(() -> {
+                        ClientDistillationConfig.setServerConfig(synced);
+                        // A config change can add or drop §2/§5/§6 lines from the graph — rebuild viewers.
+                        BrewingViewerRefresh.refreshViewers();
+                    });
                 });
         ClientPlayNetworking.registerGlobalReceiver(DiscoverySyncPayload.TYPE,
                 (payload, context) -> context.client().execute(() -> {
@@ -34,6 +39,8 @@ public final class ClientPayloadHandlers {
                     } else {
                         ClientDiscoveryState.addAll(payload.recipeIds());
                     }
+                    // A new discovery unhides its conversion in the (filtered) recipe viewers.
+                    BrewingViewerRefresh.refreshViewers();
                 }));
     }
 }

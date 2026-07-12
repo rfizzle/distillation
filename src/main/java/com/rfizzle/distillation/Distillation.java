@@ -1,5 +1,7 @@
 package com.rfizzle.distillation;
 
+import com.rfizzle.distillation.advancement.DistillationAdvancements;
+import com.rfizzle.distillation.advancement.DistillationCriteria;
 import com.rfizzle.distillation.brew.Antidotes;
 import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.brew.DistillationPotions;
@@ -46,6 +48,8 @@ public class Distillation implements ModInitializer {
         DistillationNetworking.registerPayloads();
         DistillationNetworking.registerLifecycleHandlers();
         DistillationCommand.register();
+        DistillationCriteria.register(); // before any advancement JSON is deserialized (server start)
+        DistillationAdvancements.register();
         LOGGER.info("Distillation initialized");
     }
 
