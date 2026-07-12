@@ -2,6 +2,7 @@ package com.rfizzle.distillation.recipe;
 
 import com.rfizzle.distillation.Distillation;
 import com.rfizzle.distillation.brew.DistillationBrews;
+import com.rfizzle.distillation.brew.PremiumBrews;
 import com.rfizzle.distillation.config.DistillationConfig;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -17,11 +19,12 @@ import java.util.function.Supplier;
 
 /**
  * Serves the current {@link RecipeGraph} for a brewing registry. The graph is deterministic from
- * the registry and the {@code enableMissingBrews} toggle, so entries are cached per
- * {@link PotionBrewing} instance keyed by the toggle's value — a config flip (reload, ModMenu
- * commit) is picked up by the very next lookup, which is how the spec's "rebuilt at server start,
- * datapack reload, and config reload" freshness contract is met without bespoke wiring at each
- * trigger. {@code SERVER_STARTED} eagerly warms the server's entry and logs the conversion count.
+ * the registry and the {@code enableMissingBrews} / {@code enablePremiumBrews} toggles, so entries
+ * are cached per {@link PotionBrewing} instance keyed by both toggles' values — a config flip
+ * (reload, ModMenu commit) is picked up by the very next lookup, which is how the spec's "rebuilt at
+ * server start, datapack reload, and config reload" freshness contract is met without bespoke wiring
+ * at each trigger. {@code SERVER_STARTED} eagerly warms the server's entry and logs the conversion
+ * count.
  *
  * <p>Server and client hold distinct {@code PotionBrewing} instances (an integrated server hosts
  * both in one JVM), hence a map rather than a single slot. Keys are weak so an entry dies with its
@@ -30,7 +33,7 @@ import java.util.function.Supplier;
  */
 public final class RecipeGraphs {
 
-    private record Entry(boolean missingBrewsEnabled, RecipeGraph graph) {
+    private record Entry(boolean missingBrewsEnabled, boolean premiumBrewsEnabled, RecipeGraph graph) {
     }
 
     private static final Map<PotionBrewing, Entry> CACHE = new WeakHashMap<>();
@@ -55,9 +58,9 @@ public final class RecipeGraphs {
 
     /**
      * Drops every cached graph so the very next lookup rebuilds from the live brewing registry —
-     * {@code /distillation reload}'s explicit rebuild. The cache key only tracks the
-     * {@code enableMissingBrews} value, so without this a reload that changes nothing else would
-     * silently serve the stale graph.
+     * {@code /distillation reload}'s explicit rebuild. The cache key only tracks the feature
+     * toggles, so without this a reload that changes nothing else would silently serve the stale
+     * graph.
      */
     public static void invalidate() {
         synchronized (CACHE) {
@@ -72,10 +75,8 @@ public final class RecipeGraphs {
 
     /** The graph for a level's brewing registry, under the side-appropriate config. */
     public static RecipeGraph forLevel(Level level) {
-        boolean enabled = level.isClientSide
-                ? effectiveConfig().enableMissingBrews
-                : Distillation.getConfig().enableMissingBrews;
-        return lookup(level.potionBrewing(), enabled);
+        DistillationConfig config = level.isClientSide ? effectiveConfig() : Distillation.getConfig();
+        return lookup(level.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews);
     }
 
     /**
@@ -88,13 +89,22 @@ public final class RecipeGraphs {
         return supplier != null ? supplier.get() : Distillation.getConfig();
     }
 
-    public static RecipeGraph lookup(PotionBrewing brewing, boolean missingBrewsEnabled) {
+    public static RecipeGraph lookup(PotionBrewing brewing, boolean missingBrewsEnabled, boolean premiumBrewsEnabled) {
         synchronized (CACHE) {
             Entry entry = CACHE.get(brewing);
-            if (entry == null || entry.missingBrewsEnabled() != missingBrewsEnabled) {
-                Set<ResourceLocation> excluded =
-                        missingBrewsEnabled ? Set.of() : DistillationBrews.ownedRecipeIds();
-                entry = new Entry(missingBrewsEnabled, RecipeGraph.fromBrewing(brewing, excluded));
+            if (entry == null || entry.missingBrewsEnabled() != missingBrewsEnabled
+                    || entry.premiumBrewsEnabled() != premiumBrewsEnabled) {
+                Set<ResourceLocation> excluded = new LinkedHashSet<>();
+                if (!missingBrewsEnabled) {
+                    excluded.addAll(DistillationBrews.ownedRecipeIds());
+                    // A §2 line's premium concentration goes with the line it builds on.
+                    excluded.addAll(PremiumBrews.distillationBackedRecipeIds());
+                }
+                if (!premiumBrewsEnabled) {
+                    excluded.addAll(PremiumBrews.ownedRecipeIds());
+                }
+                entry = new Entry(missingBrewsEnabled, premiumBrewsEnabled,
+                        RecipeGraph.fromBrewing(brewing, excluded));
                 CACHE.put(brewing, entry);
             }
             return entry.graph();
@@ -102,7 +112,8 @@ public final class RecipeGraphs {
     }
 
     private static void warm(MinecraftServer server) {
-        RecipeGraph graph = lookup(server.potionBrewing(), Distillation.getConfig().enableMissingBrews);
+        DistillationConfig config = Distillation.getConfig();
+        RecipeGraph graph = lookup(server.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews);
         Distillation.LOGGER.info("Recipe graph built: {} conversions", graph.conversions().size());
     }
 }

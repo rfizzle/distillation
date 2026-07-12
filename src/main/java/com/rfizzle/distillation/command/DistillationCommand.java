@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.rfizzle.distillation.Distillation;
 import com.rfizzle.distillation.batch.BatchRig;
+import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.discovery.DiscoveryData;
 import com.rfizzle.distillation.discovery.DiscoveryManager;
 import com.rfizzle.distillation.recipe.RecipeGraph;
@@ -220,7 +221,8 @@ public final class DistillationCommand {
     }
 
     private static RecipeGraph graph(MinecraftServer server) {
-        return RecipeGraphs.lookup(server.potionBrewing(), Distillation.getConfig().enableMissingBrews);
+        DistillationConfig config = Distillation.getConfig();
+        return RecipeGraphs.lookup(server.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews);
     }
 
     /**

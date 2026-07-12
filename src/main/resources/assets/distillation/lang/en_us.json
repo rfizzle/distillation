@@ -49,6 +49,7 @@
   "item.distillation.draught.half": "%s (Half)",
   "tooltip.distillation.murky.hint": "Perhaps a %s would have taken.",
   "tooltip.distillation.murky.hintless": "Perhaps nothing would have taken.",
+  "tooltip.distillation.concentrated": "Concentrated",
   "command.distillation.recipes.count": "%s / %s recipes discovered.",
   "command.distillation.recipes.count.other": "%s: %s / %s recipes discovered.",
   "command.distillation.recipes.latest": "Latest: %s",

@@ -77,9 +77,27 @@
         {
           "type": "prose",
           "html": [
-            "Brew a potion's own reagent onto it a second time — two blaze powder total for Strength — and it becomes <strong class='text-bone'>Concentrated</strong>. A concentrated potion accepts both dusts, in either order, and comes out extended <em>and</em> amplified: Strength II for 4:00 instead of choosing between II at 1:30 or I at 8:00. The rule is uniform: a premium potion runs at level II for half its extended duration.",
-            "On an ordinary potion the dusts behave exactly as in vanilla, so nothing you already know changes."
+            "Brew a potion's own reagent onto it a second time — two blaze powder total for Strength — and it becomes <strong class='text-bone'>Concentrated</strong>: identical stats, a deeper liquid, and a <em>Concentrated</em> tag. A concentrated potion then accepts <strong>both</strong> dusts, in either order, and comes out extended <em>and</em> amplified.",
+            "On an ordinary potion the dusts behave exactly as in vanilla, so nothing you already know changes. Only effects with a level II form can be concentrated."
           ]
+        },
+        {
+          "type": "table",
+          "headers": ["Effect", "Concentrate with", "Premium result"],
+          "nowrapHeaders": true,
+          "rows": [
+            ["Strength", "Blaze Powder", "II · 4:00"],
+            ["Swiftness", "Sugar", "II · 4:00"],
+            ["Leaping", "Rabbit's Foot", "II · 4:00"],
+            ["Regeneration", "Ghast Tear", "II · 1:30"],
+            ["Poison", "Spider Eye", "II · 1:30"],
+            ["Slowness", "Fermented Spider Eye", "IV · 2:00"],
+            ["Turtle Master", "Turtle Helmet", "II · 2:00"],
+            ["Resistance", "Shulker Shell", "II · 4:00"],
+            ["Absorption", "Golden Apple", "II · 4:00"],
+            ["Haste", "Honey Bottle", "II · 10:00"]
+          ],
+          "note": "A premium potion runs at its strong level for half its extended duration. Concentration is a graph conversion like any other — hintable, discoverable, and murkable; concentrating a no-strong-form or already-modified potion is an invalid pair. Setting enablePremiumBrews to false removes the concentration steps while existing bottles keep working."
         }
       ]
     },

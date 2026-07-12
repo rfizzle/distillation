@@ -1,5 +1,6 @@
 package com.rfizzle.distillation.mixin;
 
+import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionBrewing;
@@ -25,8 +26,9 @@ abstract class BrewingStandMenuIngredientsSlotMixin {
 
     @Inject(method = "mayPlace", at = @At("HEAD"), cancellable = true)
     private void distillation$gateIngredientSlot(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        DistillationConfig config = RecipeGraphs.effectiveConfig();
         cir.setReturnValue(RecipeGraphs
-                .lookup(this.potionBrewing, RecipeGraphs.effectiveConfig().enableMissingBrews)
+                .lookup(this.potionBrewing, config.enableMissingBrews, config.enablePremiumBrews)
                 .isIngredient(stack));
     }
 }
