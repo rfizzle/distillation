@@ -325,7 +325,7 @@ Splash potions tax duration 25% and lingering clouds evaporate in seconds over a
 
 ### Behavior
 
-- **Splash:** duration-bearing effects apply at **87.5%** of drinkable duration (vanilla: 75%). Instant effects keep vanilla's distance-scaled potency.
+- **Splash:** duration-bearing effects apply a flat **87.5%** of drinkable duration to every entity hit, regardless of distance. Instant effects keep vanilla's distance-scaled potency.
 - **Lingering:** the cloud lasts **60 seconds** (vanilla 30) and opens at a **4.5-block radius** (vanilla 3.0), shrinking linearly to 0 over its lifetime; the per-pickup radius cost stays vanilla (−0.5). Per-application effect duration stays vanilla's quarter of drinkable duration — which §4 has already raised for utility lines.
 - Applies to every splash/lingering potion from any source — player-thrown, dispensed, or witch-thrown (a Tribulation-hardened witch benefits like anyone; her arsenal is her own mod's business).
 
@@ -346,7 +346,7 @@ Splash potions tax duration 25% and lingering clouds evaporate in seconds over a
 
 ### Implementation Notes
 
-- Splash factor: the same `PotionContents` seam as §4, keyed on the thrown context. Lingering: an `AreaEffectCloud` configuration mixin at spawn from a thrown lingering potion (duration, radius, radius-per-tick), leaving other cloud sources (dragon breath attack) untouched.
+- Splash factor: a `ThrownPotion.applySplash` mixin replaces vanilla's distance-scaled duration operator with the flat factor, on the thrown path only — instant effects never take that operator, so they keep vanilla's distance scaling. Lingering: an `AreaEffectCloud` configuration mixin at spawn from a thrown lingering potion (duration, radius, radius-per-tick), leaving other cloud sources (dragon breath attack) untouched.
 
 ---
 
