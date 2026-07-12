@@ -1,5 +1,6 @@
 package com.rfizzle.distillation.mixin;
 
+import com.rfizzle.distillation.advancement.DistillationAdvancements;
 import com.rfizzle.distillation.discovery.DiscoveryManager;
 import com.rfizzle.distillation.item.Draughts;
 import net.minecraft.world.Container;
@@ -31,6 +32,7 @@ abstract class BrewingStandMenuPotionSlotMixin extends Slot {
     @Inject(method = "onTake", at = @At("TAIL"))
     private void distillation$recordDiscovery(Player player, ItemStack stack, CallbackInfo ci) {
         DiscoveryManager.onOutputTaken(player, this.container, this.getContainerSlot(), stack);
+        DistillationAdvancements.onBottleTaken(player, stack);
     }
 
     @Inject(method = "mayPlace", at = @At("HEAD"), cancellable = true)

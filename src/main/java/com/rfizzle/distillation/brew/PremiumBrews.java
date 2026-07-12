@@ -187,6 +187,15 @@ public final class PremiumBrews {
     }
 
     /**
+     * Whether a potion id is a finished premium output — extended and amplified ({@code design/SPEC.md}
+     * §5), the {@code premium_*} member of the concentrated family. The advancement observer keys The
+     * Good Stuff off this; concentrated intermediates return {@code false}.
+     */
+    public static boolean isPremium(ResourceLocation potionId) {
+        return potionId.getPath().startsWith("premium_") && isConcentrated(potionId);
+    }
+
+    /**
      * The recipe ids of every conversion this class registers — the set
      * {@code enablePremiumBrews=false} removes from the graph.
      */
