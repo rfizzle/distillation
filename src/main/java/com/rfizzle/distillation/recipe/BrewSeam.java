@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.recipe;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.api.DistillationBrewCallback;
 import com.rfizzle.distillation.batch.BatchBrew;
 import com.rfizzle.distillation.batch.BatchStates;
 import com.rfizzle.distillation.brew.DistillationBrews;
@@ -16,6 +17,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.Item;
@@ -25,11 +27,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * The single brew-completion choke point ({@code design/SPEC.md} §1 Implementation Notes): every
@@ -62,6 +67,8 @@ public final class BrewSeam {
         DistillationConfig config = Distillation.getConfig();
         boolean murkyEnabled = config.enableMurkyDraughts;
         ItemStack ingredient = items.get(3);
+        // Snapshot before the shrink below — the brew callback reports the ingredient consumed.
+        ItemStack ingredientSnapshot = ingredient.copy();
         // One seed per pass: bottles sharing an input potion agree on their hint (SPEC §1).
         long hintSeed = MurkyHints.seedFor(pos, level.getGameTime());
         Map<Integer, ResourceLocation> produced = new LinkedHashMap<>();
@@ -117,6 +124,38 @@ public final class BrewSeam {
             BatchStates.setBrewing(stand, false); // the committed pass is done; the rig may eject next tick
         }
         level.levelEvent(1035, pos, 0);
+
+        // Public API observation seam (SPEC §Public API): one immutable snapshot of what the cycle
+        // produced. Only vanilla's server tick reaches here, so the level is always a ServerLevel.
+        if (level instanceof ServerLevel serverLevel) {
+            UUID batchOwner = batch && stand != null ? BatchStates.owner(stand).orElse(null) : null;
+            DistillationBrewCallback.EVENT.invoker().onBrew(
+                    serverLevel, pos, ingredientSnapshot, brewResults(items, batch), batchOwner, batch);
+        }
+    }
+
+    /**
+     * An immutable snapshot of the bottles a completed cycle produced — the three drinkable slots
+     * plus the batch row (5–7) on a batch pass — as copies, so a {@code DistillationBrewCallback}
+     * listener can never mutate the stand's live inventory.
+     */
+    private static List<ItemStack> brewResults(NonNullList<ItemStack> items, boolean batch) {
+        List<ItemStack> results = new ArrayList<>();
+        for (int slot = 0; slot < 3; slot++) {
+            ItemStack bottle = items.get(slot);
+            if (!bottle.isEmpty()) {
+                results.add(bottle.copy());
+            }
+        }
+        if (batch) {
+            for (int slot = BatchBrew.FIRST_BATCH_SLOT; slot <= BatchBrew.LAST_BATCH_SLOT; slot++) {
+                ItemStack bottle = items.get(slot);
+                if (!bottle.isEmpty()) {
+                    results.add(bottle.copy());
+                }
+            }
+        }
+        return List.copyOf(results);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.discovery;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.api.DistillationDiscoveryCallback;
 import com.rfizzle.distillation.network.DistillationNetworking;
 import com.rfizzle.distillation.recipe.RecipeGraph;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
@@ -82,6 +83,7 @@ public final class DiscoveryManager {
         boolean added = player.getAttachedOrCreate(DistillationAttachments.DISCOVERY).add(recipeId);
         if (added) {
             DistillationNetworking.sendDiscoveryAdded(player, recipeId);
+            DistillationDiscoveryCallback.EVENT.invoker().onDiscover(player, recipeId);
         }
         return added;
     }
