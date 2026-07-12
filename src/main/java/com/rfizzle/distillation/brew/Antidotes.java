@@ -53,14 +53,18 @@ public final class Antidotes {
     public record BuiltIn(Holder<MobEffect> target, Item reagent, String path) {
     }
 
-    /** The six antidotes of SPEC §6, in index order — the source of truth the table test pins. */
+    /** The eight antidotes of SPEC §6, in index order — the source of truth the table test pins. */
     public static final List<BuiltIn> BUILTINS = List.of(
             new BuiltIn(MobEffects.POISON, Items.FERMENTED_SPIDER_EYE, "poison_antidote"),
             new BuiltIn(MobEffects.WITHER, Items.WITHER_ROSE, "wither_antidote"),
             new BuiltIn(MobEffects.DIG_SLOWDOWN, Items.PRISMARINE_CRYSTALS, "mining_fatigue_antidote"),
             new BuiltIn(MobEffects.BLINDNESS, Items.INK_SAC, "blindness_antidote"),
             new BuiltIn(MobEffects.DARKNESS, Items.ECHO_SHARD, "darkness_antidote"),
-            new BuiltIn(MobEffects.LEVITATION, Items.POPPED_CHORUS_FRUIT, "levitation_antidote"));
+            new BuiltIn(MobEffects.LEVITATION, Items.POPPED_CHORUS_FRUIT, "levitation_antidote"),
+            // Slowness and Weakness cure from the reagent that brews their opposite (swiftness, strength) —
+            // appended last so the six above keep their baked cleanse-amplifier indices.
+            new BuiltIn(MobEffects.MOVEMENT_SLOWDOWN, Items.SUGAR, "slowness_antidote"),
+            new BuiltIn(MobEffects.WEAKNESS, Items.BLAZE_POWDER, "weakness_antidote"));
 
     /** The cleanse instance carries a 1-tick duration (instant effects ignore it) and the index amplifier. */
     private static final int CLEANSE_COLOR = 0xC44DCC; // Potion Magenta (DESIGN §1); per-cure tint overrides it

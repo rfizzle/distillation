@@ -278,7 +278,7 @@ Curing is all-or-nothing: milk wipes your 8-minute buffs to shake a 30-second po
 
 ### Behavior
 
-Six antidotes, each brewed on a **Thick Potion** base (water + glowstone dust — glowstone's body carries the cure, and vanilla's dead-end bottle becomes the medicine base), each an **instant** potion that removes exactly one effect type (all amplifiers, any remaining duration) and touches nothing else:
+Eight antidotes, each brewed on a **Thick Potion** base (water + glowstone dust — glowstone's body carries the cure, and vanilla's dead-end bottle becomes the medicine base), each an **instant** potion that removes exactly one effect type (all amplifiers, any remaining duration) and touches nothing else:
 
 | Antidote | Recipe (Thick +) | Cures | Source logic |
 |---|---|---|---|
@@ -288,6 +288,8 @@ Six antidotes, each brewed on a **Thick Potion** base (water + glowstone dust �
 | Blindness Antidote | Ink Sac | Blindness | the ink that blinds |
 | Darkness Antidote | Echo Shard | Darkness | the deep's own echo |
 | Levitation Antidote | Popped Chorus Fruit | Levitation | the shulker's fruit, grounded |
+| Slowness Antidote | Sugar | Slowness | the sugar that quickens |
+| Weakness Antidote | Blaze Powder | Weakness | the blaze's restored vigor |
 
 - Drinking an antidote whose target effect is absent consumes it with no other outcome (the fizz plays either way).
 - Antidotes take gunpowder and dragon's breath: a **splash antidote** cures everyone it hits; a **lingering antidote** is a 60-second cleansing cloud (§7) — the support-brewer's tool.
@@ -403,7 +405,7 @@ All features are independently toggleable via a ModMenu / Cloth Config screen an
 | `enableHonestDurations` | bool | true | Utility-potion duration retune (§4) |
 | `enableDraughts` | bool | true | Sneak-drink half potions (§4) |
 | `enablePremiumBrews` | bool | true | Concentration + both-dusts premium path (§5) |
-| `enableAntidotes` | bool | true | The six antidote lines (§6) |
+| `enableAntidotes` | bool | true | The eight antidote lines (§6) |
 | `enableThrownRebalance` | bool | true | Splash/lingering rebalance (§7) |
 | `splashDurationFactor` | float | 0.875 | Fraction of drinkable duration a splash applies |
 | `lingeringCloudDurationTicks` | int | 1200 | Lingering cloud lifetime |
@@ -454,7 +456,7 @@ Per concord [`API-STANDARD.md`](../../concord/API-STANDARD.md): the only stable 
 ### Sibling & Mod Compatibility
 
 - **Distillation is provider-side for most of the suite:** siblings consume its stable potion/item ids — Mercantile's cleric trade packs (reagents at reputation), Prosperity's loot injections (rare reagents at distance), Tribulation's high-tier witches (throwing Distillation brews) all live in the consumer's repo per the suite pattern, keyed on `distillation:` ids and the graph API above.
-- **Tribulation (consumer-side, guarded):** `compat/tribulation/` — when Tribulation is loaded, Distillation registers antidote lines for Tribulation's shard-debuff effects, each brewed from the shard item that inflicts it (exact effect↔reagent mapping finalized against Tribulation's effect list in the compat module). Standard `modCompileOnly` + `isModLoaded` guard; absent Tribulation, nothing registers and nothing is missing.
+- **Tribulation:** no runtime coupling in either direction. The debuffs Tribulation's shards can inflict are the vanilla effects Slowness, Mining Fatigue, and Weakness, and §6 ships native antidotes for all three (against the vanilla effect, from a vanilla reagent) — so a player facing those debuffs has a cure whether or not Tribulation is installed, with nothing keyed on a `tribulation:` id. Tribulation's own use of Distillation (high-tier witches throwing Distillation brews) is provider-side and lives in Tribulation's repo.
 - **Meridian:** no runtime coupling in either direction — potion effects and enchantment effects never share definitions (the suite's policed boundary). Nothing to guard because nothing is consumed.
 - **Third-party brewing mods:** anything registered through the vanilla brewing registry enters the recipe graph automatically — discoverable, hintable, batchable, murk-consistent — with zero per-mod code.
 
