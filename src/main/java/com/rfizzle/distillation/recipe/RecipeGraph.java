@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.recipe;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.item.DistillationItems;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -238,6 +239,12 @@ public final class RecipeGraph {
     }
 
     private static Optional<Holder<Potion>> potionOf(ItemStack bottle) {
+        // A half draught holds a potion to drink but is never a receptive brewing bottle (SPEC §4):
+        // reporting it potionless here makes it inert to every graph path — no cycle starts over it,
+        // it never brews onward, and it never murks (the stand rejects it, no topping up).
+        if (bottle.has(DistillationItems.DRAUGHT)) {
+            return Optional.empty();
+        }
         return bottle.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion();
     }
 

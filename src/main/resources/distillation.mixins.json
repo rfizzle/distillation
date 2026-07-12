@@ -9,7 +9,10 @@
         "BrewingStandBlockEntityMixin",
         "BrewingStandMenuIngredientsSlotMixin",
         "BrewingStandMenuMixin",
-        "BrewingStandMenuPotionSlotMixin"
+        "BrewingStandMenuPotionSlotMixin",
+        "ItemStackHoverNameMixin",
+        "PotionContentsMixin",
+        "PotionItemMixin"
     ],
     "client": [],
     "injectors": {
