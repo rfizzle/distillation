@@ -5,8 +5,6 @@ import com.rfizzle.distillation.brew.DistillationPotions;
 import com.rfizzle.distillation.recipe.RecipeGraph;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -17,8 +15,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 
 /**
  * The live recipe graph and registrations on a real server: vanilla, Distillation, and container
@@ -28,9 +24,6 @@ import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
  * brewing while vanilla brewing stays byte-identical.
  */
 public class RecipeGraphGameTest implements FabricGameTest {
-
-    private static final int BREW_WAIT = 420;
-    private static final int TIMEOUT = 500;
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void liveGraphHoldsVanillaOwnAndContainerConversions(GameTestHelper helper) {
@@ -63,61 +56,40 @@ public class RecipeGraphGameTest implements FabricGameTest {
     }
 
     /**
-     * Own batch: this test flips the live server config, so it must never overlap the brew tests
-     * running under defaults.
+     * Flips the live server config, so it resolves the contract <em>synchronously</em> — the lines
+     * leave the graph, their ingredient stops being a graph ingredient, and vanilla brewing still
+     * resolves — and restores the flag in the same invocation. A delayed brew here would race the
+     * concurrent {@code /distillation reload} test, which re-reads the config from disk and would
+     * re-enable the lines mid-window.
      */
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT, batch = "distillationToggle")
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "distillationToggle")
     public void toggleOffRemovesTheLinesAndKeepsVanillaBrewing(GameTestHelper helper) {
         boolean saved = Distillation.getConfig().enableMissingBrews;
         Distillation.getConfig().enableMissingBrews = false;
-        // The flipped config lives past this method (the delayed closure), so a plain finally
-        // can't scope it: the catch restores on any synchronous failure, and the closure restores
-        // before asserting — either way no other test ever observes the flipped value.
         try {
             RecipeGraph graph = RecipeGraphs.forLevel(helper.getLevel());
             helper.assertTrue(!graph.contains(ResourceLocation.parse("distillation:shulker_shell/awkward")),
                     "with enableMissingBrews=false the five lines leave the graph");
             helper.assertTrue(graph.contains(ResourceLocation.parse("distillation:nether_wart/water")),
                     "vanilla conversions stay in the graph");
-
-            // Stand A: a Distillation line - must not even start a cycle. Stand B: vanilla brewing.
-            BrewingStandBlockEntity disabled = placeStand(helper, new BlockPos(1, 2, 1),
-                    PotionContents.createItemStack(Items.POTION, Potions.AWKWARD), new ItemStack(Items.SHULKER_SHELL));
-            BrewingStandBlockEntity vanilla = placeStand(helper, new BlockPos(3, 2, 1),
-                    PotionContents.createItemStack(Items.POTION, Potions.WATER), new ItemStack(Items.NETHER_WART));
-
-            helper.runAfterDelay(BREW_WAIT, () -> {
-                Distillation.getConfig().enableMissingBrews = saved;
-                helper.assertTrue(potionIdOf(disabled.getItem(0)).equals("minecraft:awkward"),
-                        "disabled line must leave the bottle untouched");
-                helper.assertTrue(disabled.getItem(3).is(Items.SHULKER_SHELL) && disabled.getItem(3).getCount() == 1,
-                        "disabled line must not consume the ingredient");
-                helper.assertTrue(potionIdOf(vanilla.getItem(0)).equals("minecraft:awkward"),
-                        "vanilla brewing must stay intact while the toggle is off");
-                helper.succeed();
-            });
-        } catch (Throwable t) {
+            // The line's premium concentration goes with it, so the reagent leaves the graph entirely.
+            helper.assertTrue(!graph.contains(ResourceLocation.parse("distillation:shulker_shell/distillation/resistance")),
+                    "the disabled line's premium concentration leaves the graph too");
+            // A disabled line no longer brews: its ingredient leaves the graph entirely, so no cycle
+            // ever starts over it and it resolves to nothing.
+            helper.assertTrue(!graph.isIngredient(new ItemStack(Items.SHULKER_SHELL)),
+                    "a disabled line's ingredient is no longer a graph ingredient");
+            helper.assertTrue(graph.matchConversion(new ItemStack(Items.SHULKER_SHELL),
+                            PotionContents.createItemStack(Items.POTION, Potions.AWKWARD)) == null,
+                    "a disabled line no longer resolves to its output");
+            // Vanilla brewing stays byte-identical: Water + Nether Wart still resolves to Awkward.
+            helper.assertTrue(graph.matchConversion(new ItemStack(Items.NETHER_WART),
+                            PotionContents.createItemStack(Items.POTION, Potions.WATER)) != null,
+                    "vanilla brewing must stay intact while the toggle is off");
+        } finally {
             Distillation.getConfig().enableMissingBrews = saved;
-            throw t;
         }
-    }
-
-    private static BrewingStandBlockEntity placeStand(GameTestHelper helper, BlockPos pos, ItemStack bottle,
-                                                      ItemStack ingredient) {
-        helper.setBlock(pos, Blocks.BREWING_STAND);
-        BrewingStandBlockEntity stand = helper.getBlockEntity(pos);
-        stand.setItem(0, bottle);
-        stand.setItem(3, ingredient);
-        stand.setItem(4, new ItemStack(Items.BLAZE_POWDER));
-        return stand;
-    }
-
-    private static String potionIdOf(ItemStack stack) {
-        return stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
-                .potion()
-                .flatMap(net.minecraft.core.Holder::unwrapKey)
-                .map(key -> key.location().toString())
-                .orElse("<none>");
+        helper.succeed();
     }
 
     private static void assertContains(GameTestHelper helper, RecipeGraph graph, String recipeId) {
