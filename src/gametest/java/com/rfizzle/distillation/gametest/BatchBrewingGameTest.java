@@ -213,6 +213,88 @@ public class BatchBrewingGameTest implements FabricGameTest {
         });
     }
 
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = BATCH, timeoutTicks = TIMEOUT)
+    public void drainingTheCauldronKeepsTheBrewedBatch(GameTestHelper helper) {
+        // A pass that empties the last water level is a dry-out, not a dismantle: the brewed batch
+        // stays in the (now hidden) row for the player to collect, never ejected onto the floor.
+        ServerPlayer owner = MockPlayers.serverPlayerInLevel(helper);
+        helper.setBlock(STAND, Blocks.BREWING_STAND);
+        helper.setBlock(CAULDRON, waterCauldron(1));
+        helper.setBlock(HEAT, Blocks.CAMPFIRE.defaultBlockState());
+        BrewingStandBlockEntity stand = helper.getBlockEntity(STAND);
+        RecipeGraph graph = RecipeGraphs.forLevel(helper.getLevel());
+        DiscoveryManager.discoverAll(owner, graph);
+        String expected = extendedSwiftnessId(graph);
+        for (int slot : new int[]{0, 1, 2, 5, 6, 7}) {
+            stand.setItem(slot, bottle(Potions.SWIFTNESS));
+        }
+        stand.setItem(3, new ItemStack(Items.REDSTONE, 3));
+        stand.setItem(4, new ItemStack(Items.BLAZE_POWDER));
+        BatchStates.setOwner(stand, owner.getUUID());
+
+        helper.runAfterDelay(BREW_WAIT, () -> {
+            for (int slot : new int[]{5, 6, 7}) {
+                assertPotion(helper, stand.getItem(slot), expected);
+            }
+            helper.assertTrue(helper.getLevel().getBlockState(helper.absolutePos(CAULDRON)).is(Blocks.CAULDRON),
+                    "the pass drained the cauldron dry");
+            helper.succeed();
+        });
+    }
+
+    // Own batch: this mutates the global enableBatchBrewing flag for the pass, and tests within a
+    // batch run concurrently — a sibling in BATCH would see the flag flip. Batches run sequentially.
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "distillationBatchDisabled", timeoutTicks = TIMEOUT)
+    public void batchBrewingDisabledIsInert(GameTestHelper helper) {
+        // Vanilla-parity guarantee: with the feature off, a fully-rigged stand brews a normal pass
+        // and never touches the batch row.
+        boolean saved = Distillation.getConfig().enableBatchBrewing;
+        Distillation.getConfig().enableBatchBrewing = false;
+
+        BrewingStandBlockEntity stand = riggedStand(helper);
+        String expected = extendedSwiftnessId(RecipeGraphs.forLevel(helper.getLevel()));
+        for (int slot : new int[]{0, 1, 2, 5, 6, 7}) {
+            stand.setItem(slot, bottle(Potions.SWIFTNESS));
+        }
+        stand.setItem(3, new ItemStack(Items.REDSTONE, 3));
+        stand.setItem(4, new ItemStack(Items.BLAZE_POWDER));
+
+        helper.runAfterDelay(BREW_WAIT, () -> {
+            for (int slot : new int[]{0, 1, 2}) {
+                assertPotion(helper, stand.getItem(slot), expected);
+            }
+            for (int slot : new int[]{5, 6, 7}) {
+                assertPotion(helper, stand.getItem(slot), "minecraft:swiftness"); // batch row untouched
+            }
+            helper.assertTrue(stand.getItem(3).getCount() == 2, "disabled batch brews at normal cost");
+            Distillation.getConfig().enableBatchBrewing = saved;
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = BATCH, timeoutTicks = TIMEOUT)
+    public void swappingTheIngredientMidCycleAbortsTheBatch(GameTestHelper helper) {
+        // A committed batch must not complete against an ingredient it never paid for: swapping the
+        // ingredient mid-cycle aborts the pass, leaving the batch bottles untouched.
+        ServerPlayer owner = MockPlayers.serverPlayerInLevel(helper);
+        BrewingStandBlockEntity stand = riggedStand(helper);
+        DiscoveryManager.discoverAll(owner, RecipeGraphs.forLevel(helper.getLevel()));
+        for (int slot : new int[]{5, 6, 7}) {
+            stand.setItem(slot, bottle(Potions.SWIFTNESS));
+        }
+        stand.setItem(3, new ItemStack(Items.REDSTONE, 3));
+        stand.setItem(4, new ItemStack(Items.BLAZE_POWDER));
+        BatchStates.setOwner(stand, owner.getUUID());
+
+        helper.runAfterDelay(40, () -> stand.setItem(3, new ItemStack(Items.DIRT))); // swap mid-cycle
+        helper.runAfterDelay(BREW_WAIT, () -> {
+            for (int slot : new int[]{5, 6, 7}) {
+                assertPotion(helper, stand.getItem(slot), "minecraft:swiftness"); // never brewed
+            }
+            helper.succeed();
+        });
+    }
+
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = BATCH)
     public void rigCommandIsOpenToEveryone(GameTestHelper helper) {
         var root = helper.getLevel().getServer().getCommands().getDispatcher().getRoot().getChild("distillation");
