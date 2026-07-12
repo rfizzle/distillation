@@ -147,5 +147,10 @@
   "advancements.distillation.every_drop.description": "Discover every recipe in the brewing graph",
   "emi.category.distillation.brewing": "Brewing",
   "jei.distillation.category.brewing": "Brewing",
-  "rei.distillation.category.brewing": "Brewing"
+  "rei.distillation.category.brewing": "Brewing",
+  "tooltip.distillation.probe.brewing": "Brewing: %s%%",
+  "tooltip.distillation.probe.rigged": "Rigged — water %s/%s",
+  "tooltip.distillation.probe.heat": "Heat: %s",
+  "tooltip.distillation.probe.owner": "Batch owner: %s",
+  "tooltip.distillation.probe.cauldron_rig": "Batch rig"
 }
