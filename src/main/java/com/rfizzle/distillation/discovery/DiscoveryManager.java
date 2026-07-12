@@ -50,6 +50,9 @@ public final class DiscoveryManager {
             Level level = stand.getLevel();
             if (matchesRecordedOutput(RecipeGraphs.forLevel(level), recipeId, taken)
                     && record(serverPlayer, recipeId)) {
+                // The Public API discovery event fires here — a genuine first discovery through play,
+                // exactly where the toast does — so the admin/bulk grants below stay silent.
+                DistillationDiscoveryCallback.EVENT.invoker().onDiscover(serverPlayer, recipeId);
                 celebrate(serverPlayer, taken);
             }
         });
@@ -83,7 +86,6 @@ public final class DiscoveryManager {
         boolean added = player.getAttachedOrCreate(DistillationAttachments.DISCOVERY).add(recipeId);
         if (added) {
             DistillationNetworking.sendDiscoveryAdded(player, recipeId);
-            DistillationDiscoveryCallback.EVENT.invoker().onDiscover(player, recipeId);
         }
         return added;
     }

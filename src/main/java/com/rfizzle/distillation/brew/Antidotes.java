@@ -73,6 +73,7 @@ public final class Antidotes {
     // Immutable snapshots, swapped by reference on each registration — the thread-safe read surface.
     private static volatile List<Antidote> published = List.of();
     private static volatile Set<ResourceLocation> publishedPotionIds = Set.of();
+    private static volatile Map<ResourceLocation, Antidote> publishedByPotionId = Map.of();
 
     private static Holder<MobEffect> cleanse;
     private static boolean effectRegistered = false;
@@ -160,7 +161,7 @@ public final class Antidotes {
     /** The target effect this antidote potion cures — drives the per-cure tint and tooltip. */
     @Nullable
     public static Holder<MobEffect> targetForPotion(ResourceLocation potionId) {
-        Antidote antidote = BY_POTION_ID.get(potionId);
+        Antidote antidote = publishedByPotionId.get(potionId);
         return antidote == null ? null : antidote.target();
     }
 
@@ -199,12 +200,16 @@ public final class Antidotes {
         Holder<Potion> potion = Registry.registerForHolder(BuiltInRegistries.POTION, Distillation.id(path),
                 new Potion(path, new MobEffectInstance(cleanse, 1, index)));
         Antidote antidote = new Antidote(effectId, target, reagent, reagentItems, path, index, potion);
+        ResourceLocation potionId = Distillation.id(path);
         ANTIDOTES.add(antidote);
         BY_EFFECT.put(effectId, antidote);
-        BY_POTION_ID.put(Distillation.id(path), antidote);
+        BY_POTION_ID.put(potionId, antidote);
+        // Republish every read surface as an immutable snapshot, swapped by reference — so a render
+        // or server-thread read after init always sees a fully-built, consistent view.
         published = List.copyOf(ANTIDOTES);
+        publishedByPotionId = Map.copyOf(BY_POTION_ID);
         Set<ResourceLocation> potionIds = new LinkedHashSet<>(publishedPotionIds);
-        potionIds.add(Distillation.id(path));
+        potionIds.add(potionId);
         publishedPotionIds = Set.copyOf(potionIds);
     }
 

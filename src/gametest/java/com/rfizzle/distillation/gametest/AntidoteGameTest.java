@@ -27,6 +27,8 @@ import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.inventory.BrewingStandMenu;
+import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -41,6 +43,7 @@ import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The targeted antidotes of {@code design/SPEC.md} §6 on a live server: each brews on a Thick base
@@ -242,26 +245,54 @@ public class AntidoteGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
-    public void discoveryCallbackFiresOnceOnFirstDiscovery(GameTestHelper helper) {
-        ServerPlayer player = survivalPlayer(helper);
-        try {
-            AtomicInteger fired = new AtomicInteger();
-            ResourceLocation recipeId = ResourceLocation.fromNamespaceAndPath("distillation", "fermented_spider_eye/thick");
-            DistillationDiscoveryCallback.EVENT.register((who, id) -> {
-                if (who == player && id.equals(recipeId)) {
-                    fired.incrementAndGet();
-                }
-            });
-            DiscoveryManager.record(player, recipeId);
-            DiscoveryManager.record(player, recipeId); // already known — must not fire again
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void brewCallbackResultsExcludeUntouchedBottles(GameTestHelper helper) {
+        AtomicReference<List<ItemStack>> captured = new AtomicReference<>();
+        DistillationBrewCallback.EVENT.register((level, pos, ingredient, results, batchOwner, batch) -> {
+            if (results.stream().anyMatch(AntidoteGameTest::isAntidoteStack)) {
+                captured.set(results);
+            }
+        });
+        BrewingStandBlockEntity stand = placeStand(helper, thickBottle(), new ItemStack(Items.FERMENTED_SPIDER_EYE));
+        // A leftover the cycle never touches: a glass bottle is non-empty but not a receptive bottle,
+        // so it is neither produced nor murked — it must not leak into the callback's results.
+        stand.setItem(1, new ItemStack(Items.GLASS_BOTTLE));
+        helper.runAfterDelay(BREW_WAIT, () -> {
+            List<ItemStack> results = captured.get();
+            helper.assertTrue(results != null, "the brew callback must have fired with the antidote result");
+            helper.assertTrue(results.size() == 1,
+                    "results carry only what the cycle produced, not the untouched bottle: " + results.size());
+            helper.assertTrue(isAntidoteStack(results.get(0)), "the sole result is the produced antidote");
+            helper.succeed();
+        });
+    }
 
-            helper.assertTrue(fired.get() == 1,
-                    "the discovery callback fires exactly once on first discovery, got " + fired.get());
-        } finally {
-            player.discard();
-        }
-        helper.succeed();
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void discoveryCallbackFiresOnExtractionNotAdminGrant(GameTestHelper helper) {
+        AtomicReference<ServerPlayer> playerRef = new AtomicReference<>();
+        AtomicInteger fired = new AtomicInteger();
+        // Scoped to this test's own player, so a concurrent test's discovery can't inflate the count.
+        DistillationDiscoveryCallback.EVENT.register((who, id) -> {
+            if (who == playerRef.get()) {
+                fired.incrementAndGet();
+            }
+        });
+        BrewingStandBlockEntity stand = placeStand(helper, thickBottle(), new ItemStack(Items.FERMENTED_SPIDER_EYE));
+        helper.runAfterDelay(BREW_WAIT, () -> {
+            ServerPlayer player = survivalPlayer(helper);
+            playerRef.set(player);
+            try {
+                takeBottleSlot(player, stand, 0); // a genuine extraction through the real onTake path
+                helper.assertTrue(fired.get() == 1,
+                        "extraction fires the discovery callback exactly once, got " + fired.get());
+                // An admin/command grant goes straight through record() — it must stay silent.
+                DiscoveryManager.record(player, ResourceLocation.parse("distillation:wither_rose/thick"));
+                helper.assertTrue(fired.get() == 1, "an admin grant via record() must not fire the discovery callback");
+            } finally {
+                player.discard();
+            }
+            helper.succeed();
+        });
     }
 
     // --- registerAntidote validation (the success path is init-only; the six built-ins cover it) ---
@@ -358,6 +389,12 @@ public class AntidoteGameTest implements FabricGameTest {
         stand.setItem(3, ingredient);
         stand.setItem(4, new ItemStack(Items.BLAZE_POWDER));
         return stand;
+    }
+
+    /** Takes a bottle slot's stack through the real menu slot, firing vanilla's {@code onTake} path. */
+    private static ItemStack takeBottleSlot(ServerPlayer player, BrewingStandBlockEntity stand, int slot) {
+        BrewingStandMenu menu = new BrewingStandMenu(1, player.getInventory(), stand, new SimpleContainerData(2));
+        return menu.slots.get(slot).safeTake(64, Integer.MAX_VALUE, player);
     }
 
     private static void assertPotion(GameTestHelper helper, ItemStack stack, String expectedPotionId) {

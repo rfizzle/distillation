@@ -130,30 +130,24 @@ public final class BrewSeam {
         if (level instanceof ServerLevel serverLevel) {
             UUID batchOwner = batch && stand != null ? BatchStates.owner(stand).orElse(null) : null;
             DistillationBrewCallback.EVENT.invoker().onBrew(
-                    serverLevel, pos, ingredientSnapshot, brewResults(items, batch), batchOwner, batch);
+                    serverLevel, pos, ingredientSnapshot, brewResults(items, produced, murked), batchOwner, batch);
         }
     }
 
     /**
-     * An immutable snapshot of the bottles a completed cycle produced — the three drinkable slots
-     * plus the batch row (5–7) on a batch pass — as copies, so a {@code DistillationBrewCallback}
-     * listener can never mutate the stand's live inventory.
+     * An immutable snapshot of the bottles this cycle actually produced — only the slots it converted
+     * ({@code produced}) or turned to a Murky Draught ({@code murked}), as copies, so a
+     * {@code DistillationBrewCallback} listener sees the pass's real output (never a leftover,
+     * untouched bottle) and can never mutate the stand's live inventory.
      */
-    private static List<ItemStack> brewResults(NonNullList<ItemStack> items, boolean batch) {
+    private static List<ItemStack> brewResults(NonNullList<ItemStack> items,
+                                               Map<Integer, ResourceLocation> produced, Set<Integer> murked) {
         List<ItemStack> results = new ArrayList<>();
-        for (int slot = 0; slot < 3; slot++) {
-            ItemStack bottle = items.get(slot);
-            if (!bottle.isEmpty()) {
-                results.add(bottle.copy());
-            }
+        for (int slot : produced.keySet()) {
+            results.add(items.get(slot).copy());
         }
-        if (batch) {
-            for (int slot = BatchBrew.FIRST_BATCH_SLOT; slot <= BatchBrew.LAST_BATCH_SLOT; slot++) {
-                ItemStack bottle = items.get(slot);
-                if (!bottle.isEmpty()) {
-                    results.add(bottle.copy());
-                }
-            }
+        for (int slot : murked) {
+            results.add(items.get(slot).copy());
         }
         return List.copyOf(results);
     }
