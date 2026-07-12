@@ -144,5 +144,8 @@
   "advancements.distillation.the_good_stuff.title": "The Good Stuff",
   "advancements.distillation.the_good_stuff.description": "Brew an extended, amplified premium potion",
   "advancements.distillation.every_drop.title": "Every Drop",
-  "advancements.distillation.every_drop.description": "Discover every recipe in the brewing graph"
+  "advancements.distillation.every_drop.description": "Discover every recipe in the brewing graph",
+  "emi.category.distillation.brewing": "Brewing",
+  "jei.distillation.category.brewing": "Brewing",
+  "rei.distillation.category.brewing": "Brewing"
 }

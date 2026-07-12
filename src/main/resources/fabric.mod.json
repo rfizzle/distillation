@@ -17,6 +17,9 @@
         "main": ["com.rfizzle.distillation.Distillation"],
         "client": ["com.rfizzle.distillation.client.DistillationClient"],
         "modmenu": ["com.rfizzle.distillation.compat.modmenu.ModMenuIntegration"],
+        "emi": ["com.rfizzle.distillation.compat.emi.DistillationEmiPlugin"],
+        "rei_client": ["com.rfizzle.distillation.compat.rei.DistillationReiClientPlugin"],
+        "jei_mod_plugin": ["com.rfizzle.distillation.compat.jei.DistillationJeiPlugin"],
         "fabric-gametest": [
             "com.rfizzle.distillation.gametest.SmokeGameTest",
             "com.rfizzle.distillation.gametest.MissingBrewsGameTest",
