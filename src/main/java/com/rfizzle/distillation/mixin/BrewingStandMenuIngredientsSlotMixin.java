@@ -28,7 +28,8 @@ abstract class BrewingStandMenuIngredientsSlotMixin {
     private void distillation$gateIngredientSlot(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         DistillationConfig config = RecipeGraphs.effectiveConfig();
         cir.setReturnValue(RecipeGraphs
-                .lookup(this.potionBrewing, config.enableMissingBrews, config.enablePremiumBrews)
+                .lookup(this.potionBrewing, config.enableMissingBrews, config.enablePremiumBrews,
+                        config.enableAntidotes)
                 .isIngredient(stack));
     }
 }

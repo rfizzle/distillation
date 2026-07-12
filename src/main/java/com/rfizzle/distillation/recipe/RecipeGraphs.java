@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.recipe;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.brew.Antidotes;
 import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.brew.PremiumBrews;
 import com.rfizzle.distillation.config.DistillationConfig;
@@ -33,7 +34,8 @@ import java.util.function.Supplier;
  */
 public final class RecipeGraphs {
 
-    private record Entry(boolean missingBrewsEnabled, boolean premiumBrewsEnabled, RecipeGraph graph) {
+    private record Entry(boolean missingBrewsEnabled, boolean premiumBrewsEnabled, boolean antidotesEnabled,
+                         RecipeGraph graph) {
     }
 
     private static final Map<PotionBrewing, Entry> CACHE = new WeakHashMap<>();
@@ -43,17 +45,40 @@ public final class RecipeGraphs {
     @Nullable
     private static volatile Supplier<DistillationConfig> clientConfigSupplier;
 
+    // The running server, so the server-authoritative Public API can resolve the current graph
+    // without a level in hand ({@code DistillationAPI.getRecipeIds}). Null when no server runs.
+    @Nullable
+    private static volatile MinecraftServer currentServer;
+
     private RecipeGraphs() {
     }
 
     public static void registerLifecycleHandlers() {
-        ServerLifecycleEvents.SERVER_STARTED.register(RecipeGraphs::warm);
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            currentServer = server;
+            warm(server);
+        });
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> warm(server));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            currentServer = null;
             synchronized (CACHE) {
                 CACHE.clear();
             }
         });
+    }
+
+    /**
+     * The current recipe graph's ids, server-authoritative — the {@code DistillationAPI.getRecipeIds}
+     * source. An empty set when no server is running (a client with no world, or before start).
+     */
+    public static Set<ResourceLocation> currentRecipeIds() {
+        MinecraftServer server = currentServer;
+        if (server == null) {
+            return Set.of();
+        }
+        DistillationConfig config = Distillation.getConfig();
+        return lookup(server.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews,
+                config.enableAntidotes).ids();
     }
 
     /**
@@ -76,7 +101,8 @@ public final class RecipeGraphs {
     /** The graph for a level's brewing registry, under the side-appropriate config. */
     public static RecipeGraph forLevel(Level level) {
         DistillationConfig config = level.isClientSide ? effectiveConfig() : Distillation.getConfig();
-        return lookup(level.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews);
+        return lookup(level.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews,
+                config.enableAntidotes);
     }
 
     /**
@@ -89,11 +115,13 @@ public final class RecipeGraphs {
         return supplier != null ? supplier.get() : Distillation.getConfig();
     }
 
-    public static RecipeGraph lookup(PotionBrewing brewing, boolean missingBrewsEnabled, boolean premiumBrewsEnabled) {
+    public static RecipeGraph lookup(PotionBrewing brewing, boolean missingBrewsEnabled, boolean premiumBrewsEnabled,
+                                     boolean antidotesEnabled) {
         synchronized (CACHE) {
             Entry entry = CACHE.get(brewing);
             if (entry == null || entry.missingBrewsEnabled() != missingBrewsEnabled
-                    || entry.premiumBrewsEnabled() != premiumBrewsEnabled) {
+                    || entry.premiumBrewsEnabled() != premiumBrewsEnabled
+                    || entry.antidotesEnabled() != antidotesEnabled) {
                 Set<ResourceLocation> excluded = new LinkedHashSet<>();
                 if (!missingBrewsEnabled) {
                     excluded.addAll(DistillationBrews.ownedRecipeIds());
@@ -103,7 +131,10 @@ public final class RecipeGraphs {
                 if (!premiumBrewsEnabled) {
                     excluded.addAll(PremiumBrews.ownedRecipeIds());
                 }
-                entry = new Entry(missingBrewsEnabled, premiumBrewsEnabled,
+                if (!antidotesEnabled) {
+                    excluded.addAll(Antidotes.ownedRecipeIds());
+                }
+                entry = new Entry(missingBrewsEnabled, premiumBrewsEnabled, antidotesEnabled,
                         RecipeGraph.fromBrewing(brewing, excluded));
                 CACHE.put(brewing, entry);
             }
@@ -113,7 +144,8 @@ public final class RecipeGraphs {
 
     private static void warm(MinecraftServer server) {
         DistillationConfig config = Distillation.getConfig();
-        RecipeGraph graph = lookup(server.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews);
+        RecipeGraph graph = lookup(server.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews,
+                config.enableAntidotes);
         Distillation.LOGGER.info("Recipe graph built: {} conversions", graph.conversions().size());
     }
 }

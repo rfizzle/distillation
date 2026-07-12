@@ -108,7 +108,7 @@
       "blocks": [
         {
           "type": "table",
-          "headers": ["Antidote", "Brewed from (Awkward +)", "Cures"],
+          "headers": ["Antidote", "Brewed from (Thick +)", "Cures"],
           "nowrapHeaders": true,
           "rows": [
             ["Poison Antidote", "Fermented Spider Eye", "Poison"],

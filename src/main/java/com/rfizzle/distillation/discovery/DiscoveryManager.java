@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.discovery;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.api.DistillationDiscoveryCallback;
 import com.rfizzle.distillation.network.DistillationNetworking;
 import com.rfizzle.distillation.recipe.RecipeGraph;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
@@ -49,6 +50,9 @@ public final class DiscoveryManager {
             Level level = stand.getLevel();
             if (matchesRecordedOutput(RecipeGraphs.forLevel(level), recipeId, taken)
                     && record(serverPlayer, recipeId)) {
+                // The Public API discovery event fires here — a genuine first discovery through play,
+                // exactly where the toast does — so the admin/bulk grants below stay silent.
+                DistillationDiscoveryCallback.EVENT.invoker().onDiscover(serverPlayer, recipeId);
                 celebrate(serverPlayer, taken);
             }
         });

@@ -10,6 +10,12 @@
                 "distillation:draught": 1
             },
             "model": "distillation:item/potion_half"
+        },
+        {
+            "predicate": {
+                "distillation:antidote": 1
+            },
+            "model": "distillation:item/antidote"
         }
     ]
 }

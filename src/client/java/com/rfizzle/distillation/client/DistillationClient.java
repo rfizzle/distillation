@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.client;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.brew.Antidotes;
 import com.rfizzle.distillation.client.config.ClientDistillationConfig;
 import com.rfizzle.distillation.client.discovery.ClientDiscoveryState;
 import com.rfizzle.distillation.client.net.ClientPayloadHandlers;
@@ -9,7 +10,13 @@ import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 
 public class DistillationClient implements ClientModInitializer {
     @Override
@@ -20,6 +27,10 @@ public class DistillationClient implements ClientModInitializer {
         // identity) still colors the liquid layer, so no ItemColor of our own is needed.
         ItemProperties.register(Items.POTION, Distillation.id("draught"),
                 (stack, level, entity, seed) -> stack.has(DistillationItems.DRAUGHT) ? 1.0F : 0.0F);
+        // The antidote bottle render (SPEC §6): the shared antidote model for any antidote potion,
+        // tinted per cure by the vanilla potion color provider reading the deepened liquid color.
+        ItemProperties.register(Items.POTION, Distillation.id("antidote"),
+                (stack, level, entity, seed) -> isAntidote(stack) ? 1.0F : 0.0F);
         // Client-side graph lookups (the menu's ingredient slot) honor the server's synced
         // gameplay config, falling back to the local file offline.
         RecipeGraphs.setClientConfigSupplier(ClientDistillationConfig::effective);
@@ -29,5 +40,14 @@ public class DistillationClient implements ClientModInitializer {
             ClientDistillationConfig.clear();
             ClientDiscoveryState.clear();
         });
+    }
+
+    private static boolean isAntidote(ItemStack stack) {
+        ResourceLocation id = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+                .potion()
+                .flatMap(Holder::unwrapKey)
+                .map(ResourceKey::location)
+                .orElse(null);
+        return id != null && Antidotes.isAntidote(id);
     }
 }

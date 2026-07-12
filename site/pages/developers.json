@@ -27,7 +27,7 @@
         {
           "type": "prose",
           "html": [
-            "<code>DistillationAPI.registerAntidote(ResourceLocation effectId, Ingredient reagent)</code> is the sanctioned additive-registration point: it adds an Awkward-based antidote line for the given effect (returns <code>false</code> and no-ops if the effect already has one). Call it during mod init; the recipe graph builds after all registrations. This is how any mod's debuff — sibling or third-party — gets a brewable cure that participates in discovery, hints, and batching like a native recipe.",
+            "<code>DistillationAPI.registerAntidote(ResourceLocation effectId, Ingredient reagent)</code> is the sanctioned additive-registration point: it adds a Thick-based antidote line for the given effect (returns <code>false</code> and no-ops if the effect already has one). Call it during mod init; the recipe graph builds after all registrations. This is how any mod's debuff — sibling or third-party — gets a brewable cure that participates in discovery, hints, and batching like a native recipe.",
             "Anything registered through the vanilla brewing registry also enters the recipe graph automatically — discoverable, hintable, and batchable with zero Distillation-specific code."
           ]
         }
