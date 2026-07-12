@@ -6,6 +6,7 @@ import com.rfizzle.distillation.batch.BatchBrewTick;
 import com.rfizzle.distillation.batch.BatchRig;
 import com.rfizzle.distillation.batch.BatchStand;
 import com.rfizzle.distillation.batch.BatchStates;
+import com.rfizzle.distillation.item.Draughts;
 import com.rfizzle.distillation.recipe.BrewSeam;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.minecraft.core.BlockPos;
@@ -110,6 +111,12 @@ abstract class BrewingStandBlockEntityMixin implements BatchStand {
 
     @Inject(method = "canPlaceItem", at = @At("HEAD"), cancellable = true)
     private void distillation$gateIngredientSlot(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        if (Draughts.isDraught(stack)) {
+            // A half draught is not a receptive bottle (SPEC §4) — no topping up, in any slot,
+            // including the batch row (5–7) which vanilla's own canPlaceItem would otherwise accept.
+            cir.setReturnValue(false);
+            return;
+        }
         if (slot != 3) {
             return; // bottle, fuel, and batch slots stay vanilla (vanilla accepts bottles in 5–7 already)
         }

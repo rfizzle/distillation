@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.batch;
 
 import com.rfizzle.distillation.discovery.DiscoveryManager;
+import com.rfizzle.distillation.item.Draughts;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
@@ -26,8 +27,11 @@ public class BatchBottleSlot extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        return stack.is(Items.POTION) || stack.is(Items.SPLASH_POTION)
-                || stack.is(Items.LINGERING_POTION) || stack.is(Items.GLASS_BOTTLE);
+        // Exactly what a vanilla bottle slot accepts, minus a half draught — not a receptive
+        // bottle (SPEC §4), rejected here as it is on the bottom row.
+        return !Draughts.isDraught(stack)
+                && (stack.is(Items.POTION) || stack.is(Items.SPLASH_POTION)
+                || stack.is(Items.LINGERING_POTION) || stack.is(Items.GLASS_BOTTLE));
     }
 
     @Override

@@ -24,7 +24,8 @@
             "com.rfizzle.distillation.gametest.DiscoveryGameTest",
             "com.rfizzle.distillation.gametest.DistillationCommandGameTest",
             "com.rfizzle.distillation.gametest.MurkyDraughtGameTest",
-            "com.rfizzle.distillation.gametest.BatchBrewingGameTest"
+            "com.rfizzle.distillation.gametest.BatchBrewingGameTest",
+            "com.rfizzle.distillation.gametest.DraughtGameTest"
         ]
     },
     "suggests": {

@@ -1,0 +1,7 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "distillation:item/draught_half",
+        "layer1": "item/potion"
+    }
+}
