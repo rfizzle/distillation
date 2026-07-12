@@ -19,8 +19,14 @@ import java.util.Optional;
  */
 public record BrewProvenance(Map<Integer, ResourceLocation> bySlot) {
 
-    /** Bottle slots are 0–2; anything else in a save is malformed and dropped on load. */
-    private static final int BOTTLE_SLOTS = 3;
+    /**
+     * Recordable slots are the bottle slots of the grown container: 0–2 and the batch row 5–7
+     * ({@code design/SPEC.md} §3). Ingredient (3), fuel (4), and any index outside {@code [0, 8)}
+     * never carry a brewed output; such an entry in a save is malformed and dropped on load.
+     */
+    private static boolean isBottleSlot(int slot) {
+        return (slot >= 0 && slot <= 2) || (slot >= 5 && slot <= 7);
+    }
 
     public static final BrewProvenance EMPTY = new BrewProvenance(Map.of());
 
@@ -41,8 +47,7 @@ public record BrewProvenance(Map<Integer, ResourceLocation> bySlot) {
             .xmap(entries -> {
                 Map<Integer, ResourceLocation> bySlot = new LinkedHashMap<>();
                 for (Entry entry : entries) {
-                    if (entry.slot() >= 0 && entry.slot() < BOTTLE_SLOTS
-                            && !Entry.RECIPE_UNSET.equals(entry.recipeId())) {
+                    if (isBottleSlot(entry.slot()) && !Entry.RECIPE_UNSET.equals(entry.recipeId())) {
                         bySlot.put(entry.slot(), entry.recipeId());
                     }
                 }

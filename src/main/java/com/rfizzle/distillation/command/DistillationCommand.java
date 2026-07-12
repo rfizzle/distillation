@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.batch.BatchRig;
 import com.rfizzle.distillation.discovery.DiscoveryData;
 import com.rfizzle.distillation.discovery.DiscoveryManager;
 import com.rfizzle.distillation.recipe.RecipeGraph;
@@ -17,13 +18,18 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.level.block.BrewingStandBlock;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import java.util.List;
 
@@ -79,6 +85,8 @@ public final class DistillationCommand {
                                 .executes(ctx -> runForget(ctx, ctx.getSource().getPlayerOrException()))
                                 .then(Commands.argument("player", EntityArgument.player())
                                         .executes(ctx -> runForget(ctx, EntityArgument.getPlayer(ctx, "player"))))))
+                .then(Commands.literal("rig")
+                        .executes(ctx -> runRig(ctx.getSource())))
                 .then(Commands.literal("reload")
                         .requires(source -> source.hasPermission(2))
                         .executes(DistillationCommand::runReload)));
@@ -159,6 +167,36 @@ public final class DistillationCommand {
         source.sendSuccess(() -> Component.translatable("command.distillation.forget.all",
                 removed, target.getDisplayName()), true);
         return removed;
+    }
+
+    /**
+     * Reports the batch-rig status of the brewing stand the caller is looking at, within 10 blocks
+     * ({@code design/SPEC.md} §8): the water level and heat source when rigged, or the first missing
+     * piece top-down (cauldron, then water, then heat). All output is localized.
+     */
+    private static int runRig(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        HitResult hit = player.pick(10.0, 1.0F, false);
+        ServerLevel level = player.serverLevel();
+        if (hit.getType() != HitResult.Type.BLOCK
+                || !(level.getBlockState(((BlockHitResult) hit).getBlockPos()).getBlock() instanceof BrewingStandBlock)) {
+            source.sendFailure(Component.translatable("command.distillation.rig.no_stand"));
+            return 0;
+        }
+        BlockPos pos = ((BlockHitResult) hit).getBlockPos();
+        BatchRig.Status status = BatchRig.detect(level, pos);
+        switch (status.piece()) {
+            case RIGGED -> source.sendSuccess(() -> Component.translatable("command.distillation.rig.status",
+                    status.waterLevel(), status.maxWater(),
+                    Component.translatable(status.heat().translationKey())), false);
+            case NO_CAULDRON -> source.sendSuccess(
+                    () -> Component.translatable("command.distillation.rig.missing.cauldron"), false);
+            case NO_WATER -> source.sendSuccess(
+                    () -> Component.translatable("command.distillation.rig.missing.water"), false);
+            case NO_HEAT -> source.sendSuccess(
+                    () -> Component.translatable("command.distillation.rig.missing.heat"), false);
+        }
+        return status.rigged() ? Command.SINGLE_SUCCESS : 0;
     }
 
     private static int runReload(CommandContext<CommandSourceStack> ctx) {

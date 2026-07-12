@@ -33,7 +33,18 @@ class CommandLangContractTest {
             "command.distillation.forget.all",
             "command.distillation.unknown_recipe",
             "command.distillation.reload",
-            "command.distillation.reload_failed");
+            "command.distillation.reload_failed",
+            "command.distillation.rig.no_stand",
+            "command.distillation.rig.status",
+            "command.distillation.rig.missing.cauldron",
+            "command.distillation.rig.missing.water",
+            "command.distillation.rig.missing.heat",
+            "command.distillation.rig.heat.campfire",
+            "command.distillation.rig.heat.soul_campfire",
+            "command.distillation.rig.heat.fire",
+            "command.distillation.rig.heat.soul_fire",
+            "command.distillation.rig.heat.lava",
+            "command.distillation.rig.heat.magma");
 
     @Test
     void everyCommandFeedbackKeyExistsNonBlank() {

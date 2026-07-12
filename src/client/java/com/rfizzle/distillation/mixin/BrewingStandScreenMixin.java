@@ -1,7 +1,9 @@
 package com.rfizzle.distillation.mixin;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.batch.RiggedMenu;
 import com.rfizzle.distillation.client.discovery.ClientDiscoveryState;
+import com.rfizzle.distillation.client.gui.brewing.BatchRowRenderer;
 import com.rfizzle.distillation.client.gui.brewing.BrewingStandRecipesLayout;
 import com.rfizzle.distillation.client.gui.brewing.RecipesPageRenderer;
 import com.rfizzle.distillation.client.gui.brewing.VaporHintRenderer;
@@ -56,6 +58,16 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
 
     private BrewingStandScreenMixin(BrewingStandMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
+    }
+
+    // The batch row (SPEC §3) draws in the background pass so its slot cells sit behind the bottles
+    // the menu's slots render. Shown only while the stand is rigged, independent of discovery.
+    @Inject(method = "renderBg", at = @At("TAIL"))
+    private void distillation$renderBatchRow(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY,
+                                             CallbackInfo ci) {
+        if (((RiggedMenu) this.menu).distillation$isRigged()) {
+            BatchRowRenderer.render(guiGraphics, this.leftPos, this.topPos, distillation$animTick());
+        }
     }
 
     // Single render-TAIL entry point for every discovery surface. Draw order is code order, so the

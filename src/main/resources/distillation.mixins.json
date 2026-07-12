@@ -4,8 +4,11 @@
     "package": "com.rfizzle.distillation.mixin",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
+        "AbstractContainerMenuMixin",
+        "BaseContainerBlockEntityMixin",
         "BrewingStandBlockEntityMixin",
         "BrewingStandMenuIngredientsSlotMixin",
+        "BrewingStandMenuMixin",
         "BrewingStandMenuPotionSlotMixin"
     ],
     "client": [],
