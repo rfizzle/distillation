@@ -1,5 +1,6 @@
 package com.rfizzle.distillation;
 
+import com.rfizzle.distillation.brew.Antidotes;
 import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.brew.DistillationPotions;
 import com.rfizzle.distillation.brew.PremiumBrews;
@@ -33,8 +34,11 @@ public class Distillation implements ModInitializer {
         getConfig(); // eager first load, so later callers never pay the lazy path in play
         DistillationPotions.register();
         PremiumBrews.register(); // reads the §2 holders above; premium conversions need it below
+        Antidotes.registerEffect(); // the cleanse effect must exist before its antidote potions
+        Antidotes.register();
         DistillationBrews.registerConversions();
         PremiumBrews.registerConversions();
+        Antidotes.registerConversions();
         DistillationItems.register();
         DistillationSounds.register();
         DistillationAttachments.init();

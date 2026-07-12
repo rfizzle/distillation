@@ -106,7 +106,8 @@ abstract class BrewingStandBlockEntityMixin implements BatchStand {
         // Only vanilla's serverTick calls this, so the local (server) config is authoritative.
         var config = Distillation.getConfig();
         cir.setReturnValue(BrewSeam.isBrewable(
-                RecipeGraphs.lookup(brewing, config.enableMissingBrews, config.enablePremiumBrews),
+                RecipeGraphs.lookup(brewing, config.enableMissingBrews, config.enablePremiumBrews,
+                        config.enableAntidotes),
                 items, config.enableMurkyDraughts));
     }
 

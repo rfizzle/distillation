@@ -222,7 +222,8 @@ public final class DistillationCommand {
 
     private static RecipeGraph graph(MinecraftServer server) {
         DistillationConfig config = Distillation.getConfig();
-        return RecipeGraphs.lookup(server.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews);
+        return RecipeGraphs.lookup(server.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews,
+                config.enableAntidotes);
     }
 
     /**
