@@ -11,8 +11,10 @@
         "BrewingStandMenuMixin",
         "BrewingStandMenuPotionSlotMixin",
         "ItemStackHoverNameMixin",
+        "PotionContentsColorMixin",
         "PotionContentsMixin",
-        "PotionItemMixin"
+        "PotionItemMixin",
+        "PotionItemTooltipMixin"
     ],
     "client": [],
     "injectors": {
