@@ -14,7 +14,8 @@
         "PotionContentsColorMixin",
         "PotionContentsMixin",
         "PotionItemMixin",
-        "PotionItemTooltipMixin"
+        "PotionItemTooltipMixin",
+        "ThrownPotionMixin"
     ],
     "client": [],
     "injectors": {
