@@ -2,6 +2,7 @@ package com.rfizzle.distillation;
 
 import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.brew.DistillationPotions;
+import com.rfizzle.distillation.brew.PremiumBrews;
 import com.rfizzle.distillation.command.DistillationCommand;
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.discovery.DistillationAttachments;
@@ -31,7 +32,9 @@ public class Distillation implements ModInitializer {
     public void onInitialize() {
         getConfig(); // eager first load, so later callers never pay the lazy path in play
         DistillationPotions.register();
+        PremiumBrews.register(); // reads the §2 holders above; premium conversions need it below
         DistillationBrews.registerConversions();
+        PremiumBrews.registerConversions();
         DistillationItems.register();
         DistillationSounds.register();
         DistillationAttachments.init();
