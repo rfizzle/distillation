@@ -11,6 +11,7 @@ import net.minecraft.world.item.alchemy.Potion;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * The murky draught's hint machinery ({@code design/SPEC.md} §1): which ingredient a failed
@@ -36,11 +37,27 @@ public final class MurkyHints {
      * regardless of resolution order. Empty candidates yield the hintless draught.
      */
     public static <T> Optional<T> select(List<T> candidates, long seed) {
-        if (candidates.isEmpty()) {
+        return select(candidates, seed, ignored -> false);
+    }
+
+    /**
+     * Picks the hint seeded-uniform, but from the {@code preferred} candidates when the set holds
+     * any — the draught names a new liquid to brew (a potion conversion) over a mere container
+     * swap whenever it can, falling back to the full set (container conversions alone) so a bottle
+     * that only takes a container change still hints rather than going hintless. The preference is
+     * a pure filter and the pick stays seed-deterministic, so bottles sharing a pass's seed and
+     * candidate set still agree. Empty candidates yield the hintless draught.
+     */
+    public static <T> Optional<T> select(List<T> candidates, long seed, Predicate<T> preferred) {
+        List<T> pool = candidates.stream().filter(preferred).toList();
+        if (pool.isEmpty()) {
+            pool = candidates;
+        }
+        if (pool.isEmpty()) {
             return Optional.empty();
         }
         RandomSource random = RandomSource.create(seed);
-        return Optional.of(candidates.get(random.nextInt(candidates.size())));
+        return Optional.of(pool.get(random.nextInt(pool.size())));
     }
 
     /**

@@ -194,7 +194,8 @@ public final class BrewSeam {
         if (inputPotion.isEmpty()) {
             return null;
         }
-        Optional<ResourceLocation> hint = MurkyHints.select(graph.conversionsFor(bottle), hintSeed)
+        Optional<ResourceLocation> hint = MurkyHints.select(graph.conversionsFor(bottle), hintSeed,
+                        conversion -> conversion instanceof RecipeGraph.PotionConversion)
                 .map(conversion -> BuiltInRegistries.ITEM.getKey(conversion.ingredient()));
         ItemStack draught = new ItemStack(DistillationItems.MURKY_DRAUGHT);
         draught.set(DistillationItems.MURKY_DRAUGHT_CONTENTS, new MurkyDraughtContents(inputPotion.get(), hint));

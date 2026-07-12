@@ -172,6 +172,31 @@ class RecipeGraphTest {
     }
 
     @Test
+    void murkyHintPrefersPotionConversionsOverContainers() {
+        RecipeGraph graph = RecipeGraph.fromBrewing(syntheticRegistry(), Set.of());
+
+        // Water takes both nether wart (a potion conversion → awkward) and gunpowder (a container
+        // conversion → splash). The hint must always name the new liquid, never the container swap.
+        var waterCandidates = graph.conversionsFor(bottleOf(Potions.WATER));
+        for (long seed = 0; seed < 200; seed++) {
+            var hint = MurkyHints.select(waterCandidates, seed,
+                    conversion -> conversion instanceof RecipeGraph.PotionConversion);
+            assertTrue(hint.isPresent() && hint.get().ingredient() == Items.NETHER_WART,
+                    "a bottle with both kinds of candidate never hints the container ingredient (seed " + seed + ")");
+        }
+
+        // A drinkable awkward bottle only takes gunpowder (container conversion); with no potion
+        // conversion to prefer, the container hint stands — better than a hintless draught.
+        var awkwardCandidates = graph.conversionsFor(bottleOf(Potions.AWKWARD));
+        for (long seed = 0; seed < 200; seed++) {
+            var hint = MurkyHints.select(awkwardCandidates, seed,
+                    conversion -> conversion instanceof RecipeGraph.PotionConversion);
+            assertTrue(hint.isPresent() && hint.get().ingredient() == Items.GUNPOWDER,
+                    "a container-only bottle still hints its container conversion (seed " + seed + ")");
+        }
+    }
+
+    @Test
     void flickerResolvesTheHintedConversionsOutput() {
         RecipeGraph graph = RecipeGraph.fromBrewing(syntheticRegistry(), Set.of());
         ResourceLocation water = ResourceLocation.parse("minecraft:water");
