@@ -1,7 +1,10 @@
 package com.rfizzle.distillation.recipe;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.batch.BatchBrew;
+import com.rfizzle.distillation.batch.BatchStates;
 import com.rfizzle.distillation.brew.DistillationBrews;
+import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.discovery.BrewProvenances;
 import com.rfizzle.distillation.item.DistillationItems;
 import com.rfizzle.distillation.item.MurkyDraughtContents;
@@ -15,6 +18,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
@@ -46,16 +50,26 @@ public final class BrewSeam {
     private BrewSeam() {
     }
 
-    /** Replaces {@code BrewingStandBlockEntity.doBrew}. Slots 0–2 bottles, 3 ingredient. */
+    /**
+     * Replaces {@code BrewingStandBlockEntity.doBrew}. Bottom bottles 0–2 and ingredient 3 resolve
+     * as vanilla-plus-graph; when the stand's persisted batch flag is set ({@code design/SPEC.md}
+     * §3) the batch row 5–7 resolves too — valid, owner-brewable conversions only, never murked —
+     * and the ingredient shrinks by {@code batchIngredientCost} instead of one.
+     */
     public static void completeBrew(Level level, BlockPos pos, NonNullList<ItemStack> items) {
         RecipeGraph graph = RecipeGraphs.forLevel(level);
         // Only vanilla's serverTick reaches doBrew, so the local (server) config is authoritative.
-        boolean murkyEnabled = Distillation.getConfig().enableMurkyDraughts;
+        DistillationConfig config = Distillation.getConfig();
+        boolean murkyEnabled = config.enableMurkyDraughts;
         ItemStack ingredient = items.get(3);
         // One seed per pass: bottles sharing an input potion agree on their hint (SPEC §1).
         long hintSeed = MurkyHints.seedFor(pos, level.getGameTime());
         Map<Integer, ResourceLocation> produced = new LinkedHashMap<>();
         Set<Integer> murked = new LinkedHashSet<>();
+
+        BrewingStandBlockEntity stand = level.getBlockEntity(pos) instanceof BrewingStandBlockEntity s ? s : null;
+        boolean batch = stand != null && BatchStates.get(stand).brewing();
+
         for (int slot = 0; slot < 3; slot++) {
             ItemStack bottle = items.get(slot);
             RecipeGraph.Conversion conversion = graph.matchConversion(ingredient, bottle);
@@ -70,28 +84,65 @@ public final class BrewSeam {
                 }
             }
         }
+
+        // Batch row: a committed pass fills a batch bottle only when the ingredient takes it to a
+        // conversion the owner may brew (lenient — the pass was paid for at start; see BatchBrew).
+        // Everything else in the row is left untouched, never murked.
+        if (batch) {
+            for (int slot = BatchBrew.FIRST_BATCH_SLOT; slot <= BatchBrew.LAST_BATCH_SLOT; slot++) {
+                ItemStack bottle = items.get(slot);
+                RecipeGraph.Conversion conversion =
+                        BatchBrew.batchConversion(stand, level, ingredient, bottle, graph, config, true);
+                if (conversion != null) {
+                    items.set(slot, graph.outputOf(conversion, bottle));
+                    produced.put(slot, conversion.id());
+                }
+            }
+        }
+
         // Matched slots record the conversion that just produced their bottle; discovery reads
         // the record back when a player takes the output. Murked slots clear any earlier record —
         // a Murky Draught is nobody's brewed output. Untouched slots keep theirs.
-        if (level.getBlockEntity(pos) instanceof BrewingStandBlockEntity stand) {
+        if (stand != null) {
             BrewProvenances.recordBrew(stand, produced, murked);
         }
         if (!murked.isEmpty()) {
             level.playSound(null, pos, DistillationSounds.MURKY_FIZZLE, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
 
+        int cost = batch ? config.batchIngredientCost : 1;
+        items.set(3, consumeIngredient(level, pos, ingredient, cost));
+
+        if (batch) {
+            BatchStates.setBrewing(stand, false); // the committed pass is done; the rig may eject next tick
+        }
+        level.levelEvent(1035, pos, 0);
+    }
+
+    /**
+     * Shrinks the ingredient by {@code count} and settles its crafting remainder as vanilla does,
+     * scaled to the batch cost: an ingredient {@linkplain DistillationBrews#isConsumedWhole consumed
+     * whole} leaves nothing, otherwise each consumed unit yields a remainder — the first refilling an
+     * emptied slot, the rest dropped beside the stand.
+     */
+    private static ItemStack consumeIngredient(Level level, BlockPos pos, ItemStack ingredient, int count) {
+        Item item = ingredient.getItem();
         boolean consumedWhole = DistillationBrews.isConsumedWhole(ingredient);
-        ingredient.shrink(1);
-        if (!consumedWhole && ingredient.getItem().hasCraftingRemainingItem()) {
-            ItemStack remainder = new ItemStack(ingredient.getItem().getCraftingRemainingItem());
+        int consumed = Math.min(count, ingredient.getCount());
+        ingredient.shrink(count);
+        if (consumedWhole || !item.hasCraftingRemainingItem()) {
+            return ingredient;
+        }
+        Item remainderItem = item.getCraftingRemainingItem();
+        for (int i = 0; i < consumed; i++) {
+            ItemStack remainder = new ItemStack(remainderItem);
             if (ingredient.isEmpty()) {
                 ingredient = remainder;
             } else {
                 Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), remainder);
             }
         }
-        items.set(3, ingredient);
-        level.levelEvent(1035, pos, 0);
+        return ingredient;
     }
 
     /**

@@ -51,14 +51,18 @@ class BrewProvenanceTest {
 
     @Test
     void malformedSlotsAreDroppedOnLoad() {
+        // Slot 8 is past the grown container; slot 7 is a valid batch-row slot (SPEC §3) and stays.
         JsonElement tampered = JsonParser.parseString(
-                "[{\"slot\":7,\"recipe\":\"distillation:bogus\"},{\"slot\":1,\"recipe\":\"distillation:ok\"}]");
+                "[{\"slot\":8,\"recipe\":\"distillation:bogus\"},"
+                        + "{\"slot\":7,\"recipe\":\"distillation:batch\"},"
+                        + "{\"slot\":1,\"recipe\":\"distillation:ok\"}]");
         BrewProvenance decoded = BrewProvenance.CODEC.parse(JsonOps.INSTANCE, tampered)
                 .getOrThrow(message -> new AssertionError("decode failed: " + message));
 
-        assertEquals(Optional.empty(), decoded.forSlot(7));
+        assertEquals(Optional.empty(), decoded.forSlot(8), "out-of-range slots from a tampered save are dropped");
+        assertEquals(Optional.of(id("batch")), decoded.forSlot(7), "batch-row slots are recordable");
         assertEquals(Optional.of(id("ok")), decoded.forSlot(1));
-        assertEquals(1, decoded.bySlot().size(), "out-of-range slots from a tampered save are dropped");
+        assertEquals(2, decoded.bySlot().size());
     }
 
     @Test

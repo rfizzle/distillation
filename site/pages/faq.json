@@ -25,7 +25,7 @@
             },
             {
               "q": "How does discovery work on a server?",
-              "a": "Per player: your recipes page fills only with what you have brewed, and late joiners learn the same way the founders did. Batch brewing scales only recipes the brewer has personally discovered. A server can start everyone fully unlocked with <code>startDiscovered</code>."
+              "a": "Per player: your recipes page fills only with what you have brewed, and late joiners learn the same way the founders did. Batch brewing scales only recipes the stand's owner has personally discovered, and only while that owner is online; otherwise the stand brews a normal three-bottle pass. A server can start everyone fully unlocked with <code>startDiscovered</code>."
             },
             {
               "q": "Won't EMI/REI/JEI spoil the discovery game?",

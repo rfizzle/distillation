@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.discovery;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.batch.BatchState;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 
@@ -23,6 +24,11 @@ public final class DistillationAttachments {
     public static final AttachmentType<BrewProvenance> BREW_PROVENANCE = AttachmentRegistry.create(
             Distillation.id("brew_provenance"),
             builder -> builder.persistent(BrewProvenance.CODEC));
+
+    /** Per-stand batch bookkeeping (owner UUID + in-flight batch flag, {@code design/SPEC.md} §3). */
+    public static final AttachmentType<BatchState> BATCH_STATE = AttachmentRegistry.create(
+            Distillation.id("batch_state"),
+            builder -> builder.persistent(BatchState.CODEC));
 
     private DistillationAttachments() {
     }
