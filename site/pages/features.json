@@ -130,7 +130,7 @@
         {
           "type": "prose",
           "html": [
-            "Lingering clouds last <strong class='text-bone'>60 seconds</strong> instead of 30 and open at a 4½-block radius instead of 3. A splash potion applies 87.5% of the drinkable duration instead of 75%. Throw a cloud where the fight is and it is still working when the second wave arrives — a dedicated brewer becomes a viable support role."
+            "Lingering clouds last <strong class='text-bone'>60 seconds</strong> instead of 30 and open at a 4½-block radius instead of 3. A splash potion applies a flat <strong class='text-bone'>87.5%</strong> of the drinkable duration to everyone it hits — no distance falloff on how long the effect lasts. Throw a cloud where the fight is and it is still working when the second wave arrives — a dedicated brewer becomes a viable support role."
           ]
         }
       ]
