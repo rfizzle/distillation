@@ -45,6 +45,16 @@ public final class Draughts {
     }
 
     /**
+     * The drink time for a resolved drink kind ({@code design/SPEC.md} §4): a draught is a
+     * half-measure, and a half-measure swallows in half the time — a sip of a full bottle or a stored
+     * half both take {@code ⌊vanillaTicks ÷ 2⌋}; a full drink keeps vanilla's time. Pure over the
+     * classified kind and vanilla's own use duration, so the number tracks vanilla if it ever moves.
+     */
+    public static int useDuration(DrinkKind kind, int vanillaTicks) {
+        return kind == DrinkKind.FULL ? vanillaTicks : vanillaTicks / 2;
+    }
+
+    /**
      * The pure sip/drink decision. A half draught always drinks its remaining half — even with
      * {@code enableDraughts} off, so existing halves stay drinkable. A full potion sips only when
      * sipping is enabled, the drinker is sneaking, and the potion has a non-instant effect (instant

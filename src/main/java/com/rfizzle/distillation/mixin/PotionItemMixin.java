@@ -1,5 +1,6 @@
 package com.rfizzle.distillation.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.rfizzle.distillation.item.Draughts;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * falls through to untouched vanilla. Splash and lingering potions ({@code ThrowablePotionItem},
  * itself a {@code PotionItem} subclass) override {@code use} to throw on the spot, so they never
  * enter the drink flow this seam intercepts ("cannot be sipped"). A half draught's tooltip shows
- * halved durations by scaling vanilla's own duration factor.
+ * halved durations by scaling vanilla's own duration factor, and a half-measure — a sip or a stored
+ * half — swallows in half the drink time.
  */
 @Mixin(PotionItem.class)
 abstract class PotionItemMixin {
@@ -31,6 +33,18 @@ abstract class PotionItemMixin {
             return;
         }
         cir.setReturnValue(Draughts.finishDraught(stack, level, entity, kind));
+    }
+
+    /**
+     * A draught is a half-measure and swallows in half the time (SPEC §4): the same classification
+     * that halves the dose halves the drink duration, so a sip or a stored half both quicken while a
+     * full drink keeps vanilla's time. Resolves identically on both sides — the marker component and
+     * config sync to the client, and the drinker's own crouch drives its animation — so the shorter
+     * client animation lands the drink on the same tick the server completes it.
+     */
+    @ModifyReturnValue(method = "getUseDuration", at = @At("RETURN"))
+    private int distillation$quickSip(int original, ItemStack stack, LivingEntity entity) {
+        return Draughts.useDuration(Draughts.classify(stack, entity), original);
     }
 
     @ModifyArg(method = "appendHoverText",

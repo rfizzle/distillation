@@ -42,6 +42,9 @@ public class DraughtGameTest implements FabricGameTest {
     private static final int TIMEOUT = 600;
     private static final int TOLERANCE = 20;
 
+    private static final int VANILLA_DRINK_TICKS = 32; // vanilla PotionItem drink time (1.6s)
+    private static final int DRAUGHT_DRINK_TICKS = 16;  // half-measure: half the time (0.8s)
+
     private static final int FIRE_RES_HONEST = 9600;   // SPEC §4: 8:00
     private static final int FIRE_RES_HALF = 4800;     // ⌊9600 ÷ 2⌋
     private static final int FIRE_RES_VANILLA = 3600;  // vanilla 3:00, honest off
@@ -97,6 +100,33 @@ public class DraughtGameTest implements FabricGameTest {
                     "drinking the half applies the remaining ⌊honest ÷ 2⌋");
             helper.assertTrue(returned.is(Items.GLASS_BOTTLE),
                     "drinking a half must return the glass bottle");
+        } finally {
+            player.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void draughtSwallowsInHalfTheTime(GameTestHelper helper) {
+        // SPEC §4: a half-measure swallows in half the vanilla drink time; a full drink keeps it.
+        ServerPlayer player = survivalPlayer(helper);
+        try {
+            ItemStack full = potion("minecraft:fire_resistance");
+            int vanilla = full.getItem().getUseDuration(full, player);
+            helper.assertTrue(vanilla == VANILLA_DRINK_TICKS,
+                    "a non-sneaking full potion keeps the vanilla drink time, was " + vanilla);
+
+            player.setShiftKeyDown(true);
+            helper.assertTrue(full.getItem().getUseDuration(full, player) == DRAUGHT_DRINK_TICKS,
+                    "sneak-sipping a full potion swallows in half the drink time");
+
+            ItemStack half = half("minecraft:fire_resistance");
+            helper.assertTrue(half.getItem().getUseDuration(half, player) == DRAUGHT_DRINK_TICKS,
+                    "drinking a stored half swallows in half the drink time");
+
+            ItemStack instant = potion("minecraft:healing");
+            helper.assertTrue(instant.getItem().getUseDuration(instant, player) == VANILLA_DRINK_TICKS,
+                    "an instant potion cannot be sipped and keeps the full drink time even sneaking");
         } finally {
             player.discard();
         }
