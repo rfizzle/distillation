@@ -91,6 +91,20 @@ final class ClothConfigScreenBuilder {
                 .setSaveConsumer(v -> config.batchFuelCost = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
+                        Component.translatable("config.distillation.enable_tipped_arrows"),
+                        config.enableTippedArrows)
+                .setTooltip(Component.translatable("config.distillation.enable_tipped_arrows.tooltip"))
+                .setDefaultValue(defaults.enableTippedArrows)
+                .setSaveConsumer(v -> config.enableTippedArrows = v)
+                .build());
+        server.addEntry(entry.startIntSlider(
+                        Component.translatable("config.distillation.tipped_arrows_per_dip"),
+                        config.tippedArrowsPerDip, 1, 16)
+                .setTooltip(Component.translatable("config.distillation.tipped_arrows_per_dip.tooltip"))
+                .setDefaultValue(defaults.tippedArrowsPerDip)
+                .setSaveConsumer(v -> config.tippedArrowsPerDip = v)
+                .build());
+        server.addEntry(entry.startBooleanToggle(
                         Component.translatable("config.distillation.enable_honest_durations"),
                         config.enableHonestDurations)
                 .setTooltip(Component.translatable("config.distillation.enable_honest_durations.tooltip"))

@@ -92,14 +92,25 @@ line.
 - **What changes for you** — A dedicated brewer is a viable support role:
   the cloud is still working when the second wave arrives.
 
+### Tipped arrows worth fletching
+- **What it is** — Tipped arrows craftable at survival prices, not gated
+  behind a dragon's-breath lingering potion.
+- **How you use it** — Right-click a water cauldron with a potion you have
+  discovered to charge it, then dip a stack of arrows to tip eight at a time;
+  each dip spends one water level. Vanilla's lingering-potion recipe still
+  works alongside it.
+- **What changes for you** — Arrows of Slowness or Poison become part of the
+  brewing you already do, not a dragon's-breath luxury.
+
 ## Staying in control
 
 Every piece switches off on its own — discovery hints, Murky Draughts, batch
-brewing, the new recipes, the longer durations, the splash and lingering
-rebalance — so a server can run any slice of the mod, or start everyone with
-the full recipes page unlocked. Change nothing and the defaults are exactly
-this document; whatever you change, every vanilla recipe still brews, milk
-still cures all, and golden apples are untouched. Discoveries are per player
+brewing, the new recipes, the longer durations, cauldron-tipped arrows, the
+splash and lingering rebalance — so a server can run any slice of the mod, or
+start everyone with the full recipes page unlocked. Change nothing and the
+defaults are exactly this document; whatever you change, every vanilla recipe
+still brews, milk still cures all, and golden apples are untouched. Discoveries
+are per player
 — your recipes page fills only with what you have brewed.
 
 ## Better together

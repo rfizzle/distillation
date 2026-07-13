@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Wires the §9 advancement triggers to the systems they observe, keeping all advancement-firing out
+ * Wires the §10 advancement triggers to the systems they observe, keeping all advancement-firing out
  * of the gameplay classes themselves. It rides Distillation's own public callbacks (dogfooding the
  * discovery and brew events) for the derived milestones, and is called from the extraction hook for
  * the "obtain the bottle" milestones — the player-attributed, automation-safe moment, since the brew

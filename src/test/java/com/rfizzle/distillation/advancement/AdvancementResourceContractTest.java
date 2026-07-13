@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Pins the hand-written §9 advancement tree against SPEC: the seven ids ship, each parents under
+ * Pins the hand-written §10 advancement tree against SPEC: the seven ids ship, each parents under
  * vanilla's Local Brewery, keeps telemetry off, fires only {@code distillation:} triggers, and has
  * a non-blank title and description lang key. The Missing Shelf must carry exactly the five §2 lines.
  * The live-registry parse (that each trigger id resolves) is the gametest's job; this guards the

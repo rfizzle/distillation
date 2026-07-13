@@ -38,7 +38,7 @@ public final class CleanseMobEffect extends InstantenousMobEffect {
         Holder<MobEffect> target = Antidotes.targetForIndex(amplifier);
         if (target != null && entity.removeEffect(target) && entity instanceof ServerPlayer serverPlayer
                 && !FakePlayers.isFakePlayer(serverPlayer) && serverPlayer.getActiveEffects().size() >= 2) {
-            // Surgical (SPEC §9): the strip landed on a real player who keeps ≥2 other effects — a
+            // Surgical (SPEC §10): the strip landed on a real player who keeps ≥2 other effects — a
             // dispenser-thrown splash curing a fake player earns nothing. The cleanse is instant
             // (applied via applyInstantenousEffect, never stored), so the active list here is exactly
             // the drinker's other effects, with the just-removed target already gone.

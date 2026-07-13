@@ -2,6 +2,8 @@ package com.rfizzle.distillation;
 
 import com.rfizzle.distillation.advancement.DistillationAdvancements;
 import com.rfizzle.distillation.advancement.DistillationCriteria;
+import com.rfizzle.distillation.arrow.CauldronDipInteractions;
+import com.rfizzle.distillation.arrow.ChargedCauldronParticles;
 import com.rfizzle.distillation.brew.Antidotes;
 import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.brew.DistillationPotions;
@@ -44,6 +46,8 @@ public class Distillation implements ModInitializer {
         DistillationItems.register();
         DistillationSounds.register();
         DistillationAttachments.init();
+        CauldronDipInteractions.register();
+        ChargedCauldronParticles.register();
         RecipeGraphs.registerLifecycleHandlers();
         DistillationNetworking.registerPayloads();
         DistillationNetworking.registerLifecycleHandlers();

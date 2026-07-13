@@ -352,7 +352,37 @@ Splash potions tax duration 25% and lingering clouds evaporate in seconds over a
 
 ---
 
-## 8. Commands
+## 8. Tipped Arrows
+
+### Problem
+
+Vanilla tips arrows only through a lingering potion — dragon's breath per batch — which prices them out of survival play. The stand pours the potion, so the path is Distillation's to fix; the item and its behavior stay vanilla's, only the way to it changes.
+
+### Behavior
+
+- **Charging.** Right-clicking a **water cauldron** (any level) with a **drinkable potion the player has discovered** tints the cauldron with that potion and returns an empty glass bottle. Only normal potions charge — splash and lingering potions have no cauldron interaction, so vanilla's lingering-potion tipped-arrow recipe is untouched. A charged cauldron lifts potion-colored particles, so it reads as charged in-world.
+- **Dipping.** Right-clicking a charged cauldron with a stack of arrows tips up to `tippedArrowsPerDip` of them (default 8) into vanilla **tipped arrows** carrying the cauldron's potion, and spends **one water level**. A full (level-3) cauldron therefore tips up to three dips before running dry; draining the last level empties the cauldron and clears its charge.
+- **Discovery gate.** Charging is gated like batch brewing: with `enableDiscovery` on, the potion must be produced by at least one conversion the charging player has discovered. An undiscovered-but-tippable brew names that brew in the action bar and does nothing; with discovery off, any drinkable potion charges.
+
+### Edge Cases
+
+- **Water bottles** keep vanilla's behavior — right-clicking a water cauldron with a water bottle raises its level as always; only effect potions charge.
+- **A potion no conversion produces** (a foreign or base potion with no producing edge) fails closed — it cannot charge.
+- **Arrow damage and effects stay vanilla's** — only the path to the item changes. Dipping is not a brew: it never routes through the brew choke point and produces no bottle.
+- **Cauldron removal** — a plain cauldron has no block entity, so a charge whose cauldron is emptied or replaced is dropped lazily on the next read or particle sweep.
+- **Charge persistence** — the tinting potion is saved per dimension (the remaining capacity is the cauldron's own water level) and survives reload.
+
+### Config
+
+`enableTippedArrows` (default true) gates the whole feature — off, a water cauldron behaves exactly as vanilla. `tippedArrowsPerDip` (default 8, range 1–16) sets how many arrows one dip tips, and with it how many a full cauldron yields.
+
+### Implementation Notes
+
+- Two `CauldronInteraction.WATER` entries registered at init — the `POTION` entry (delegating to the captured vanilla water-fill for water bottles and whenever the feature is off) and the `ARROW` entry — so no mixin or access widener is needed. The potion→conversion discovery lookup walks the recipe graph (there is no reverse index; it runs only on a charge interaction). The tinting potion persists in a per-dimension `SavedData`; a budgeted server sweep emits the particles and lazily clears stale entries.
+
+---
+
+## 9. Commands
 
 ### `/distillation` Command Tree
 
@@ -369,7 +399,7 @@ All feedback is localized (`command.distillation.*`). Diagnostic density is favo
 
 ---
 
-## 9. Advancements
+## 10. Advancements
 
 Seven entries, parented under vanilla's **Local Brewery** (`minecraft:nether/brew_potion`) — extending the brewing story vanilla already tells.
 
@@ -402,6 +432,8 @@ All features are independently toggleable via a ModMenu / Cloth Config screen an
 | `enableBatchBrewing` | bool | true | The heated-cauldron batch rig (§3) |
 | `batchIngredientCost` | int | 3 | Ingredients consumed per six-bottle pass |
 | `batchFuelCost` | int | 2 | Fuel charges consumed per six-bottle pass |
+| `enableTippedArrows` | bool | true | Cauldron potion-charging + arrow dipping (§8) |
+| `tippedArrowsPerDip` | int | 8 | Arrows tipped per dip, one water level each |
 | `enableHonestDurations` | bool | true | Utility-potion duration retune (§4) |
 | `enableDraughts` | bool | true | Sneak-drink half potions (§4) |
 | `enablePremiumBrews` | bool | true | Concentration + both-dusts premium path (§5) |
@@ -509,6 +541,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 - Duration retune math: override table application, §2 lines exempt from double-scaling, splash factor application, draught halving (⌊÷2⌋, no quarter-splits)
 - Premium formula: `long ÷ 2` durations and amplifiers per line; concentration validity (strong-form-only, base-potion-only)
 - Discovery set semantics: idempotent re-discovery, forget, stale-id hiding vs retention
+- Tipped-arrow dip: per-dip count caps (rate, arrows held, empty hand), the charge gate over discovered producers, charged-cauldron NBT round-trip (sorted order, malformed-entry skip)
 - Config round-trip, clamping, corrupted-file fallback
 
 ### Gametests (Fabric Gametest API)
@@ -522,6 +555,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 - Concentration → both dusts (either order) yields premium at `long ÷ 2`; concentrating a modified potion murks
 - Each antidote brews from a Thick base (Awkward + the same reagent murks) and strips exactly its effect and nothing else; absent-effect drink consumes silently; splash antidote cures a poisoned entity; lingering antidote cloud lasts 1200 ticks at 4.5 radius
 - Discovering the final graph recipe grants Every Drop
+- Tipped arrows: a discovered drinkable potion charges a water cauldron and returns a bottle; dipping tips `tippedArrowsPerDip` arrows and spends one water level; draining the last level clears the charge; an undiscovered brew does not charge; splash/lingering potions have no cauldron handler; the feature off is inert
 - Splash potion applies 87.5% duration; dispenser-thrown identical
 - Commands: `recipes`, `discover`, `forget`, `rig` behave and permission-gate as specced
 
