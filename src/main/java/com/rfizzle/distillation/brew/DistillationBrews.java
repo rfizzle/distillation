@@ -66,23 +66,36 @@ public final class DistillationBrews {
         addLine(mixes, Potions.AWKWARD, Items.CHORUS_FRUIT, "levitation", false);
         // Health Boost: Awkward + Pumpkin Pie, an overworld delicacy. Mirrors Absorption's line.
         addLine(mixes, Potions.AWKWARD, Items.PUMPKIN_PIE, "health_boost", true);
-        // Corruptions (§2): Haste → Mining Fatigue and Luck → Bad Luck, with the long mirror
-        // vanilla's own corruptions carry (long_swiftness + eye → long_slowness).
-        mixes.add(new Mix(DistillationPotions.potion("haste"), Items.FERMENTED_SPIDER_EYE,
-                DistillationPotions.potion("mining_fatigue")));
-        mixes.add(new Mix(DistillationPotions.potion("long_haste"), Items.FERMENTED_SPIDER_EYE,
-                DistillationPotions.potion("long_mining_fatigue")));
+        // Corruptions (§2): fermented spider eye inverts an effect into its opposite, completing the
+        // set vanilla ships (Swiftness/Leaping → Slowness, Night Vision → Invisibility, Healing/Poison
+        // → Harming, Water → Weakness). Extended inputs invert to the extended opposite; each output
+        // already carries its own redstone route (vanilla's, or the §2 line's above), so the only
+        // redstone edges added here are for Mining Fatigue and Bad Luck, which have no vanilla base.
+        corrupt(mixes, DistillationPotions.potion("haste"), DistillationPotions.potion("mining_fatigue"));
+        corrupt(mixes, DistillationPotions.potion("long_haste"), DistillationPotions.potion("long_mining_fatigue"));
         mixes.add(new Mix(DistillationPotions.potion("mining_fatigue"), Items.REDSTONE,
                 DistillationPotions.potion("long_mining_fatigue")));
-        mixes.add(new Mix(DistillationPotions.potion("luck"), Items.FERMENTED_SPIDER_EYE,
-                DistillationPotions.potion("bad_luck")));
-        mixes.add(new Mix(DistillationPotions.potion("long_luck"), Items.FERMENTED_SPIDER_EYE,
-                DistillationPotions.potion("long_bad_luck")));
+        corrupt(mixes, DistillationPotions.potion("luck"), DistillationPotions.potion("bad_luck"));
+        corrupt(mixes, DistillationPotions.potion("long_luck"), DistillationPotions.potion("long_bad_luck"));
         mixes.add(new Mix(DistillationPotions.potion("bad_luck"), Items.REDSTONE,
                 DistillationPotions.potion("long_bad_luck")));
+        // Strength → Weakness — the canonical inversion vanilla left unwired. No strong_weakness
+        // exists, so strong_strength stays an invalid pair, as vanilla leaves strong_swiftness.
+        corrupt(mixes, Potions.STRENGTH, Potions.WEAKNESS);
+        corrupt(mixes, Potions.LONG_STRENGTH, Potions.LONG_WEAKNESS);
+        // Regeneration → Poison — heal-over-time inverts to damage-over-time.
+        corrupt(mixes, Potions.REGENERATION, Potions.POISON);
+        corrupt(mixes, Potions.LONG_REGENERATION, Potions.LONG_POISON);
+        corrupt(mixes, Potions.STRONG_REGENERATION, Potions.STRONG_POISON);
+        // Glowing → Invisibility — reveal inverts to conceal, mirroring vanilla's Night Vision route.
+        corrupt(mixes, DistillationPotions.potion("glowing"), Potions.INVISIBILITY);
+        corrupt(mixes, DistillationPotions.potion("long_glowing"), Potions.LONG_INVISIBILITY);
+        // Slow Falling → Levitation — a gentle descent inverts to a forced rise.
+        corrupt(mixes, Potions.SLOW_FALLING, DistillationPotions.potion("levitation"));
+        corrupt(mixes, Potions.LONG_SLOW_FALLING, DistillationPotions.potion("long_levitation"));
         // The Mundane bottle's onward arrow (§2): Mundane + Fermented Spider Eye → Weakness,
         // alongside vanilla's untouched water-bottle route.
-        mixes.add(new Mix(Potions.MUNDANE, Items.FERMENTED_SPIDER_EYE, Potions.WEAKNESS));
+        corrupt(mixes, Potions.MUNDANE, Potions.WEAKNESS);
         return mixes;
     }
 
@@ -94,6 +107,11 @@ public final class DistillationBrews {
             mixes.add(new Mix(DistillationPotions.potion(path), Items.GLOWSTONE_DUST,
                     DistillationPotions.potion("strong_" + path)));
         }
+    }
+
+    /** A fermented-spider-eye conversion edge (§2) — the corruptions and the Mundane onward arrow. */
+    private static void corrupt(List<Mix> mixes, Holder<Potion> from, Holder<Potion> to) {
+        mixes.add(new Mix(from, Items.FERMENTED_SPIDER_EYE, to));
     }
 
     /**
