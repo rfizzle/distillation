@@ -216,7 +216,7 @@ public final class PremiumBrews {
 
     /**
      * The subset of {@link #ownedRecipeIds()} whose base is a §2 line (Resistance, Absorption,
-     * Haste). These leave the graph when {@code enableMissingBrews} is off as well — concentrating a
+     * Haste, Health Boost). These leave the graph when {@code enableMissingBrews} is off as well — concentrating a
      * base you can no longer brew is a dangling conversion, and it would otherwise keep the §2
      * reagent (e.g. Shulker Shell) a graph ingredient after its line was disabled.
      */
