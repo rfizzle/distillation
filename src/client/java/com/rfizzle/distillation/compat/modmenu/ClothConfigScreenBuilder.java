@@ -63,6 +63,13 @@ final class ClothConfigScreenBuilder {
                 .setSaveConsumer(v -> config.startDiscovered = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
+                        Component.translatable("config.distillation.enable_recipe_notes"),
+                        config.enableRecipeNotes)
+                .setTooltip(Component.translatable("config.distillation.enable_recipe_notes.tooltip"))
+                .setDefaultValue(defaults.enableRecipeNotes)
+                .setSaveConsumer(v -> config.enableRecipeNotes = v)
+                .build());
+        server.addEntry(entry.startBooleanToggle(
                         Component.translatable("config.distillation.enable_missing_brews"),
                         config.enableMissingBrews)
                 .setTooltip(Component.translatable("config.distillation.enable_missing_brews.tooltip"))

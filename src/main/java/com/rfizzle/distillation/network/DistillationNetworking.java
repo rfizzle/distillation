@@ -24,6 +24,7 @@ public final class DistillationNetworking {
     public static void registerPayloads() {
         PayloadTypeRegistry.playS2C().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(DiscoverySyncPayload.TYPE, DiscoverySyncPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(CopyRecipeNotePayload.TYPE, CopyRecipeNotePayload.CODEC);
     }
 
     /**

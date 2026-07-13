@@ -12,6 +12,7 @@ import com.rfizzle.distillation.command.DistillationCommand;
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.discovery.DistillationAttachments;
 import com.rfizzle.distillation.item.DistillationItems;
+import com.rfizzle.distillation.item.RecipeNoteServerHandler;
 import com.rfizzle.distillation.network.DistillationNetworking;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import com.rfizzle.distillation.sound.DistillationSounds;
@@ -51,6 +52,7 @@ public class Distillation implements ModInitializer {
         RecipeGraphs.registerLifecycleHandlers();
         DistillationNetworking.registerPayloads();
         DistillationNetworking.registerLifecycleHandlers();
+        RecipeNoteServerHandler.register();
         DistillationCommand.register();
         DistillationCriteria.register(); // before any advancement JSON is deserialized (server start)
         DistillationAdvancements.register();

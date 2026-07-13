@@ -23,6 +23,7 @@
 |---|---|---|
 | Bottle brand glyph 16×16 (Jade/recipe viewers, suite footer) | `art/glyphs/bottle-16.glyph` | `assets/distillation/textures/gui/bottle.png` — (not yet shipped) |
 | Murky Draught item 16×16 | `art/glyphs/murky_draught.glyph` | `assets/distillation/textures/item/murky_draught.png` |
+| Recipe Note item 16×16 | `art/glyphs/recipe_note.glyph` | `assets/distillation/textures/item/recipe_note.png` |
 | Half-draught liquid overlay 16×16 (potion model override, tint-layered) | `art/glyphs/draught_half.gen.sh` (derived from vanilla `item/potion_overlay`, lower bulb kept) | `assets/distillation/textures/item/draught_half.png` |
 | Recipes-page tab button 16×16 (brewing screen) | `art/glyphs/recipes_tab.glyph` | `assets/distillation/textures/gui/recipes_tab.png` |
 

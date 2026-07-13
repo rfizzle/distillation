@@ -39,6 +39,7 @@ class DistillationConfigTest {
         assertTrue(json.get("enableDiscovery").getAsBoolean());
         assertTrue(json.get("enableMurkyDraughts").getAsBoolean());
         assertFalse(json.get("startDiscovered").getAsBoolean());
+        assertTrue(json.get("enableRecipeNotes").getAsBoolean());
         assertTrue(json.get("enableMissingBrews").getAsBoolean());
         assertTrue(json.get("enableBatchBrewing").getAsBoolean());
         assertEquals(3, json.get("batchIngredientCost").getAsInt());

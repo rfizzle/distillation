@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
@@ -44,6 +45,12 @@ public final class RecipeGraphs {
     // dedicated-server JVM, where the local config is authoritative.
     @Nullable
     private static volatile Supplier<DistillationConfig> clientConfigSupplier;
+
+    // Set from client init: the client world's graph, so a level-less client caller (a recipe-note
+    // item tooltip) can resolve a conversion without a level in hand. Null in a dedicated-server JVM
+    // and null-returning before a world loads.
+    @Nullable
+    private static volatile Supplier<RecipeGraph> clientGraphSupplier;
 
     // The running server, so the server-authoritative Public API can resolve the current graph
     // without a level in hand ({@code DistillationAPI.getRecipeIds}). Null when no server runs.
@@ -96,6 +103,34 @@ public final class RecipeGraphs {
     /** Wires the client's synced-first config view in; called from client init only. */
     public static void setClientConfigSupplier(Supplier<DistillationConfig> supplier) {
         clientConfigSupplier = supplier;
+    }
+
+    /** Wires the client world's graph in for level-less tooltips; called from client init only. */
+    public static void setClientGraphSupplier(Supplier<RecipeGraph> supplier) {
+        clientGraphSupplier = supplier;
+    }
+
+    /**
+     * The graph a level-less caller should read for a recipe-note tooltip: the client world's graph
+     * when this JVM has a client in a world, else the running server's graph, else empty (a client
+     * at the title screen, or before any world loads). Both sides resolve a note's stored recipe id
+     * without a level in hand.
+     */
+    public static Optional<RecipeGraph> tooltipGraph() {
+        Supplier<RecipeGraph> supplier = clientGraphSupplier;
+        if (supplier != null) {
+            RecipeGraph graph = supplier.get();
+            if (graph != null) {
+                return Optional.of(graph);
+            }
+        }
+        MinecraftServer server = currentServer;
+        if (server == null) {
+            return Optional.empty();
+        }
+        DistillationConfig config = Distillation.getConfig();
+        return Optional.of(lookup(server.potionBrewing(), config.enableMissingBrews, config.enablePremiumBrews,
+                config.enableAntidotes));
     }
 
     /** The graph for a level's brewing registry, under the side-appropriate config. */

@@ -60,6 +60,11 @@ public final class BrewingStandRecipesLayout {
     public static final int ROW_ARROW_DX = 101;
     public static final int ROW_OUTPUT_DX = 115;
 
+    // The per-row copy-to-paper affordance (the ✎ button, SPEC §1 Recipe Notes), inset to the
+    // right of the output icon. Drawn and clickable only while enableRecipeNotes is on.
+    public static final int ROW_COPY_DX = 146;
+    public static final int COPY_W = 12;
+
     // ---- Tab button ----
 
     /** Tab button left x in screen coords: inset from the panel's right edge. */
@@ -85,6 +90,11 @@ public final class BrewingStandRecipesLayout {
     /** Top y of the row band (first row's icon top) for an overlay anchored at {@code overlayTop}. */
     public static int rowTop(int overlayTop, int rowIndex) {
         return overlayTop + HEADER_HEIGHT + rowIndex * ROW_HEIGHT;
+    }
+
+    /** The copy-button left x in screen coords for the current overlay. */
+    public static int copyButtonX(int screenWidth) {
+        return overlayX(screenWidth) + ROW_COPY_DX;
     }
 
     public static int closeX(int screenWidth) {

@@ -75,6 +75,18 @@ class BrewingStandRecipesLayoutTest {
     }
 
     @Test
+    void copyButtonSitsRightOfTheOutputIcon() {
+        // overlayX(400)=112, + ROW_COPY_DX 146 = 258; clear of the output icon at 112+115=227(+16).
+        assertEquals(258, BrewingStandRecipesLayout.copyButtonX(400));
+        assertTrue(BrewingStandRecipesLayout.ROW_COPY_DX > BrewingStandRecipesLayout.ROW_OUTPUT_DX
+                        + BrewingStandRecipesLayout.SLOT_SIZE,
+                "the copy button must not overlap the output icon");
+        assertTrue(BrewingStandRecipesLayout.ROW_COPY_DX + BrewingStandRecipesLayout.COPY_W
+                        <= BrewingStandRecipesLayout.OVERLAY_WIDTH - BrewingStandRecipesLayout.OVERLAY_PAD,
+                "the copy button must stay inside the overlay's right pad");
+    }
+
+    @Test
     void pointInIsHalfOpen() {
         assertTrue(BrewingStandRecipesLayout.pointIn(10, 10, 10, 10, 16, 16));
         assertTrue(BrewingStandRecipesLayout.pointIn(25, 25, 10, 10, 16, 16));

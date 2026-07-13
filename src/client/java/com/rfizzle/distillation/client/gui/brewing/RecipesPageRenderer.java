@@ -33,6 +33,7 @@ public final class RecipesPageRenderer {
     public static final String KEY_COUNT_FULL = "gui.distillation.recipes_page.count.full";
     public static final String KEY_EMPTY = "gui.distillation.recipes_page.empty";
     public static final String KEY_PAGE = "gui.distillation.recipes_page.page";
+    public static final String KEY_COPY = "gui.distillation.recipes_page.copy";
 
     private static final int DIM_COLOR = 0xC0000000;
     private static final int PANEL_BG = 0xF11A0A18;
@@ -44,6 +45,9 @@ public final class RecipesPageRenderer {
     private static final int EMPTY_COLOR = 0xFF9A8FA0;
     private static final int ARROW_COLOR = 0xFFEDE7F0;
     private static final int ARROW_DISABLED = 0xFF5E5548;
+    private static final int COPY_COLOR = 0xFF9A8FA0;
+    private static final int COPY_HOVER = 0xFFDA79E3;
+    private static final int COPY_HOVER_BG = 0x30FFFFFF;
 
     // The three display stacks per conversion, cached by conversion identity so an open overlay
     // doesn't rebuild them every frame. Conversions are immutable and graph-scoped; a weak key lets
@@ -74,7 +78,7 @@ public final class RecipesPageRenderer {
      */
     public static void render(GuiGraphics guiGraphics, Font font, List<RecipeGraph.Conversion> visible,
                               int total, int page, int screenWidth, int screenHeight,
-                              int mouseX, int mouseY) {
+                              int mouseX, int mouseY, boolean notesEnabled) {
         guiGraphics.fill(0, 0, screenWidth, screenHeight, DIM_COLOR);
 
         int ox = BrewingStandRecipesLayout.overlayX(screenWidth);
@@ -118,6 +122,10 @@ public final class RecipesPageRenderer {
                 guiGraphics.renderItem(stacks[1], ox + BrewingStandRecipesLayout.ROW_INGREDIENT_DX, rowTop);
                 drawSymbol(guiGraphics, font, "→", ox + BrewingStandRecipesLayout.ROW_ARROW_DX, rowTop);
                 guiGraphics.renderItem(stacks[2], ox + BrewingStandRecipesLayout.ROW_OUTPUT_DX, rowTop);
+                if (notesEnabled) {
+                    drawCopyButton(guiGraphics, font, BrewingStandRecipesLayout.copyButtonX(screenWidth), rowTop,
+                            overCopyButton(mouseX, mouseY, screenWidth, rowTop));
+                }
             }
         }
 
@@ -174,6 +182,45 @@ public final class RecipesPageRenderer {
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    /**
+     * The conversion whose copy button is under the cursor, or {@code null} — so the mixin can show
+     * the copy tooltip and send the copy on click. Only meaningful while the overlay is open with
+     * recipe notes enabled; the caller gates on {@code enableRecipeNotes}.
+     */
+    public static RecipeGraph.Conversion copyConversionUnderMouse(List<RecipeGraph.Conversion> visible, int page,
+                                                                  int screenWidth, int screenHeight,
+                                                                  int mouseX, int mouseY) {
+        int oy = BrewingStandRecipesLayout.overlayY(screenHeight);
+        int first = BrewingStandRecipesLayout.firstIndexOnPage(page);
+        for (int row = 0; row < BrewingStandRecipesLayout.ROWS_PER_PAGE; row++) {
+            int index = first + row;
+            if (index >= visible.size()) {
+                break;
+            }
+            int rowTop = BrewingStandRecipesLayout.rowTop(oy, row);
+            if (overCopyButton(mouseX, mouseY, screenWidth, rowTop)) {
+                return visible.get(index);
+            }
+        }
+        return null;
+    }
+
+    private static boolean overCopyButton(int mouseX, int mouseY, int screenWidth, int rowTop) {
+        return BrewingStandRecipesLayout.pointIn(mouseX, mouseY,
+                BrewingStandRecipesLayout.copyButtonX(screenWidth), rowTop,
+                BrewingStandRecipesLayout.COPY_W, BrewingStandRecipesLayout.SLOT_SIZE);
+    }
+
+    private static void drawCopyButton(GuiGraphics guiGraphics, Font font, int x, int rowTop, boolean hover) {
+        if (hover) {
+            guiGraphics.fill(x - 1, rowTop, x + BrewingStandRecipesLayout.COPY_W - 1,
+                    rowTop + BrewingStandRecipesLayout.SLOT_SIZE, COPY_HOVER_BG);
+        }
+        guiGraphics.drawString(font, "✎", x + 1,
+                rowTop + (BrewingStandRecipesLayout.SLOT_SIZE - font.lineHeight) / 2 + 1,
+                hover ? COPY_HOVER : COPY_COLOR, false);
     }
 
     /** The {@code [input, ingredient, output]} display stacks for a conversion, cached by identity. */
