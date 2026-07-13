@@ -70,6 +70,19 @@ class RecipeGraphTest {
     }
 
     @Test
+    void conversionsProducingFindsTheEdgesToAPotion() {
+        RecipeGraph graph = RecipeGraph.fromBrewing(syntheticRegistry(), Set.of());
+
+        // Synthetic graph: water + nether_wart -> awkward is the one edge that produces awkward.
+        var producing = graph.conversionsProducing(Potions.AWKWARD);
+        assertEquals(1, producing.size());
+        assertSame(Items.NETHER_WART, producing.get(0).ingredient());
+
+        // Nothing brews to water, and a container conversion never changes a potion, so no producer.
+        assertTrue(graph.conversionsProducing(Potions.WATER).isEmpty());
+    }
+
+    @Test
     void validPairResolvesToTheOutputPotion() {
         RecipeGraph graph = RecipeGraph.fromBrewing(syntheticRegistry(), Set.of());
 
