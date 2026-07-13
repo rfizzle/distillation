@@ -103,11 +103,11 @@ Every vanilla effect that shipped without a recipe becomes brewable.
 
 ### Problem
 
-Resistance, Haste, Absorption, Luck, and Glowing exist in vanilla — with icons, ids, and (for Luck) even a bottled potion item — but no survival path. The effect roster is creative-mode-only for no stated reason.
+Resistance, Haste, Absorption, Luck, Glowing, Levitation, and Health Boost exist in vanilla — with icons, ids, and (for Luck) even a bottled potion item — but no brewing recipe. The effect roster ships gaps for no stated reason.
 
 ### Behavior
 
-Five new potion lines, registered under the `distillation:` namespace and brewed at the stand like any potion:
+Seven new potion lines, registered under the `distillation:` namespace and brewed at the stand like any potion:
 
 | Effect | Recipe | Base | + Redstone | + Glowstone |
 |---|---|---|---|---|
@@ -116,12 +116,15 @@ Five new potion lines, registered under the `distillation:` namespace and brewed
 | Absorption | Awkward + Golden Apple | Absorption 3:00 | 8:00 | Absorption II 1:30 |
 | Luck | Awkward + Nautilus Shell | Luck 8:00 | 20:00 | — |
 | Glowing | Awkward + Glow Ink Sac | Glowing 3:00 | 8:00 | — |
+| Levitation | Awkward + Chorus Fruit | Levitation 0:30 | 1:00 | — |
+| Health Boost | Awkward + Pumpkin Pie | Health Boost 3:00 | 8:00 | Health Boost II 1:30 |
 
-- Haste routes through Swiftness deliberately — honey over a sugar brew — so the utility line costs two steps. Haste and Luck are utility-class and take the §4 long durations; Resistance, Absorption, and Glowing are combat/marker effects and keep vanilla-scale timers.
+- Haste routes through Swiftness deliberately — honey over a sugar brew — so the utility line costs two steps. Haste and Luck are utility-class and take the §4 long durations; Resistance, Absorption, Glowing, and Health Boost are combat/marker effects and keep vanilla-scale timers.
+- Levitation carries a deliberately short base — mobility of that order stays a novelty, not a weapon — and a raw Chorus Fruit reagent, where the *popped* fruit brews the §8 Levitation Antidote.
 - The Honey Bottle is consumed whole (no empty bottle back), matching the dragon's-breath precedent.
-- Luck and Glowing have no meaningful second level; glowstone on them is an invalid pair (→ Murky Draught, which the absent vapor hint warns about).
-- **Corruptions** (fermented spider eye): Haste → Mining Fatigue 3:00 (+redstone 8:00); Luck → Bad Luck 8:00 (+redstone 20:00). Resistance, Absorption, and Glowing have no corruption (invalid pair).
-- All five lines take gunpowder (splash) and dragon's breath (lingering) as vanilla, subject to §7.
+- Luck, Glowing, and Levitation have no meaningful second level; glowstone on them is an invalid pair (→ Murky Draught, which the absent vapor hint warns about).
+- **Corruptions** (fermented spider eye): Haste → Mining Fatigue 3:00 (+redstone 8:00); Luck → Bad Luck 8:00 (+redstone 20:00). Resistance, Absorption, Glowing, Levitation, and Health Boost have no corruption (invalid pair).
+- Every line takes gunpowder (splash) and dragon's breath (lingering) as vanilla, subject to §7.
 - **The Mundane bottle's onward arrow:** Mundane Potion + Fermented Spider Eye → Weakness 1:30 (+redstone 4:00 as vanilla), alongside vanilla's untouched water-bottle route. With §6's Thick base, neither of vanilla's dead-end base bottles ends the graph — every conversion the stand teaches leads somewhere.
 
 ### Edge Cases
@@ -140,7 +143,7 @@ Five new potion lines, registered under the `distillation:` namespace and brewed
 
 ### Implementation Notes
 
-- Potion registrations: `distillation:resistance` / `long_` / `strong_` variants and likewise per line (no `strong_luck`/`strong_glowing`; corruption lines analogous), registered with the durations above; conversions registered through the vanilla brewing builder so they enter the §1 graph with no special casing.
+- Potion registrations: `distillation:resistance` / `long_` / `strong_` variants and likewise per line (no `strong_luck`/`strong_glowing`/`strong_levitation`; corruption lines analogous), registered with the durations above; conversions registered through the vanilla brewing builder so they enter the §1 graph with no special casing.
 
 ---
 

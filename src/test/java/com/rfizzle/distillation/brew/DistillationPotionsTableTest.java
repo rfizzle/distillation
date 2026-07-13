@@ -38,6 +38,8 @@ class DistillationPotionsTableTest {
             "absorption", new int[]{3600, 9600, 1800},
             "luck", new int[]{9600, 24000, -1},
             "glowing", new int[]{3600, 9600, -1},
+            "levitation", new int[]{600, 1200, -1},
+            "health_boost", new int[]{3600, 9600, 1800},
             "mining_fatigue", new int[]{3600, 9600, -1},
             "bad_luck", new int[]{9600, 24000, -1});
 

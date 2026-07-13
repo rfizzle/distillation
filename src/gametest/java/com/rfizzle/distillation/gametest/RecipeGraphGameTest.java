@@ -37,6 +37,8 @@ public class RecipeGraphGameTest implements FabricGameTest {
         // Distillation's own lines arrive through the same vanilla registry — including a
         // non-minecraft input namespace deriving a prefixed segment.
         assertContains(helper, graph, "distillation:shulker_shell/awkward");
+        assertContains(helper, graph, "distillation:chorus_fruit/awkward");
+        assertContains(helper, graph, "distillation:pumpkin_pie/awkward");
         assertContains(helper, graph, "distillation:honey_bottle/swiftness");
         assertContains(helper, graph, "distillation:redstone/distillation/haste");
         assertContains(helper, graph, "distillation:fermented_spider_eye/mundane");

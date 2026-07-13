@@ -131,6 +131,44 @@ public class MissingBrewsGameTest implements FabricGameTest {
                 "distillation:glowing");
     }
 
+    // --- Levitation: Awkward + Chorus Fruit -> 0:30 / 1:00, no level II ---
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void levitationBrews(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.AWKWARD), new ItemStack(Items.CHORUS_FRUIT), "distillation:levitation");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void levitationExtends(GameTestHelper helper) {
+        assertBrewsTo(helper, distillationBottle("levitation"), new ItemStack(Items.REDSTONE),
+                "distillation:long_levitation");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void glowstoneOnLevitationIsAnInvalidPair(GameTestHelper helper) {
+        assertMurks(helper, distillationBottle("levitation"), new ItemStack(Items.GLOWSTONE_DUST),
+                "distillation:levitation");
+    }
+
+    // --- Health Boost: Awkward + Pumpkin Pie -> 3:00 / 8:00 / II 1:30 ---
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void healthBoostBrews(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.AWKWARD), new ItemStack(Items.PUMPKIN_PIE), "distillation:health_boost");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void healthBoostExtends(GameTestHelper helper) {
+        assertBrewsTo(helper, distillationBottle("health_boost"), new ItemStack(Items.REDSTONE),
+                "distillation:long_health_boost");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void healthBoostAmplifies(GameTestHelper helper) {
+        assertBrewsTo(helper, distillationBottle("health_boost"), new ItemStack(Items.GLOWSTONE_DUST),
+                "distillation:strong_health_boost");
+    }
+
     // --- Corruptions and the Mundane arrow ---
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
