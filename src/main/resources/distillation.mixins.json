@@ -5,6 +5,7 @@
     "compatibilityLevel": "JAVA_21",
     "mixins": [
         "AbstractContainerMenuMixin",
+        "AreaEffectCloudMixin",
         "BaseContainerBlockEntityMixin",
         "BrewingStandBlockEntityMixin",
         "BrewingStandBlockMixin",

@@ -1,11 +1,17 @@
 package com.rfizzle.distillation.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.brew.AttunedTargeting;
 import com.rfizzle.distillation.brew.ThrownRebalance;
 import com.rfizzle.distillation.config.DistillationConfig;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,6 +53,26 @@ abstract class ThrownPotionMixin {
         }
         float factor = config.splashDurationFactor;
         return base -> ThrownRebalance.splashDuration(base, factor);
+    }
+
+    /**
+     * Attuned splash ({@code design/SPEC.md} §7): a beneficial, duration-bearing effect from a
+     * player-thrown splash reaches only allies (players and their pets). Wrapping vanilla's own
+     * per-effect {@code addEffect} call keeps the filter per-effect and per-target — a mixed potion's
+     * harmful effects still land on the enemy this beneficial one is skipped for. The instant branch
+     * ({@code applyInstantenousEffect}) is deliberately not wrapped, so beneficial instants keep
+     * vanilla's indiscriminate, distance-scaled targeting (Instant Health still hurts undead). Returns
+     * {@code false} — vanilla's own return for an effect that failed to apply — when suppressed.
+     */
+    @WrapOperation(method = "applySplash",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean distillation$attuneSplash(LivingEntity target, MobEffectInstance effect, Entity source,
+                                              Operation<Boolean> original) {
+        if (AttunedTargeting.suppresses(effect, target, ((ThrownPotion) (Object) this).getOwner())) {
+            return false;
+        }
+        return original.call(target, effect, source);
     }
 
     /**

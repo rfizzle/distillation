@@ -344,19 +344,23 @@ Splash potions tax duration 25% and lingering clouds evaporate in seconds over a
 
 - **Splash:** duration-bearing effects apply a flat **87.5%** of drinkable duration to every entity hit, regardless of distance. Instant effects keep vanilla's distance-scaled potency.
 - **Lingering:** the cloud lasts **60 seconds** (vanilla 30) and opens at a **4.5-block radius** (vanilla 3.0), shrinking linearly to 0 over its lifetime; the per-pickup radius cost stays vanilla (−0.5). Per-application effect duration stays vanilla's quarter of drinkable duration — which §4 has already raised for utility lines.
-- Applies to every splash/lingering potion from any source — player-thrown, dispensed, or witch-thrown (a Tribulation-hardened witch benefits like anyone; her arsenal is her own mod's business).
+- The duration/radius numbers above apply to every splash/lingering potion from any source — player-thrown, dispensed, or witch-thrown (a Tribulation-hardened witch benefits like anyone; her arsenal is her own mod's business).
+- **Attuned targeting (`enableAttunedSplash`, default on):** a **beneficial, duration-bearing** effect from a **player-thrown** splash or lingering cloud reaches only **allies** — players and their pets — never a hostile or a bystander. The filter is per-effect, so a mixed brew still lands its harmful effects on the enemy it withheld the beneficial one from. Harmful and neutral effects stay indiscriminate grenades; instant effects (including beneficial Instant Health, which doubles as an anti-undead weapon) keep vanilla's everyone-in-range targeting; and a potion with no player thrower is untouched. This is what makes the back-line support role real: a Strength cloud thrown over your melee friend stops buffing the wave standing on him.
 
 ### Edge Cases
 
 - **Dispensers** throw with identical physics and the same rebalanced numbers.
 - **Creeper/ghast-popped clouds** (a lingering potion destroyed as an item) are unaffected — the rebalance touches thrown entities and their clouds, not item despawn.
-- **Multiplayer/PvP:** harmful splash/lingering potions gain the same numbers — support and sabotage scale together. Servers wanting vanilla PvP numbers disable `enableThrownRebalance`.
+- **Multiplayer/PvP:** harmful splash/lingering potions gain the same numbers — support and sabotage scale together. Servers wanting vanilla PvP numbers disable `enableThrownRebalance`. Attunement treats **"players" literally**: a beneficial brew reaches every player in range (an enemy player included) and every player-owned pet, and excludes only non-player-owned mobs. Servers wanting vanilla PvP targeting disable `enableAttunedSplash` on its own.
+- **Ally resolution** goes through vanilla ownership only — a player, or an entity whose owner resolves to an online player (`OwnableEntity`: tamed wolves, cats, parrots). No faction system, no sibling dependency; a passive animal, a villager, a golem, or a pet whose owner is offline is not an ally.
+- **Ownerless throws** (dispensed, witch-thrown) have no player owner, so attunement never engages — they keep vanilla targeting even while carrying the rebalanced duration/radius numbers.
 
 ### Config
 
 | Key | Type | Default | Range |
 |---|---|---|---|
 | `enableThrownRebalance` | bool | true | — |
+| `enableAttunedSplash` | bool | true | — |
 | `splashDurationFactor` | float | 0.875 | 0.5–1.0 |
 | `lingeringCloudDurationTicks` | int | 1200 | 600–2400 |
 | `lingeringCloudRadius` | float | 4.5 | 3.0–6.0 |
@@ -364,6 +368,7 @@ Splash potions tax duration 25% and lingering clouds evaporate in seconds over a
 ### Implementation Notes
 
 - Splash factor: a `ThrownPotion.applySplash` mixin replaces vanilla's distance-scaled duration operator with the flat factor, on the thrown path only — instant effects never take that operator, so they keep vanilla's distance scaling. Lingering: an `AreaEffectCloud` configuration mixin at spawn from a thrown lingering potion (duration, radius, radius-per-tick), leaving other cloud sources (dragon breath attack) untouched.
+- Attuned targeting: both the splash seam (`ThrownPotion.applySplash`) and the cloud seam (`AreaEffectCloud.tick`) wrap vanilla's own per-effect `LivingEntity.addEffect` call, skipping it when a beneficial duration effect from a player owner lands on a non-ally. The instant-effect branch is left unwrapped, so beneficial instants stay vanilla. Attunement is derived live from `getOwner()`, which the cloud already persists in its save data — no new stored state, and no config migration for the additive `enableAttunedSplash` bool. The decision is a pure rule; the mixins are config-to-vanilla shells over it.
 
 ---
 
@@ -494,6 +499,7 @@ All features are independently toggleable via a ModMenu / Cloth Config screen an
 | `enablePremiumBrews` | bool | true | Concentration + both-dusts premium path (§5) |
 | `enableAntidotes` | bool | true | The eight antidote lines (§6) |
 | `enableThrownRebalance` | bool | true | Splash/lingering rebalance (§7) |
+| `enableAttunedSplash` | bool | true | Beneficial player throws reach only allies (§7) |
 | `splashDurationFactor` | float | 0.875 | Fraction of drinkable duration a splash applies |
 | `lingeringCloudDurationTicks` | int | 1200 | Lingering cloud lifetime |
 | `lingeringCloudRadius` | float | 4.5 | Lingering cloud starting radius |
@@ -612,6 +618,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 - Discovering the final graph recipe grants Every Drop
 - Tipped arrows: a discovered drinkable potion charges a water cauldron and returns a bottle; dipping tips `tippedArrowsPerDip` arrows and spends one water level; draining the last level clears the charge; an undiscovered brew does not charge; splash/lingering potions have no cauldron handler; the feature off is inert
 - Splash potion applies 87.5% duration; dispenser-thrown identical
+- Attuned splash: a player's beneficial splash/cloud reaches a pet and the player but not a hostile or a bystander; harmful and instant effects and ownerless throws stay indiscriminate; the `enableAttunedSplash` toggle off restores vanilla targeting
 - Commands: `recipes`, `discover`, `forget`, `rig` behave and permission-gate as specced
 
 ### Manual Testing

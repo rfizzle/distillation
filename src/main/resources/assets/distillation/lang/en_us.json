@@ -34,6 +34,8 @@
   "config.distillation.enable_antidotes.tooltip": "The antidote lines.",
   "config.distillation.enable_thrown_rebalance": "Enable Thrown Rebalance",
   "config.distillation.enable_thrown_rebalance.tooltip": "The splash and lingering potion rebalance.",
+  "config.distillation.enable_attuned_splash": "Enable Attuned Splash",
+  "config.distillation.enable_attuned_splash.tooltip": "A beneficial splash or lingering brew you throw affects only players and their pets, never hostiles. Harmful brews stay indiscriminate.",
   "config.distillation.splash_duration_factor": "Splash Duration Factor",
   "config.distillation.splash_duration_factor.tooltip": "Fraction of the drinkable duration a splash potion applies.",
   "config.distillation.lingering_cloud_duration_ticks": "Lingering Cloud Duration",

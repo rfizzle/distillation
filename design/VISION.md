@@ -99,12 +99,17 @@ line.
   off a poison is a brewing decision, not a sacrifice.
 
 ### Lingering worth throwing
-- **What it is** — Splash and lingering potions rebalanced as support tools.
+- **What it is** — Splash and lingering potions rebalanced as support tools,
+  and beneficial ones you throw attuned to your side.
 - **How you use it** — Lingering clouds last 60 seconds instead of 30 and
   open at a 4½-block radius instead of 3; a splash potion loses an eighth of
-  the drinkable duration instead of a quarter.
+  the drinkable duration instead of a quarter. A beneficial splash or cloud you
+  throw buffs only players and their pets — the enemy wave standing in it gets
+  nothing. Harmful potions are still grenades for everyone.
 - **What changes for you** — A dedicated brewer is a viable support role:
-  the cloud is still working when the second wave arrives.
+  throw a Strength cloud over your friend and it holds the line for him, not
+  for the zombies on top of him, and it is still working when the second wave
+  arrives.
 
 ### Tipped arrows worth fletching
 - **What it is** — Tipped arrows craftable at survival prices, not gated
