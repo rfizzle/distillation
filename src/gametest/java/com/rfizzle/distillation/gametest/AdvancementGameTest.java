@@ -75,11 +75,11 @@ public class AdvancementGameTest implements FabricGameTest {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
-    public void brewingAllFiveMissingLinesGrantsTheMissingShelf(GameTestHelper helper) {
+    public void brewingAllSevenMissingLinesGrantsTheMissingShelf(GameTestHelper helper) {
         BrewingStandBlockEntity stand = placeStand(helper);
         ServerPlayer player = listeningPlayer(helper);
         try {
-            String[] lines = {"resistance", "haste", "absorption", "luck", "glowing"};
+            String[] lines = {"resistance", "haste", "absorption", "luck", "glowing", "levitation", "health_boost"};
             for (int i = 0; i < lines.length; i++) {
                 stand.setItem(0, PotionContents.createItemStack(Items.POTION, DistillationPotions.potion(lines[i])));
                 takeBottleSlot(player, stand, 0);

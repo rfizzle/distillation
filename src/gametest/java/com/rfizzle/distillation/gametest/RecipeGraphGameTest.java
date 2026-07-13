@@ -37,6 +37,8 @@ public class RecipeGraphGameTest implements FabricGameTest {
         // Distillation's own lines arrive through the same vanilla registry — including a
         // non-minecraft input namespace deriving a prefixed segment.
         assertContains(helper, graph, "distillation:shulker_shell/awkward");
+        assertContains(helper, graph, "distillation:chorus_fruit/awkward");
+        assertContains(helper, graph, "distillation:pumpkin_pie/awkward");
         assertContains(helper, graph, "distillation:honey_bottle/swiftness");
         assertContains(helper, graph, "distillation:redstone/distillation/haste");
         assertContains(helper, graph, "distillation:fermented_spider_eye/mundane");
@@ -69,7 +71,7 @@ public class RecipeGraphGameTest implements FabricGameTest {
         try {
             RecipeGraph graph = RecipeGraphs.forLevel(helper.getLevel());
             helper.assertTrue(!graph.contains(ResourceLocation.parse("distillation:shulker_shell/awkward")),
-                    "with enableMissingBrews=false the five lines leave the graph");
+                    "with enableMissingBrews=false the missing-brew lines leave the graph");
             helper.assertTrue(graph.contains(ResourceLocation.parse("distillation:nether_wart/water")),
                     "vanilla conversions stay in the graph");
             // The line's premium concentration goes with it, so the reagent leaves the graph entirely.

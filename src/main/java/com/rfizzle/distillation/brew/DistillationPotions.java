@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * The potion registrations for {@code design/SPEC.md} §2 — the five effect lines vanilla shipped
+ * The potion registrations for {@code design/SPEC.md} §2 — the effect lines vanilla shipped
  * without recipes, plus the two corruption outputs. Every line is declared in {@link #LINES} and
  * registered mechanically from it, so the table is the single place the spec's durations live.
  *
@@ -47,6 +47,10 @@ public final class DistillationPotions {
             new Line("absorption", "absorption", MobEffects.ABSORPTION, 3600, 9600, 1800),
             new Line("luck", "luck", MobEffects.LUCK, 9600, 24000, -1),
             new Line("glowing", "glowing", MobEffects.GLOWING, 3600, 9600, -1),
+            // Levitation carries a deliberately short base (§2): mobility of that order stays a
+            // novelty, not a weapon. No level II — glowstone stays an invalid pair.
+            new Line("levitation", "levitation", MobEffects.LEVITATION, 600, 1200, -1),
+            new Line("health_boost", "health_boost", MobEffects.HEALTH_BOOST, 3600, 9600, 1800),
             // Corruption outputs (§2): Haste → Mining Fatigue, Luck → Bad Luck.
             new Line("mining_fatigue", "mining_fatigue", MobEffects.DIG_SLOWDOWN, 3600, 9600, -1),
             new Line("bad_luck", "bad_luck", MobEffects.UNLUCK, 9600, 24000, -1));

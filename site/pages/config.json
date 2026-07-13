@@ -18,7 +18,7 @@
             ["<code>enableMurkyDraughts</code>", "bool", "true", "Failed brews bottle Murky Draughts (off: invalid pairs simply don't brew)"],
             ["<code>startDiscovered</code>", "bool", "false", "Every player starts with the full recipes page"],
             ["<code>enableRecipeNotes</code>", "bool", "true", "Copy a discovered recipe onto paper from the recipes page — a tradeable note"],
-            ["<code>enableMissingBrews</code>", "bool", "true", "The five recipe-less effect lines"],
+            ["<code>enableMissingBrews</code>", "bool", "true", "The recipe-less effect lines vanilla shipped"],
             ["<code>enableBatchBrewing</code>", "bool", "true", "The heated-cauldron six-bottle rig"],
             ["<code>batchIngredientCost</code>", "int (2–6)", "3", "Ingredients consumed per six-bottle pass"],
             ["<code>batchFuelCost</code>", "int (1–4)", "2", "Fuel charges consumed per six-bottle pass"],

@@ -61,6 +61,11 @@ public final class DistillationBrews {
         addLine(mixes, Potions.AWKWARD, Items.NAUTILUS_SHELL, "luck", false);
         // Glowing: Awkward + Glow Ink Sac. No level II.
         addLine(mixes, Potions.AWKWARD, Items.GLOW_INK_SAC, "glowing", false);
+        // Levitation: Awkward + Chorus Fruit — raw fruit floats you, where the popped fruit brews
+        // the levitation antidote. Short base, no level II — glowstone stays invalid.
+        addLine(mixes, Potions.AWKWARD, Items.CHORUS_FRUIT, "levitation", false);
+        // Health Boost: Awkward + Pumpkin Pie, an overworld delicacy. Mirrors Absorption's line.
+        addLine(mixes, Potions.AWKWARD, Items.PUMPKIN_PIE, "health_boost", true);
         // Corruptions (§2): Haste → Mining Fatigue and Luck → Bad Luck, with the long mirror
         // vanilla's own corruptions carry (long_swiftness + eye → long_slowness).
         mixes.add(new Mix(DistillationPotions.potion("haste"), Items.FERMENTED_SPIDER_EYE,

@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.gametest;
 
 import com.rfizzle.distillation.Distillation;
+import com.rfizzle.distillation.brew.DistillationPotions;
 import com.rfizzle.distillation.brew.PremiumBrews;
 import com.rfizzle.distillation.brew.PremiumColors;
 import com.rfizzle.distillation.item.DistillationItems;
@@ -81,6 +82,21 @@ public class PremiumBrewsGameTest implements FabricGameTest {
     public void slownessConcentratesWithFermentedSpiderEye(GameTestHelper helper) {
         assertBrewsTo(helper, vanillaBottle(Potions.SLOWNESS), new ItemStack(Items.FERMENTED_SPIDER_EYE),
                 "distillation:concentrated_slowness");
+    }
+
+    // --- Health Boost: a §2 line eligible for premium, mirroring Absorption (§5.1) ---
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void healthBoostConcentrates(GameTestHelper helper) {
+        assertBrewsTo(helper, distillationBottle("health_boost"), new ItemStack(Items.PUMPKIN_PIE),
+                "distillation:concentrated_health_boost");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void premiumHealthBoostCarriesSpecStats(GameTestHelper helper) {
+        // SPEC §5.3: Health Boost II 4:00 — the long variant (8:00) halved, at the strong amplifier.
+        assertSingleEffect(helper, "premium_health_boost", 4800, 1);
+        helper.succeed();
     }
 
     // --- Concentrating an already-modified potion is an invalid pair (→ Murky) ---
@@ -221,6 +237,11 @@ public class PremiumBrewsGameTest implements FabricGameTest {
 
     private static ItemStack premiumBottle(String path) {
         return PotionContents.createItemStack(Items.POTION, PremiumBrews.potion(path));
+    }
+
+    /** A bottle of a §2 base potion (e.g. {@code distillation:health_boost}) — a premium line's base. */
+    private static ItemStack distillationBottle(String path) {
+        return PotionContents.createItemStack(Items.POTION, DistillationPotions.potion(path));
     }
 
     private static BrewingStandBlockEntity placeStand(GameTestHelper helper, ItemStack bottle, ItemStack ingredient) {

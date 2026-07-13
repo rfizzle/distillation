@@ -39,7 +39,7 @@ class PremiumBrewsTableTest {
             Map.entry("strength", 4800), Map.entry("swiftness", 4800), Map.entry("leaping", 4800),
             Map.entry("regeneration", 1800), Map.entry("poison", 1800), Map.entry("slowness", 2400),
             Map.entry("turtle_master", 2400), Map.entry("resistance", 4800), Map.entry("absorption", 4800),
-            Map.entry("haste", 12000));
+            Map.entry("haste", 12000), Map.entry("health_boost", 4800));
 
     /** Lines where the enumerated §5.3 table diverges from the {@code long ÷ 2} guide. */
     private static final Set<String> FORMULA_EXCEPTIONS = Set.of("regeneration", "poison", "turtle_master");
@@ -62,12 +62,13 @@ class PremiumBrewsTableTest {
                 Map.entry("leaping", Items.RABBIT_FOOT), Map.entry("regeneration", Items.GHAST_TEAR),
                 Map.entry("poison", Items.SPIDER_EYE), Map.entry("slowness", Items.FERMENTED_SPIDER_EYE),
                 Map.entry("turtle_master", Items.TURTLE_HELMET), Map.entry("resistance", Items.SHULKER_SHELL),
-                Map.entry("absorption", Items.GOLDEN_APPLE), Map.entry("haste", Items.HONEY_BOTTLE));
+                Map.entry("absorption", Items.GOLDEN_APPLE), Map.entry("haste", Items.HONEY_BOTTLE),
+                Map.entry("health_boost", Items.PUMPKIN_PIE));
         assertEquals(expected, PremiumBrews.REAGENTS, "each line concentrates with its own effect reagent");
     }
 
     @Test
-    void eligibleLinesAreExactlyTheTenStrongFormLines() {
+    void eligibleLinesAreExactlyTheStrongFormLines() {
         assertEquals(SPEC_TICKS.keySet(), PremiumBrews.PREMIUM_TICKS.keySet());
         assertEquals(SPEC_TICKS.keySet(), PremiumBrews.REAGENTS.keySet(),
                 "the reagent and duration tables cover the same lines");

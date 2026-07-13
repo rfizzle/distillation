@@ -73,7 +73,8 @@ public final class PremiumBrews {
             Map.entry("turtle_master", Items.TURTLE_HELMET),
             Map.entry("resistance", Items.SHULKER_SHELL),
             Map.entry("absorption", Items.GOLDEN_APPLE),
-            Map.entry("haste", Items.HONEY_BOTTLE));
+            Map.entry("haste", Items.HONEY_BOTTLE),
+            Map.entry("health_boost", Items.PUMPKIN_PIE));
 
     /**
      * The premium effect duration in ticks per line — SPEC §5.3's enumerated table, authoritative
@@ -90,10 +91,11 @@ public final class PremiumBrews {
             Map.entry("turtle_master", 2400),
             Map.entry("resistance", 4800),
             Map.entry("absorption", 4800),
-            Map.entry("haste", 12000));
+            Map.entry("haste", 12000),
+            Map.entry("health_boost", 4800));
 
     /** The eligible lines whose base is a §2 registration (their premium follows missing-brews too). */
-    private static final Set<String> DISTILLATION_BACKED = Set.of("resistance", "absorption", "haste");
+    private static final Set<String> DISTILLATION_BACKED = Set.of("resistance", "absorption", "haste", "health_boost");
 
     private static final Map<String, Holder<Potion>> REGISTERED = new LinkedHashMap<>();
     private static volatile Set<ResourceLocation> familyIds = Set.of();
@@ -118,10 +120,11 @@ public final class PremiumBrews {
                 vanilla("poison", Potions.POISON, Potions.LONG_POISON, Potions.STRONG_POISON),
                 vanilla("slowness", Potions.SLOWNESS, Potions.LONG_SLOWNESS, Potions.STRONG_SLOWNESS),
                 vanilla("turtle_master", Potions.TURTLE_MASTER, Potions.LONG_TURTLE_MASTER, Potions.STRONG_TURTLE_MASTER),
-                // §2 lines with a strong form (Luck and Glowing have none, so they are ineligible).
+                // §2 lines with a strong form (Luck, Glowing, and Levitation have none, so they are ineligible).
                 distillation("resistance"),
                 distillation("absorption"),
-                distillation("haste"));
+                distillation("haste"),
+                distillation("health_boost"));
     }
 
     /** A line whose base/long/strong variants are vanilla potions; name equals the path. */
@@ -213,7 +216,7 @@ public final class PremiumBrews {
 
     /**
      * The subset of {@link #ownedRecipeIds()} whose base is a §2 line (Resistance, Absorption,
-     * Haste). These leave the graph when {@code enableMissingBrews} is off as well — concentrating a
+     * Haste, Health Boost). These leave the graph when {@code enableMissingBrews} is off as well — concentrating a
      * base you can no longer brew is a dangling conversion, and it would otherwise keep the §2
      * reagent (e.g. Shulker Shell) a graph ingredient after its line was disabled.
      */

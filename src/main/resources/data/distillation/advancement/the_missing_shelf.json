@@ -45,6 +45,18 @@
             "conditions": {
                 "line": "glowing"
             }
+        },
+        "levitation": {
+            "trigger": "distillation:missing_line_brewed",
+            "conditions": {
+                "line": "levitation"
+            }
+        },
+        "health_boost": {
+            "trigger": "distillation:missing_line_brewed",
+            "conditions": {
+                "line": "health_boost"
+            }
         }
     },
     "requirements": [
@@ -62,6 +74,12 @@
         ],
         [
             "glowing"
+        ],
+        [
+            "levitation"
+        ],
+        [
+            "health_boost"
         ]
     ],
     "sends_telemetry_event": false

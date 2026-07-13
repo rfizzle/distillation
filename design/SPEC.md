@@ -103,11 +103,11 @@ Every vanilla effect that shipped without a recipe becomes brewable.
 
 ### Problem
 
-Resistance, Haste, Absorption, Luck, and Glowing exist in vanilla — with icons, ids, and (for Luck) even a bottled potion item — but no survival path. The effect roster is creative-mode-only for no stated reason.
+Resistance, Haste, Absorption, Luck, Glowing, Levitation, and Health Boost exist in vanilla — with icons, ids, and (for Luck) even a bottled potion item — but no brewing recipe. The effect roster ships gaps for no stated reason.
 
 ### Behavior
 
-Five new potion lines, registered under the `distillation:` namespace and brewed at the stand like any potion:
+Seven new potion lines, registered under the `distillation:` namespace and brewed at the stand like any potion:
 
 | Effect | Recipe | Base | + Redstone | + Glowstone |
 |---|---|---|---|---|
@@ -116,12 +116,15 @@ Five new potion lines, registered under the `distillation:` namespace and brewed
 | Absorption | Awkward + Golden Apple | Absorption 3:00 | 8:00 | Absorption II 1:30 |
 | Luck | Awkward + Nautilus Shell | Luck 8:00 | 20:00 | — |
 | Glowing | Awkward + Glow Ink Sac | Glowing 3:00 | 8:00 | — |
+| Levitation | Awkward + Chorus Fruit | Levitation 0:30 | 1:00 | — |
+| Health Boost | Awkward + Pumpkin Pie | Health Boost 3:00 | 8:00 | Health Boost II 1:30 |
 
-- Haste routes through Swiftness deliberately — honey over a sugar brew — so the utility line costs two steps. Haste and Luck are utility-class and take the §4 long durations; Resistance, Absorption, and Glowing are combat/marker effects and keep vanilla-scale timers.
+- Haste routes through Swiftness deliberately — honey over a sugar brew — so the utility line costs two steps. Haste and Luck are utility-class and take the §4 long durations; Resistance, Absorption, Glowing, and Health Boost are combat/marker effects and keep vanilla-scale timers.
+- Levitation carries a deliberately short base — mobility of that order stays a novelty, not a weapon — and a raw Chorus Fruit reagent, where the *popped* fruit brews the §8 Levitation Antidote.
 - The Honey Bottle is consumed whole (no empty bottle back), matching the dragon's-breath precedent.
-- Luck and Glowing have no meaningful second level; glowstone on them is an invalid pair (→ Murky Draught, which the absent vapor hint warns about).
-- **Corruptions** (fermented spider eye): Haste → Mining Fatigue 3:00 (+redstone 8:00); Luck → Bad Luck 8:00 (+redstone 20:00). Resistance, Absorption, and Glowing have no corruption (invalid pair).
-- All five lines take gunpowder (splash) and dragon's breath (lingering) as vanilla, subject to §7.
+- Luck, Glowing, and Levitation have no meaningful second level; glowstone on them is an invalid pair (→ Murky Draught, which the absent vapor hint warns about).
+- **Corruptions** (fermented spider eye): Haste → Mining Fatigue 3:00 (+redstone 8:00); Luck → Bad Luck 8:00 (+redstone 20:00). Resistance, Absorption, Glowing, Levitation, and Health Boost have no corruption (invalid pair).
+- Every line takes gunpowder (splash) and dragon's breath (lingering) as vanilla, subject to §7.
 - **The Mundane bottle's onward arrow:** Mundane Potion + Fermented Spider Eye → Weakness 1:30 (+redstone 4:00 as vanilla), alongside vanilla's untouched water-bottle route. With §6's Thick base, neither of vanilla's dead-end base bottles ends the graph — every conversion the stand teaches leads somewhere.
 
 ### Edge Cases
@@ -140,7 +143,7 @@ Five new potion lines, registered under the `distillation:` namespace and brewed
 
 ### Implementation Notes
 
-- Potion registrations: `distillation:resistance` / `long_` / `strong_` variants and likewise per line (no `strong_luck`/`strong_glowing`; corruption lines analogous), registered with the durations above; conversions registered through the vanilla brewing builder so they enter the §1 graph with no special casing.
+- Potion registrations: `distillation:resistance` / `long_` / `strong_` variants and likewise per line (no `strong_luck`/`strong_glowing`/`strong_levitation`; corruption lines analogous), registered with the durations above; conversions registered through the vanilla brewing builder so they enter the §1 graph with no special casing.
 
 ---
 
@@ -256,12 +259,12 @@ Vanilla forces every potion to choose: long (redstone) or strong (glowstone), ne
 
 1. **Concentration:** brewing a potion's own effect reagent onto the finished potion — e.g. Potion of Strength + Blaze Powder — yields a **Concentrated** potion: identical stats, marked concentrated (deeper liquid color; tooltip line *"Concentrated"*). This is the "double the base reagent" step: two blaze powder total have gone into the bottle. Concentration is valid only for effects that have a strong (level II) form.
 2. A Concentrated potion accepts **both** modifiers cumulatively, in either order: redstone then glowstone, or glowstone then redstone. The finished **premium** potion is extended *and* amplified: **level II at the extended duration ÷ 2**.
-3. Premium results by line: Strength II 4:00, Swiftness II 4:00, Leaping II 4:00, Regeneration II 1:30 (from extended 3:00... see table), Poison II 1:30, Slowness IV 2:00, Turtle Master II 2:00, Resistance II 4:00, Absorption II 4:00, Haste II 10:00. The general formula: `premium duration = long-variant duration ÷ 2`, amplifier = the strong variant's.
+3. Premium results by line: Strength II 4:00, Swiftness II 4:00, Leaping II 4:00, Regeneration II 1:30 (from extended 3:00... see table), Poison II 1:30, Slowness IV 2:00, Turtle Master II 2:00, Resistance II 4:00, Absorption II 4:00, Haste II 10:00, Health Boost II 4:00. The general formula: `premium duration = long-variant duration ÷ 2`, amplifier = the strong variant's.
 4. On a **non-concentrated** potion, redstone and glowstone keep exact vanilla behavior (including vanilla's trades when applied to an already-modified potion). Concentration entries are graph conversions like any other — hintable, discoverable, murk-able.
 
 ### Edge Cases
 
-- **Effects with no strong form** (Fire Resistance, Night Vision, Invisibility, Water Breathing, Slow Falling, Luck, Glowing): concentration is an invalid pair (→ Murky Draught; the missing vapor hint warns first).
+- **Effects with no strong form** (Fire Resistance, Night Vision, Invisibility, Water Breathing, Slow Falling, Luck, Glowing, Levitation): concentration is an invalid pair (→ Murky Draught; the missing vapor hint warns first).
 - **Concentrating an already-modified potion** (long or strong) is invalid — concentration applies to the base potion only. The order is always: brew → concentrate → dusts.
 - **Splash/lingering:** gunpowder and dragon's breath apply to premium potions as to any potion (§7).
 - **Multiplayer:** world rules, identical for everyone.
@@ -419,7 +422,7 @@ Seven entries, parented under vanilla's **Local Brewery** (`minecraft:nether/bre
 |---|---|---|
 | `trial_and_error` | Trial and Error | bottle a Murky Draught |
 | `scholar_of_the_still` | Scholar of the Still | discover 10 recipes |
-| `the_missing_shelf` | The Missing Shelf | brew all five §2 effects at least once |
+| `the_missing_shelf` | The Missing Shelf | brew every §2 effect at least once |
 | `round_for_the_table` | Round for the Table | complete a six-bottle batch pass |
 | `surgical` | Surgical | an antidote strips an effect while you keep ≥ 2 other effects |
 | `the_good_stuff` | The Good Stuff | brew a premium (extended + amplified) potion |
@@ -440,7 +443,7 @@ All features are independently toggleable via a ModMenu / Cloth Config screen an
 | `enableDiscovery` | bool | true | Recipe recording, toasts, recipes page, hints (§1) |
 | `enableMurkyDraughts` | bool | true | Failed brews bottle Murky Draughts (§1) |
 | `startDiscovered` | bool | false | Players start with every recipe discovered (§1) |
-| `enableMissingBrews` | bool | true | The five recipe-less effect lines (§2) |
+| `enableMissingBrews` | bool | true | The recipe-less effect lines vanilla shipped (§2) |
 | `enableBatchBrewing` | bool | true | The heated-cauldron batch rig (§3) |
 | `batchIngredientCost` | int | 3 | Ingredients consumed per six-bottle pass |
 | `batchFuelCost` | int | 2 | Fuel charges consumed per six-bottle pass |
