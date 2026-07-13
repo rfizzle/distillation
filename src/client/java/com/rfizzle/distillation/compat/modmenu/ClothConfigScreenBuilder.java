@@ -153,6 +153,13 @@ final class ClothConfigScreenBuilder {
                 .setDefaultValue(defaults.enableThrownRebalance)
                 .setSaveConsumer(v -> config.enableThrownRebalance = v)
                 .build());
+        server.addEntry(entry.startBooleanToggle(
+                        Component.translatable("config.distillation.enable_attuned_splash"),
+                        config.enableAttunedSplash)
+                .setTooltip(Component.translatable("config.distillation.enable_attuned_splash.tooltip"))
+                .setDefaultValue(defaults.enableAttunedSplash)
+                .setSaveConsumer(v -> config.enableAttunedSplash = v)
+                .build());
         server.addEntry(entry.startFloatField(
                         Component.translatable("config.distillation.splash_duration_factor"),
                         config.splashDurationFactor)

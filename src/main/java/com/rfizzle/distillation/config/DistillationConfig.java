@@ -67,6 +67,7 @@ public class DistillationConfig {
     public boolean enablePremiumBrews = true;
     public boolean enableAntidotes = true;
     public boolean enableThrownRebalance = true;
+    public boolean enableAttunedSplash = true;
     public float splashDurationFactor = 0.875f;
     public int lingeringCloudDurationTicks = 1200;
     public float lingeringCloudRadius = 4.5f;

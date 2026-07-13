@@ -49,6 +49,7 @@ class DistillationConfigTest {
         assertTrue(json.get("enablePremiumBrews").getAsBoolean());
         assertTrue(json.get("enableAntidotes").getAsBoolean());
         assertTrue(json.get("enableThrownRebalance").getAsBoolean());
+        assertTrue(json.get("enableAttunedSplash").getAsBoolean());
         assertEquals(0.875f, json.get("splashDurationFactor").getAsFloat());
         assertEquals(1200, json.get("lingeringCloudDurationTicks").getAsInt());
         assertEquals(4.5f, json.get("lingeringCloudRadius").getAsFloat());
@@ -180,6 +181,7 @@ class DistillationConfigTest {
         JsonObject json = JsonParser.parseString(sync).getAsJsonObject();
         assertFalse(json.has("client"), "the client block never leaves the server");
         assertTrue(json.has("enableDiscovery"), "server keys are all present in the sync view");
+        assertTrue(json.has("enableAttunedSplash"), "the attuned-splash toggle syncs server→client");
         assertTrue(json.has("lingeringCloudRadius"), "server keys are all present in the sync view");
     }
 

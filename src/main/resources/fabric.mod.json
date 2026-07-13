@@ -34,6 +34,7 @@
             "com.rfizzle.distillation.gametest.PremiumBrewsGameTest",
             "com.rfizzle.distillation.gametest.AntidoteGameTest",
             "com.rfizzle.distillation.gametest.ThrownRebalanceGameTest",
+            "com.rfizzle.distillation.gametest.AttunedSplashGameTest",
             "com.rfizzle.distillation.gametest.TippedArrowCauldronGameTest",
             "com.rfizzle.distillation.gametest.AdvancementGameTest",
             "com.rfizzle.distillation.gametest.ProbeTooltipGameTest",
