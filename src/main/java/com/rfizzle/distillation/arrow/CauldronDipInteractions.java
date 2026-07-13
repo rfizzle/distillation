@@ -81,7 +81,7 @@ public final class CauldronDipInteractions {
             // A tippable-in-principle potion the player hasn't learned: name the gate, don't just no-op.
             if (!producing.isEmpty()) {
                 serverPlayer.displayClientMessage(
-                        Component.translatable("message.distillation.arrow_undiscovered"), true);
+                        Component.translatable("message.distillation.arrow_undiscovered", stack.getHoverName()), true);
             }
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }

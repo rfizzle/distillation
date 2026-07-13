@@ -362,7 +362,7 @@ Vanilla tips arrows only through a lingering potion — dragon's breath per batc
 
 - **Charging.** Right-clicking a **water cauldron** (any level) with a **drinkable potion the player has discovered** tints the cauldron with that potion and returns an empty glass bottle. Only normal potions charge — splash and lingering potions have no cauldron interaction, so vanilla's lingering-potion tipped-arrow recipe is untouched. A charged cauldron lifts potion-colored particles, so it reads as charged in-world.
 - **Dipping.** Right-clicking a charged cauldron with a stack of arrows tips up to `tippedArrowsPerDip` of them (default 8) into vanilla **tipped arrows** carrying the cauldron's potion, and spends **one water level**. A full (level-3) cauldron therefore tips up to three dips before running dry; draining the last level empties the cauldron and clears its charge.
-- **Discovery gate.** Charging is gated like batch brewing: with `enableDiscovery` on, the potion must be produced by at least one conversion the charging player has discovered. An undiscovered-but-tippable brew names the gate in the action bar and does nothing; with discovery off, any drinkable potion charges.
+- **Discovery gate.** Charging is gated like batch brewing: with `enableDiscovery` on, the potion must be produced by at least one conversion the charging player has discovered. An undiscovered-but-tippable brew names that brew in the action bar and does nothing; with discovery off, any drinkable potion charges.
 
 ### Edge Cases
 

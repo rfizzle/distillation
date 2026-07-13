@@ -46,7 +46,7 @@
   "gui.distillation.recipes_page.count.full": "✦ %s / %s",
   "gui.distillation.recipes_page.empty": "No recipes discovered yet.",
   "gui.distillation.recipes_page.page": "%s / %s",
-  "message.distillation.arrow_undiscovered": "You haven't discovered this brew yet.",
+  "message.distillation.arrow_undiscovered": "You haven't discovered %s yet.",
   "notification.distillation.recipe_learned": "✦ Recipe learned: %s",
   "subtitles.distillation.recipe_learned": "Recipe learned",
   "subtitles.distillation.murky": "Brew goes murky",
