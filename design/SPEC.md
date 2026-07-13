@@ -223,7 +223,7 @@ Unchanged (combat/mobility class): Swiftness, Leaping, Strength, Regeneration, P
 
 1. **Sneak + use** on a full, drinkable, non-instant potion drinks a **half**: a quick swallow — half the vanilla drink time (**16 ticks, ~0.8s**) — applies each effect at ⌊duration ÷ 2⌋, and the item becomes a **half draught** — same potion, marked half-full (bottle renders half-empty; name suffixed *"(Half)"*; tooltip shows the halved durations).
 2. Drinking a half draught (sneaking or not) is the same quick swallow: it applies the remaining half and returns the glass bottle. Halves do not split further.
-3. A half-measure — a sip or a stored half — is the only fast drink; a full potion keeps the vanilla drink time (32 ticks, 1.6s), and milk and food are untouched. The animation stays vanilla's drink; only its length shortens.
+3. A half-measure — a sip or a stored half — is the only fast drink; a full potion keeps the vanilla drink time (32 ticks, 1.6s), and milk and food are untouched. The animation stays vanilla's drink; only its length shortens. The sip-or-full choice is fixed when the drink starts, from the crouch and stack at that instant, so releasing the sneak mid-drink flips neither the dose nor the speed — no full dose at a sip's pace.
 4. Instant potions (Healing, Harming, antidotes §6) cannot be sipped — sneak-use drinks them whole at full time. Splash, lingering, and Murky Draughts cannot be sipped.
 5. Effect stacking follows vanilla merge rules — sipping the second half while the first is active extends the timer by replacing it with the fresh half duration if longer.
 
@@ -232,7 +232,7 @@ Unchanged (combat/mobility class): Swiftness, Leaping, Strength, Regeneration, P
 - **Half draughts and brewing:** a half draught is not a receptive bottle — the stand rejects it (no topping up).
 - **Existing worlds:** potions bottled before install retune on next effect application (duration is resolved at drink time, not stored in the item).
 - **Multiplayer:** per-player consumption; nothing shared.
-- **Disabled:** `enableHonestDurations=false` restores vanilla timers (already-applied effects tick out unchanged); `enableDraughts=false` makes sneak-use drink normally (existing half draughts remain drinkable for their stored half).
+- **Disabled:** `enableHonestDurations=false` restores vanilla timers (already-applied effects tick out unchanged); `enableDraughts=false` makes sneak-use drink normally (existing half draughts remain drinkable — and still swallow quick — for their stored half).
 
 ### Config
 
@@ -244,7 +244,7 @@ Unchanged (combat/mobility class): Swiftness, Leaping, Strength, Regeneration, P
 ### Implementation Notes
 
 - Duration overrides: an internal map (potion id → base ticks) applied at the single seam where potion contents instantiate their `MobEffectInstance`s (a `PotionContents` mixin), so loot/trade/creative potions retune identically. §2's own lines bake their durations at registration and skip the map.
-- Draughts: a `distillation:draught` item component (fraction consumed); interaction via `use` interception on potion items when sneaking; the half state drives an item-model override (half-full bottle texture) and tooltip lines. The same classification that halves the dose halves `PotionItem.getUseDuration` (a `PotionItem` mixin returning half vanilla's ticks for any half-measure), so the shorter client animation lands the drink on the tick the server completes it.
+- Draughts: a `distillation:draught` item component (fraction consumed); interaction via `use` interception on potion items when sneaking; the half state drives an item-model override (half-full bottle texture) and tooltip lines. The same classification that halves the dose halves `PotionItem.getUseDuration` (a `PotionItem` mixin returning half vanilla's ticks for any half-measure), so the shorter client animation lands the drink on the tick the server completes it. The kind is latched at `LivingEntity.startUsingItem` (a `LivingEntity` mixin exposing it through the `DraughtDrinker` seam) and read back for both the duration and the completion, so the speed fixed at the start and the dose applied at the end stay in lockstep regardless of a mid-drink sneak toggle; a direct completion with no use started (a test, a foreign consumer) classifies live.
 
 ---
 

@@ -13,6 +13,7 @@
         "BrewingStandMenuMixin",
         "BrewingStandMenuPotionSlotMixin",
         "ItemStackHoverNameMixin",
+        "LivingEntityMixin",
         "PotionContentsColorMixin",
         "PotionContentsMixin",
         "PotionItemMixin",

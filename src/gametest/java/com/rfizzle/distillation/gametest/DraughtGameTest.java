@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Item;
@@ -134,6 +135,33 @@ public class DraughtGameTest implements FabricGameTest {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void sipStaysHalfWhenCrouchReleasedMidDrink(GameTestHelper helper) {
+        // SPEC §4: the sip/full choice is latched when the drink starts, so releasing the sneak
+        // mid-drink cannot buy a full dose at the quick sip's speed.
+        ServerPlayer player = survivalPlayer(helper);
+        player.setShiftKeyDown(true);
+        try {
+            ItemStack full = potion("minecraft:fire_resistance");
+            player.setItemInHand(InteractionHand.MAIN_HAND, full);
+            player.startUsingItem(InteractionHand.MAIN_HAND); // latches SIP_HALF from the crouch at start
+
+            player.setShiftKeyDown(false); // let go of sneak before the drink finishes
+            ItemStack using = player.getUseItem();
+            helper.assertTrue(using.getItem().getUseDuration(using, player) == DRAUGHT_DRINK_TICKS,
+                    "a latched sip keeps the quick drink time after the crouch is released");
+
+            ItemStack returned = using.getItem().finishUsingItem(using, helper.getLevel(), player);
+            assertDuration(helper, player.getEffect(MobEffects.FIRE_RESISTANCE), FIRE_RES_HALF,
+                    "a latched sip applies the half dose even though the crouch was released");
+            helper.assertTrue(returned.has(DistillationItems.DRAUGHT),
+                    "a latched sip still leaves a marked half draught, never a full drink");
+        } finally {
+            player.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void instantPotionSneakDrinksWhole(GameTestHelper helper) {
         ServerPlayer player = survivalPlayer(helper);
         player.setShiftKeyDown(true);
@@ -238,16 +266,20 @@ public class DraughtGameTest implements FabricGameTest {
         ServerPlayer player = survivalPlayer(helper);
         player.setShiftKeyDown(true);
         try {
-            // Sneaking on a full potion now drinks it whole — no half is created.
+            // Sneaking on a full potion now drinks it whole — no half is created, at the full time.
             ItemStack full = potion("minecraft:fire_resistance");
+            helper.assertTrue(full.getItem().getUseDuration(full, player) == VANILLA_DRINK_TICKS,
+                    "with draughts off, sneaking on a full potion keeps the vanilla drink time");
             ItemStack fromFull = full.getItem().finishUsingItem(full, helper.getLevel(), player);
             helper.assertTrue(fromFull.is(Items.GLASS_BOTTLE) && !fromFull.has(DistillationItems.DRAUGHT),
                     "with draughts off, sneaking drinks the whole potion");
             assertDuration(helper, player.getEffect(MobEffects.FIRE_RESISTANCE), FIRE_RES_HONEST,
                     "with draughts off, a whole drink applies the full honest duration");
 
-            // An existing half is still drinkable for its stored half.
+            // An existing half is still drinkable for its stored half — and stays a quick swallow.
             ItemStack half = half("minecraft:fire_resistance");
+            helper.assertTrue(half.getItem().getUseDuration(half, player) == DRAUGHT_DRINK_TICKS,
+                    "an existing half stays quick even with draughts off — a half is a half");
             ItemStack fromHalf = half.getItem().finishUsingItem(half, helper.getLevel(), player);
             helper.assertTrue(fromHalf.is(Items.GLASS_BOTTLE),
                     "an existing half draught must still drink for the glass bottle");

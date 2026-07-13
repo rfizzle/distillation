@@ -28,7 +28,7 @@ abstract class PotionItemMixin {
     @Inject(method = "finishUsingItem", at = @At("HEAD"), cancellable = true)
     private void distillation$sipHalf(ItemStack stack, Level level, LivingEntity entity,
                                       CallbackInfoReturnable<ItemStack> cir) {
-        Draughts.DrinkKind kind = Draughts.classify(stack, entity);
+        Draughts.DrinkKind kind = Draughts.kindFor(stack, entity);
         if (kind == Draughts.DrinkKind.FULL) {
             return;
         }
@@ -36,15 +36,16 @@ abstract class PotionItemMixin {
     }
 
     /**
-     * A draught is a half-measure and swallows in half the time (SPEC §4): the same classification
-     * that halves the dose halves the drink duration, so a sip or a stored half both quicken while a
-     * full drink keeps vanilla's time. Resolves identically on both sides — the marker component and
-     * config sync to the client, and the drinker's own crouch drives its animation — so the shorter
-     * client animation lands the drink on the same tick the server completes it.
+     * A draught is a half-measure and swallows in half the time (SPEC §4): the same decision that
+     * halves the dose halves the drink duration, so a sip or a stored half both quicken while a full
+     * drink keeps vanilla's time. The decision is latched at the start of the drink ({@link
+     * Draughts#kindFor}), so the speed fixed here and the dose applied at completion always agree and
+     * neither can be flipped by toggling the sneak mid-drink. Resolves identically on both sides —
+     * the marker component and config sync to the client, and the crouch is read once at the start.
      */
     @ModifyReturnValue(method = "getUseDuration", at = @At("RETURN"))
     private int distillation$quickSip(int original, ItemStack stack, LivingEntity entity) {
-        return Draughts.useDuration(Draughts.classify(stack, entity), original);
+        return Draughts.useDuration(Draughts.kindFor(stack, entity), original);
     }
 
     @ModifyArg(method = "appendHoverText",

@@ -71,6 +71,24 @@ public final class Draughts {
         return DrinkKind.FULL;
     }
 
+    /**
+     * The kind governing a drink already in progress: the value latched at {@code startUsingItem}
+     * when the drinker is mid-drink on this exact stack ({@link DraughtDrinker}), else a live
+     * classification. Latching keeps the shortened drink time (decided once at the start) and the
+     * halved dose (decided at completion) in agreement — a released sneak mid-drink no longer flips
+     * one without the other. A direct {@code finishUsingItem} call that never started a use (e.g. a
+     * test, or a foreign consumer) has no latch and classifies live.
+     */
+    public static DrinkKind kindFor(ItemStack stack, LivingEntity entity) {
+        if (entity instanceof DraughtDrinker drinker && entity.isUsingItem() && entity.getUseItem() == stack) {
+            DrinkKind latched = drinker.distillation$drinkKind();
+            if (latched != null) {
+                return latched;
+            }
+        }
+        return classify(stack, entity);
+    }
+
     /** The shell classification for the drink seam: gathers the booleans and defers to the core. */
     public static DrinkKind classify(ItemStack stack, LivingEntity entity) {
         // A creative drinker consumes nothing, so a sip would apply a silent half-dose with no half to
