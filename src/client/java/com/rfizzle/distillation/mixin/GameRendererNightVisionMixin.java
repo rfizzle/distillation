@@ -39,6 +39,8 @@ public class GameRendererNightVisionMixin {
             // Vanilla's caller confirms the effect before calling; guard anyway and defer to vanilla.
             return;
         }
+        // getDuration() is -1 for an infinite effect; the fade math reads that sentinel as full
+        // brightness, matching vanilla, so the raw duration passes straight through.
         cir.setReturnValue(NightVisionFadeMath.scale(effect.getDuration(), partialTick));
     }
 }

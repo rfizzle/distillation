@@ -22,12 +22,21 @@ public final class NightVisionFadeMath {
      * The brightness scale (0.0–1.0) to substitute for vanilla's flicker, given the effect's
      * remaining duration and the frame's partial tick.
      *
-     * @param durationTicks the effect's remaining duration in ticks
+     * <p>A negative duration is Minecraft's infinite-effect sentinel ({@code getDuration() == -1}
+     * when {@code isInfiniteDuration()}). An infinite effect never expires, so it holds full
+     * brightness — matching vanilla, whose {@code endsWithin(200)} is {@code false} for an infinite
+     * effect. Handling it here, rather than in the mixin shell, keeps the whole curve (including its
+     * edges) in one unit-tested place.
+     *
+     * @param durationTicks the effect's remaining duration in ticks, or negative for an infinite effect
      * @param partialTick   the render frame's fractional progress into the current tick (0.0–1.0)
-     * @return {@code 1.0} while more than {@link #FADE_TICKS} ticks remain, then a linear ramp to
-     * {@code 0.0} at expiry, clamped to {@code [0.0, 1.0]}
+     * @return {@code 1.0} for an infinite effect or while more than {@link #FADE_TICKS} ticks remain,
+     * then a linear ramp to {@code 0.0} at expiry, clamped to {@code [0.0, 1.0]}
      */
     public static float scale(int durationTicks, float partialTick) {
+        if (durationTicks < 0) {
+            return 1.0F;
+        }
         float remaining = durationTicks - partialTick;
         if (remaining >= FADE_TICKS) {
             return 1.0F;

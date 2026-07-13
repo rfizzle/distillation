@@ -29,11 +29,20 @@ class NightVisionFadeMathTest {
     }
 
     @Test
-    void reachesZeroAtExpiryAndClampsBelow() {
+    void reachesZeroAtExpiry() {
         assertEquals(0.0F, NightVisionFadeMath.scale(0, 0.0F));
-        assertEquals(0.0F, NightVisionFadeMath.scale(-40, 0.0F));
         // A late partial tick can push remaining below zero; still clamped, never negative.
         assertEquals(0.0F, NightVisionFadeMath.scale(0, 0.9F));
+    }
+
+    @Test
+    void holdsFullBrightnessForInfiniteDuration() {
+        // Minecraft stores an infinite effect as getDuration() == -1; vanilla's endsWithin(200) is
+        // false for it, so it holds full brightness and never fades. A negative sentinel must not
+        // fall through to the ramp and black the effect out.
+        assertEquals(1.0F, NightVisionFadeMath.scale(-1, 0.0F));
+        assertEquals(1.0F, NightVisionFadeMath.scale(-1, 0.5F));
+        assertEquals(1.0F, NightVisionFadeMath.scale(-40, 0.0F));
     }
 
     @Test
