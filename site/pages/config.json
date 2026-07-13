@@ -48,7 +48,8 @@
           "nowrapHeaders": true,
           "rows": [
             ["<code>showVaporHints</code>", "bool", "true", "The color hints over the ingredient slot"],
-            ["<code>recipeViewerShowsUndiscovered</code>", "bool", "false", "Whether EMI/REI/JEI list conversions you haven't discovered"]
+            ["<code>recipeViewerShowsUndiscovered</code>", "bool", "false", "Whether EMI/REI/JEI list conversions you haven't discovered"],
+            ["<code>smoothNightVisionFade</code>", "bool", "true", "Fade Night Vision out over its final seconds instead of the vanilla flicker"]
           ]
         }
       ]

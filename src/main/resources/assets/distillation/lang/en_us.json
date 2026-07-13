@@ -46,6 +46,8 @@
   "config.distillation.show_vapor_hints.tooltip": "Color hints over the brewing stand's ingredient slot.",
   "config.distillation.recipe_viewer_shows_undiscovered": "Recipe Viewers Show Undiscovered",
   "config.distillation.recipe_viewer_shows_undiscovered.tooltip": "Recipe viewers list conversions you haven't discovered yet.",
+  "config.distillation.smooth_night_vision_fade": "Smooth Night Vision Fade",
+  "config.distillation.smooth_night_vision_fade.tooltip": "Fade Night Vision out over its final seconds instead of flickering.",
   "gui.distillation.recipes_page.button": "Recipes",
   "gui.distillation.recipes_page.title": "Recipes",
   "gui.distillation.recipes_page.count": "%s / %s",

@@ -78,6 +78,7 @@ public class DistillationConfig {
     public static class Client {
         public boolean showVaporHints = true;
         public boolean recipeViewerShowsUndiscovered = false;
+        public boolean smoothNightVisionFade = true;
     }
 
     public static DistillationConfig load() {
