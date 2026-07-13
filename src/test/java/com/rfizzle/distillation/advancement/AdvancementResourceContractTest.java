@@ -87,11 +87,12 @@ class AdvancementResourceContractTest {
                     "every Missing Shelf criterion fires the missing-line trigger");
             lines.add(conditions.get("line").getAsString());
         }
-        assertEquals(Set.of("resistance", "haste", "absorption", "luck", "glowing"), lines,
-                "The Missing Shelf pins exactly the five §2 lines");
+        assertEquals(
+                Set.of("resistance", "haste", "absorption", "luck", "glowing", "levitation", "health_boost"),
+                lines, "The Missing Shelf pins exactly the §2 lines");
 
         JsonArray requirements = json.getAsJsonArray("requirements");
-        assertEquals(5, requirements.size(), "all five criteria are required (AND), each in its own group");
+        assertEquals(7, requirements.size(), "every criterion is required (AND), each in its own group");
         for (var group : requirements) {
             assertFalse(group.getAsJsonArray().isEmpty(), "each requirement group names its criterion");
         }

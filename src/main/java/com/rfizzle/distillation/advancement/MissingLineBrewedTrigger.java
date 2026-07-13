@@ -11,9 +11,9 @@ import java.util.Optional;
 
 /**
  * Grants a criterion when a player brews (and takes) one of the §2 "missing brew" effect lines
- * ({@code design/SPEC.md} §10 — The Missing Shelf brews all five). One registered trigger backs the
- * whole set: the advancement declares five criteria, each pinning a {@code line}, and a fire with
- * that line satisfies exactly its criterion. An absent {@code line} passes for any line — the
+ * ({@code design/SPEC.md} §10 — The Missing Shelf brews every one). One registered trigger backs the
+ * whole set: the advancement declares one criterion per line, each pinning a {@code line}, and a fire
+ * with that line satisfies exactly its criterion. An absent {@code line} passes for any line — the
  * "brewed any missing line" shape — mirroring vanilla's collect-them-all predicates.
  */
 public class MissingLineBrewedTrigger extends SimpleCriterionTrigger<MissingLineBrewedTrigger.TriggerInstance> {

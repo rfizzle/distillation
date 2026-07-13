@@ -99,7 +99,7 @@ public final class DistillationAdvancements {
         }
     }
 
-    /** The §2 line whose effect this holder is, or {@code null} for anything outside the five. */
+    /** The §2 line whose effect this holder is, or {@code null} for anything outside the lines. */
     private static String missingLineFor(Holder<MobEffect> effect) {
         MobEffect value = effect.value();
         if (value == MobEffects.DAMAGE_RESISTANCE.value()) {
@@ -116,6 +116,12 @@ public final class DistillationAdvancements {
         }
         if (value == MobEffects.GLOWING.value()) {
             return "glowing";
+        }
+        if (value == MobEffects.LEVITATION.value()) {
+            return "levitation";
+        }
+        if (value == MobEffects.HEALTH_BOOST.value()) {
+            return "health_boost";
         }
         return null;
     }
