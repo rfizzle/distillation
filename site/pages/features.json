@@ -138,6 +138,19 @@
       ]
     },
     {
+      "id": "tipped-arrows",
+      "title": "Tipped Arrows Worth Fletching",
+      "intro": "Tipped arrows craftable at survival prices, not gated behind dragon's breath.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Right-click a water cauldron with a potion you have <strong class='text-bone'>discovered</strong> to charge it with that brew, then dip a stack of arrows to tip <strong class='text-bone'>eight at a time</strong> — each dip spends one water level, so a full cauldron tips two dozen before running dry. Only drinkable potions charge; vanilla's lingering-potion recipe still works untouched. Arrows of Slowness or Poison become part of the brewing you already do, and an undiscovered brew still pays vanilla's dragon's-breath price."
+          ]
+        }
+      ]
+    },
+    {
       "title": "Better Together",
       "intro": "With siblings from the Concord collection installed, Distillation lights up further — never required, and with none installed nothing is missing.",
       "blocks": [

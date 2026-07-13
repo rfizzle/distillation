@@ -32,6 +32,10 @@
               "a": "By default the recipe viewers list only conversions you've already discovered. Veterans can flip <code>recipeViewerShowsUndiscovered</code> and have the full index."
             },
             {
+              "q": "Why won't my arrows tip in a cauldron?",
+              "a": "Charging a cauldron works only with a <em>drinkable</em> potion you have already discovered, and only while <code>enableTippedArrows</code> is on. Right-click a water cauldron with the potion to charge it (it hands back an empty bottle), then dip arrows to tip up to eight per dip — each dip spends one water level. Splash and lingering potions don't charge, and vanilla's lingering-potion recipe keeps working for anything you haven't discovered."
+            },
+            {
               "q": "Does it add new ingredients, plants, or mobs?",
               "a": "No. Every recipe brews from items vanilla already ships — shulker shells, honey, golden apples, nautilus shells, glow ink, wither roses. No new dimensions either, and nothing on your HUD."
             },

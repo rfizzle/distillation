@@ -21,6 +21,8 @@
             ["<code>enableBatchBrewing</code>", "bool", "true", "The heated-cauldron six-bottle rig"],
             ["<code>batchIngredientCost</code>", "int (2–6)", "3", "Ingredients consumed per six-bottle pass"],
             ["<code>batchFuelCost</code>", "int (1–4)", "2", "Fuel charges consumed per six-bottle pass"],
+            ["<code>enableTippedArrows</code>", "bool", "true", "Charge a water cauldron with a discovered potion, then dip arrows to tip them"],
+            ["<code>tippedArrowsPerDip</code>", "int (1–16)", "8", "Arrows tipped per dip; each dip spends one cauldron water level"],
             ["<code>enableHonestDurations</code>", "bool", "true", "The utility-potion duration retune"],
             ["<code>enableDraughts</code>", "bool", "true", "Sneak-drink half potions"],
             ["<code>enablePremiumBrews</code>", "bool", "true", "Concentration and the both-dusts premium path"],
