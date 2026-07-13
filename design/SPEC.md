@@ -51,6 +51,15 @@ With `enableMurkyDraughts=false`, invalid pairs simply do not brew (the bottle p
 3. Discovery is permanent: it survives death, relog, and dimension change. `/distillation forget` (Commands) is the only removal.
 4. With `startDiscovered=true`, every player's set starts (and joins) complete — for servers of veterans.
 
+### Behavior — Recipe Notes
+
+Discovery is per player, but knowledge travels as a physical **Recipe Note** (`distillation:recipe_note`) — a tradeable, giftable paper reference to one conversion:
+
+1. On the recipes page, each discovered row carries a small **copy button** (a ✎ glyph, right of the output icon). Clicking it with **paper** in the inventory copies that recipe onto paper: one paper is consumed and one Recipe Note is produced, its components recording the copied recipe id. The click is a client request the server re-validates — the recipe must be in the current graph, the player must have discovered it, `enableRecipeNotes` must be on, and the player must hold paper — so a client can never mint a note for a recipe it did not learn.
+2. A note's tooltip resolves its recipe against the live graph and reads `input + ingredient → output` (the recipes-page grammar), followed by a reminder: *"Brew it at a stand to learn it."* A note whose recipe the current graph no longer carries reads *"An unreadable recipe."*
+3. A note **never grants a recipe.** It points: the reader still brews the conversion at a stand, and that brew records discovery through the normal output-slot seam. Reading, holding, or trading a note changes no one's discovery set — it tells the reader what to brew, skipping the murky gambling.
+4. Notes are reusable references, not consumed on reading. Copying is gated on the copier's own discovery, so a received note can be read but not re-copied unless the reader has themselves learned that recipe — knowledge spreads by teaching, not by photocopying a photocopy.
+
 ### Sync
 
 The server pushes the owner's discovery set on join and on change (`DiscoverySyncS2C`, id-list delta). The client uses it for hints, tooltips, the recipes page, and the recipe-viewer filter (Compatibility); all recording happens server-side.
@@ -61,8 +70,9 @@ The server pushes the owner's discovery set on join and on change (`DiscoverySyn
 - **Two players, one stand:** whoever removes each output learns its conversion. The brew doesn't care who loaded the stand.
 - **Already-discovered brews** re-record harmlessly (set semantics); the toast and chime fire only on first discovery.
 - **Graph changes** (mods/datapacks added or removed): discovery entries whose recipe id no longer resolves are retained in storage but hidden from the page and count — they reappear if the recipe returns.
-- **Creative mode:** identical behavior; creative players discover normally.
-- **Multiplayer:** discovery is strictly per player; no shared or server-wide unlocks (fairness: late joiners learn the same way founders did).
+- **Creative mode:** identical behavior; creative players discover normally, and copy notes normally (the copy still spends a paper).
+- **Multiplayer:** discovery is strictly per player; no shared or server-wide unlocks (fairness: late joiners learn the same way founders did). Recipe Notes are the sanctioned way knowledge crosses between players.
+- **Recipe Notes off / recipe gone:** with `enableRecipeNotes=false` no note can be minted and the copy button is hidden; a note whose recipe has left the graph reads as unreadable and points at nothing until the recipe returns. Existing notes are never invalidated — they are ordinary items.
 
 ### Config
 
@@ -71,17 +81,19 @@ The server pushes the owner's discovery set on join and on change (`DiscoverySyn
 | `enableDiscovery` | bool | true | — |
 | `enableMurkyDraughts` | bool | true | — |
 | `startDiscovered` | bool | false | — |
+| `enableRecipeNotes` | bool | true | — |
 
 Client: `showVaporHints` (bool, default true).
 
-`enableDiscovery=false` disables recording, the toast, the recipes page button, and vapor hints (server-authoritative kill switch); Murky Draughts are governed independently. Batch brewing (§3) treats every recipe as discovered while discovery is disabled.
+`enableDiscovery=false` disables recording, the toast, the recipes page button, and vapor hints (server-authoritative kill switch); Murky Draughts are governed independently. Batch brewing (§3) treats every recipe as discovered while discovery is disabled. `enableRecipeNotes=false` removes the copy button and refuses copy requests server-side; the recipes page (and thus the button) also requires `enableDiscovery`.
 
 ### Implementation Notes
 
 - Graph builder: iterate the vanilla `PotionBrewing` mix/container lists (via accessor or the 1.21.1 builder hook) plus Distillation's registrations into one immutable `RecipeGraph` (maps keyed by ingredient item and by input potion). Rebuilt on datapack reload; synced config version stamped.
 - Ingredient-slot gate: a `BrewingStandBlockEntity#canPlaceItem` mixin widening slot 3 to graph ingredients; the brew-completion seam is one mixin at `BrewingStandBlockEntity`'s `doBrew` equivalent, resolving per-bottle through the graph — murky fallback, §3 batch, and `DistillationBrewCallback` (Public API) all live in this one choke point.
 - Discovery attachment `DiscoveryData` (persistent player attachment, `Set<ResourceLocation>` with codec); extraction hook via the stand menu's output-slot `onTake`.
-- Screen additions live in a client mixin on `BrewingStandScreen`: vapor tint pass, tooltip lines, recipes-page button + overlay widget. No new `Screen` is registered.
+- Screen additions live in a client mixin on `BrewingStandScreen`: vapor tint pass, tooltip lines, recipes-page button + overlay widget, and the per-row copy button. No new `Screen` is registered.
+- Recipe Notes: the `distillation:recipe_note` item stores the copied recipe id in a `noted_recipe` component; its tooltip resolves that id against the graph a level-less client caller can reach. The copy button sends the mod's one C2S payload (`CopyRecipeNotePayload`), re-validated server-side (config, graph membership, the copier's own discovery, paper in hand) before a note is minted. Copying records no discovery and never touches the brew seam.
 
 ---
 

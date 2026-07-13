@@ -34,7 +34,10 @@ line.
   of your brewing screen; land the last one and the count gilds — every
   drop, accounted for.
 - **What changes for you** — Brewing becomes a system you learn by playing.
-  Your first Night Vision costs a few murky bottles, not a browser tab.
+  Your first Night Vision costs a few murky bottles, not a browser tab. And a
+  recipe you have learned can be copied onto paper — a note to sell, gift, or
+  leave in a chest, so a server's master brewer teaches instead of dictating
+  from the stand. The note points; the reader still brews it once to learn it.
 
 ### The missing brews
 - **What it is** — Every effect vanilla shipped without a recipe becomes
@@ -104,10 +107,10 @@ line.
 
 ## Staying in control
 
-Every piece switches off on its own — discovery hints, Murky Draughts, batch
-brewing, the new recipes, the longer durations, cauldron-tipped arrows, the
-splash and lingering rebalance — so a server can run any slice of the mod, or
-start everyone with the full recipes page unlocked. Change nothing and the
+Every piece switches off on its own — discovery hints, Murky Draughts, recipe
+notes, batch brewing, the new recipes, the longer durations, cauldron-tipped
+arrows, the splash and lingering rebalance — so a server can run any slice of
+the mod, or start everyone with the full recipes page unlocked. Change nothing and the
 defaults are exactly this document; whatever you change, every vanilla recipe
 still brews, milk still cures all, and golden apples are untouched. Discoveries
 are per player

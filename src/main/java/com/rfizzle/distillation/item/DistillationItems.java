@@ -6,12 +6,14 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
 /**
- * The mod's registered items and their data components ({@code design/SPEC.md}'s one item: the
- * Murky Draught). Registration is unconditional — {@code enableMurkyDraughts} gates production at
- * the brew seam, so bottled draughts keep working when the feature is later switched off.
+ * The mod's registered items and their data components ({@code design/SPEC.md} §1): the Murky
+ * Draught and the Recipe Note. Registration is unconditional — the feature toggles
+ * ({@code enableMurkyDraughts}, {@code enableRecipeNotes}) gate production at the brew seam and the
+ * copy seam, so bottled draughts and copied notes keep working when a feature is later switched off.
  */
 public final class DistillationItems {
 
@@ -37,7 +39,22 @@ public final class DistillationItems {
                     .cacheEncoding()
                     .build();
 
+    /**
+     * The recipe a note points at ({@code design/SPEC.md} §1): the stable recipe id its tooltip
+     * resolves against the live graph to show {@code input + ingredient → output}. Persisted and
+     * synced so the note reads the same in a chest, a trade, or a friend's hand.
+     */
+    public static final DataComponentType<ResourceLocation> NOTED_RECIPE =
+            DataComponentType.<ResourceLocation>builder()
+                    .persistent(ResourceLocation.CODEC)
+                    .networkSynchronized(ResourceLocation.STREAM_CODEC)
+                    .cacheEncoding()
+                    .build();
+
     public static final Item MURKY_DRAUGHT = new MurkyDraughtItem(new Item.Properties().stacksTo(1));
+
+    /** The copied recipe on paper ({@code design/SPEC.md} §1): tradeable, giftable, never a grant. */
+    public static final Item RECIPE_NOTE = new RecipeNoteItem(new Item.Properties());
 
     private DistillationItems() {
     }
@@ -46,6 +63,8 @@ public final class DistillationItems {
         Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Distillation.id("murky_draught_contents"),
                 MURKY_DRAUGHT_CONTENTS);
         Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Distillation.id("draught"), DRAUGHT);
+        Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Distillation.id("noted_recipe"), NOTED_RECIPE);
         Registry.register(BuiltInRegistries.ITEM, Distillation.id("murky_draught"), MURKY_DRAUGHT);
+        Registry.register(BuiltInRegistries.ITEM, Distillation.id("recipe_note"), RECIPE_NOTE);
     }
 }

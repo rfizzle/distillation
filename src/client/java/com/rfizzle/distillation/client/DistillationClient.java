@@ -9,6 +9,7 @@ import com.rfizzle.distillation.item.DistillationItems;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -34,6 +35,12 @@ public class DistillationClient implements ClientModInitializer {
         // Client-side graph lookups (the menu's ingredient slot) honor the server's synced
         // gameplay config, falling back to the local file offline.
         RecipeGraphs.setClientConfigSupplier(ClientDistillationConfig::effective);
+        // The client world's graph, so a recipe-note tooltip (no level in reach) resolves the
+        // recipe it points at; null at the title screen, before any world loads.
+        RecipeGraphs.setClientGraphSupplier(() -> {
+            Minecraft client = Minecraft.getInstance();
+            return client.level == null ? null : RecipeGraphs.forLevel(client.level);
+        });
         // Clear synced server state on disconnect so stale rules and another server's
         // discoveries never bleed into the next world or singleplayer session.
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {

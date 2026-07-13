@@ -7,8 +7,10 @@ import com.rfizzle.distillation.client.gui.brewing.BatchRowRenderer;
 import com.rfizzle.distillation.client.gui.brewing.BrewingStandRecipesLayout;
 import com.rfizzle.distillation.client.gui.brewing.RecipesPageRenderer;
 import com.rfizzle.distillation.client.gui.brewing.VaporHintRenderer;
+import com.rfizzle.distillation.network.CopyRecipeNotePayload;
 import com.rfizzle.distillation.recipe.RecipeGraph;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BrewingStandScreen;
@@ -107,15 +109,23 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0.0F, 0.0F, 300.0F);
             RecipesPageRenderer.render(guiGraphics, this.font, visible, graph.ids().size(),
-                    distillation$page, this.width, this.height, mouseX, mouseY);
+                    distillation$page, this.width, this.height, mouseX, mouseY,
+                    distillation$recipeNotesEnabled());
             guiGraphics.pose().popPose();
         }
 
         // Tooltips last.
         if (distillation$overlayOpen) {
+            RecipeGraph.Conversion copyTarget = distillation$recipeNotesEnabled()
+                    ? RecipesPageRenderer.copyConversionUnderMouse(visible, distillation$page,
+                            this.width, this.height, mouseX, mouseY)
+                    : null;
             ItemStack row = RecipesPageRenderer.stackUnderMouse(visible, distillation$page,
                     this.width, this.height, mouseX, mouseY);
-            if (!row.isEmpty()) {
+            if (copyTarget != null) {
+                guiGraphics.renderTooltip(this.font, Component.translatable(RecipesPageRenderer.KEY_COPY),
+                        mouseX, mouseY);
+            } else if (!row.isEmpty()) {
                 guiGraphics.renderTooltip(this.font, row, mouseX, mouseY);
             }
         } else if (distillation$overTab(mouseX, mouseY)) {
@@ -162,6 +172,9 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
                             BrewingStandRecipesLayout.arrowY(this.height),
                             BrewingStandRecipesLayout.ARROW_W, BrewingStandRecipesLayout.ARROW_H)) {
                         distillation$page++;
+                        return true;
+                    }
+                    if (distillation$recipeNotesEnabled() && distillation$copyClicked(mouseX, mouseY)) {
                         return true;
                     }
                     if (!BrewingStandRecipesLayout.pointInOverlay(mouseX, mouseY, this.width, this.height)) {
@@ -213,6 +226,33 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     @Unique
     private boolean distillation$vaporHintsEnabled() {
         return Distillation.getConfig().client.showVaporHints;
+    }
+
+    @Unique
+    private boolean distillation$recipeNotesEnabled() {
+        return RecipeGraphs.effectiveConfig().enableRecipeNotes;
+    }
+
+    /**
+     * Sends the copy request when a row's ✎ button is clicked ({@code SPEC.md} §1). The client only
+     * asks — the server re-validates discovery, the graph, and paper before minting the note, so a
+     * request for an unlearned recipe is refused there, not here.
+     */
+    @Unique
+    private boolean distillation$copyClicked(double mouseX, double mouseY) {
+        RecipeGraph graph = distillation$graph();
+        if (graph == null) {
+            return false;
+        }
+        List<RecipeGraph.Conversion> visible =
+                RecipesPageRenderer.visibleConversions(graph, ClientDiscoveryState.discovered());
+        RecipeGraph.Conversion target = RecipesPageRenderer.copyConversionUnderMouse(visible, distillation$page,
+                this.width, this.height, (int) mouseX, (int) mouseY);
+        if (target == null) {
+            return false;
+        }
+        ClientPlayNetworking.send(new CopyRecipeNotePayload(target.id()));
+        return true;
     }
 
     @Unique

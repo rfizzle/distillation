@@ -26,6 +26,7 @@
             "com.rfizzle.distillation.gametest.MissingBrewsGameTest",
             "com.rfizzle.distillation.gametest.RecipeGraphGameTest",
             "com.rfizzle.distillation.gametest.DiscoveryGameTest",
+            "com.rfizzle.distillation.gametest.RecipeNoteGameTest",
             "com.rfizzle.distillation.gametest.DistillationCommandGameTest",
             "com.rfizzle.distillation.gametest.MurkyDraughtGameTest",
             "com.rfizzle.distillation.gametest.BatchBrewingGameTest",

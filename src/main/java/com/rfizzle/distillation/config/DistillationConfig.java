@@ -54,6 +54,7 @@ public class DistillationConfig {
     public boolean enableDiscovery = true;
     public boolean enableMurkyDraughts = true;
     public boolean startDiscovered = false;
+    public boolean enableRecipeNotes = true;
     public boolean enableMissingBrews = true;
     public boolean enableBatchBrewing = true;
     public int batchIngredientCost = 3;
