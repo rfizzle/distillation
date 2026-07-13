@@ -30,6 +30,7 @@
             ["<code>enablePremiumBrews</code>", "bool", "true", "Concentration and the both-dusts premium path"],
             ["<code>enableAntidotes</code>", "bool", "true", "The eight antidote lines"],
             ["<code>enableThrownRebalance</code>", "bool", "true", "The splash/lingering rebalance"],
+            ["<code>enableAttunedSplash</code>", "bool", "true", "A beneficial splash/cloud you throw reaches only players and their pets"],
             ["<code>splashDurationFactor</code>", "float (0.5–1.0)", "0.875", "Fraction of drinkable duration a splash applies"],
             ["<code>lingeringCloudDurationTicks</code>", "int (600–2400)", "1200", "Lingering cloud lifetime"],
             ["<code>lingeringCloudRadius</code>", "float (3.0–6.0)", "4.5", "Lingering cloud starting radius"]

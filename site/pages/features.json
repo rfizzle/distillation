@@ -137,7 +137,8 @@
         {
           "type": "prose",
           "html": [
-            "Lingering clouds last <strong class='text-bone'>60 seconds</strong> instead of 30 and open at a 4½-block radius instead of 3. A splash potion applies a flat <strong class='text-bone'>87.5%</strong> of the drinkable duration to everyone it hits — no distance falloff on how long the effect lasts. Throw a cloud where the fight is and it is still working when the second wave arrives — a dedicated brewer becomes a viable support role."
+            "Lingering clouds last <strong class='text-bone'>60 seconds</strong> instead of 30 and open at a 4½-block radius instead of 3. A splash potion applies a flat <strong class='text-bone'>87.5%</strong> of the drinkable duration to every entity it hits — no distance falloff on how long the effect lasts. Throw a cloud where the fight is and it is still working when the second wave arrives — a dedicated brewer becomes a viable support role.",
+            "And a beneficial splash or cloud <em>you</em> throw is attuned to your side: it buffs only players and their pets, never the hostiles standing in it. A Strength cloud over your melee friend holds the line for him, not for the zombies on top of him. Harmful potions stay indiscriminate grenades, and a Harming or Instant-Health splash still works on anyone — attunement withholds only the lasting buffs, only from things that are not your allies. Turn it off with <code>enableAttunedSplash</code> for vanilla targeting."
           ]
         }
       ]

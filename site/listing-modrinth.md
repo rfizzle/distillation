@@ -79,8 +79,11 @@ included. Throwable as splash and lingering for mid-fight support.
 ### Lingering Worth Throwing
 
 Lingering clouds last **60 seconds** at a **4½-block radius**; splash potions
-apply a flat **87.5%** of the drinkable duration to everyone hit. A
-dedicated brewer becomes a viable support role.
+apply a flat **87.5%** of the drinkable duration, no distance falloff. A
+beneficial splash or cloud you throw is attuned to your side — it buffs only
+players and their pets, never the hostiles standing in it — while harmful
+potions stay grenades for everyone. A dedicated brewer becomes a viable
+support role.
 
 ## Enhanced by (never required)
 
