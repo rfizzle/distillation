@@ -28,6 +28,8 @@
   "config.distillation.enable_honest_durations.tooltip": "The utility-potion duration retune.",
   "config.distillation.enable_draughts": "Enable Draughts",
   "config.distillation.enable_draughts.tooltip": "Sneak-drink half a potion and keep the other half.",
+  "config.distillation.enable_top_up_drinking": "Enable Top-Up Drinking",
+  "config.distillation.enable_top_up_drinking.tooltip": "Re-drinking a brew extends its timer instead of resetting it, capped at twice the base duration.",
   "config.distillation.enable_premium_brews": "Enable Premium Brews",
   "config.distillation.enable_premium_brews.tooltip": "Concentration and the both-dusts premium path.",
   "config.distillation.enable_antidotes": "Enable Antidotes",
