@@ -79,9 +79,11 @@ line.
   Night Vision) base at 8:00 instead of 3:00; combat potions keep their short
   timers. Sneak-drink to sip half: 4:00 now, a stoppered 4:00 for later —
   and a half goes down in half the time, a quick swallow you can afford
-  mid-fight.
+  mid-fight. And re-drinking with time still on the clock tops the buff up
+  instead of throwing the remainder away, up to double the base duration.
 - **What changes for you** — A potion becomes a commitment you plan around,
-  not a timer that expires in transit.
+  not a timer that expires in transit — and no bottle is wasted for being
+  drunk a few seconds early.
 
 ### Both, not either/or
 - **What it is** — Redstone and glowstone stop being mutually exclusive.
