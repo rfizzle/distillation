@@ -30,7 +30,7 @@ public final class DistillationCriteria {
     public static final PlayerTrigger ANTIDOTE_SURGICAL = new PlayerTrigger();
     /** Reaching a discovery-count threshold — Scholar of the Still (ten). */
     public static final RecipesDiscoveredTrigger RECIPES_DISCOVERED = new RecipesDiscoveredTrigger();
-    /** Brewing one of the five §2 effect lines — The Missing Shelf (all five). */
+    /** Brewing one of the §2 effect lines — The Missing Shelf (all of them). */
     public static final MissingLineBrewedTrigger MISSING_LINE_BREWED = new MissingLineBrewedTrigger();
 
     private static boolean registered = false;

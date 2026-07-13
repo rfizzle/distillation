@@ -422,7 +422,7 @@ Seven entries, parented under vanilla's **Local Brewery** (`minecraft:nether/bre
 |---|---|---|
 | `trial_and_error` | Trial and Error | bottle a Murky Draught |
 | `scholar_of_the_still` | Scholar of the Still | discover 10 recipes |
-| `the_missing_shelf` | The Missing Shelf | brew all five §2 effects at least once |
+| `the_missing_shelf` | The Missing Shelf | brew every §2 effect at least once |
 | `round_for_the_table` | Round for the Table | complete a six-bottle batch pass |
 | `surgical` | Surgical | an antidote strips an effect while you keep ≥ 2 other effects |
 | `the_good_stuff` | The Good Stuff | brew a premium (extended + amplified) potion |
@@ -443,7 +443,7 @@ All features are independently toggleable via a ModMenu / Cloth Config screen an
 | `enableDiscovery` | bool | true | Recipe recording, toasts, recipes page, hints (§1) |
 | `enableMurkyDraughts` | bool | true | Failed brews bottle Murky Draughts (§1) |
 | `startDiscovered` | bool | false | Players start with every recipe discovered (§1) |
-| `enableMissingBrews` | bool | true | The five recipe-less effect lines (§2) |
+| `enableMissingBrews` | bool | true | The recipe-less effect lines vanilla shipped (§2) |
 | `enableBatchBrewing` | bool | true | The heated-cauldron batch rig (§3) |
 | `batchIngredientCost` | int | 3 | Ingredients consumed per six-bottle pass |
 | `batchFuelCost` | int | 2 | Fuel charges consumed per six-bottle pass |
