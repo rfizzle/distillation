@@ -61,6 +61,17 @@ line.
 - **What changes for you** — Kitting a group for a raid takes one session,
   not six. Undiscovered recipes still brew three — the shortcut is earned.
 
+### The stand talks to redstone
+- **What it is** — A comparator against a brewing stand reads brew *state*,
+  not just how full it is.
+- **How you use it** — Set a comparator against the stand: it reads low while
+  a cycle runs and high once the bottles are done, with the bottle count
+  carried in the number — up to six on a rigged batch. Wire a lamp or a bell
+  to the done reading and it fires the moment a pass finishes.
+- **What changes for you** — "The batch is done" bell no longer means watching
+  the bubbles yourself; the stand is finally legible to the automation you
+  already build in vanilla.
+
 ### Draughts and honest durations
 - **What it is** — Durations sized to how people play, and potions drinkable
   in halves.
@@ -108,13 +119,13 @@ line.
 ## Staying in control
 
 Every piece switches off on its own — discovery hints, Murky Draughts, recipe
-notes, batch brewing, the new recipes, the longer durations, cauldron-tipped
-arrows, the splash and lingering rebalance — so a server can run any slice of
-the mod, or start everyone with the full recipes page unlocked. Change nothing and the
-defaults are exactly this document; whatever you change, every vanilla recipe
-still brews, milk still cures all, and golden apples are untouched. Discoveries
-are per player
-— your recipes page fills only with what you have brewed.
+notes, batch brewing, the comparator read, the new recipes, the longer
+durations, cauldron-tipped arrows, the splash and lingering rebalance — so a
+server can run any slice of the mod, or start everyone with the full recipes
+page unlocked. Change nothing and the defaults are exactly this document;
+whatever you change, every vanilla recipe still brews, milk still cures all, and
+golden apples are untouched. Discoveries are per player — your recipes page
+fills only with what you have brewed.
 
 ## Better together
 

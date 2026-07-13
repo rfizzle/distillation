@@ -18,6 +18,8 @@
   "config.distillation.batch_ingredient_cost.tooltip": "Ingredients consumed per six-bottle pass.",
   "config.distillation.batch_fuel_cost": "Batch Fuel Cost",
   "config.distillation.batch_fuel_cost.tooltip": "Fuel charges consumed per six-bottle pass.",
+  "config.distillation.enable_comparator_output": "Enable Comparator Output",
+  "config.distillation.enable_comparator_output.tooltip": "A comparator reads brew state: idle, brewing (bottle count), or done. Off restores vanilla's container-fullness signal.",
   "config.distillation.enable_tipped_arrows": "Enable Tipped Arrows",
   "config.distillation.enable_tipped_arrows.tooltip": "Charge a water cauldron with a discovered potion, then dip arrows to tip them.",
   "config.distillation.tipped_arrows_per_dip": "Tipped Arrows Per Dip",

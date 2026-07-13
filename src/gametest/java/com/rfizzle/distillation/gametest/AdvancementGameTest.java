@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The §10 advancement grants on a live server. Each milestone is driven through the same seam the game
+ * The §11 advancement grants on a live server. Each milestone is driven through the same seam the game
  * uses — extraction for the "brew and obtain" ones, the discovery and brew callbacks for the derived
  * ones, a real antidote drink for Surgical — and asserted granted. Isolation cases pin the
  * automation-safety and threshold contracts (a bystander earns nothing; a partial set stays ungranted).

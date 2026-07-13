@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Pins the two parameterized §10 criterion instances: their thresholds are inclusive-and-floored
+ * Pins the two parameterized §11 criterion instances: their thresholds are inclusive-and-floored
  * ({@code >=}, never equality), an absent field passes, and each instance shape round-trips through
  * its codec. The vanilla {@link net.minecraft.advancements.critereon.PlayerTrigger} milestones carry
  * no predicate, so their grants are proved in the gametest rather than here.

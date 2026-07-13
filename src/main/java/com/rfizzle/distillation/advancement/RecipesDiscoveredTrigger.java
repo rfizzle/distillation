@@ -12,7 +12,7 @@ import java.util.Optional;
 
 /**
  * Grants when a player's graph-resolvable discovery count reaches a threshold ({@code design/SPEC.md}
- * §10 — Scholar of the Still at ten). The count is evaluated against the live recipe graph at each
+ * §11 — Scholar of the Still at ten). The count is evaluated against the live recipe graph at each
  * discovery, so stale ids never pad it. The predicate is a {@code >=} threshold, never equality, so a
  * bulk grant that jumps past the threshold still satisfies it.
  */
