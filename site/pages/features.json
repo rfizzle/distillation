@@ -98,7 +98,8 @@
             ["Turtle Master", "Turtle Helmet", "II · 2:00"],
             ["Resistance", "Shulker Shell", "II · 4:00"],
             ["Absorption", "Golden Apple", "II · 4:00"],
-            ["Haste", "Honey Bottle", "II · 10:00"]
+            ["Haste", "Honey Bottle", "II · 10:00"],
+            ["Health Boost", "Pumpkin Pie", "II · 4:00"]
           ],
           "note": "A premium potion runs at its strong level for half its extended duration. Concentration is a graph conversion like any other — hintable, discoverable, and murkable; concentrating a no-strong-form or already-modified potion is an invalid pair. Setting enablePremiumBrews to false removes the concentration steps while existing bottles keep working."
         }

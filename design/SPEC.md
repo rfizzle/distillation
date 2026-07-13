@@ -259,12 +259,12 @@ Vanilla forces every potion to choose: long (redstone) or strong (glowstone), ne
 
 1. **Concentration:** brewing a potion's own effect reagent onto the finished potion — e.g. Potion of Strength + Blaze Powder — yields a **Concentrated** potion: identical stats, marked concentrated (deeper liquid color; tooltip line *"Concentrated"*). This is the "double the base reagent" step: two blaze powder total have gone into the bottle. Concentration is valid only for effects that have a strong (level II) form.
 2. A Concentrated potion accepts **both** modifiers cumulatively, in either order: redstone then glowstone, or glowstone then redstone. The finished **premium** potion is extended *and* amplified: **level II at the extended duration ÷ 2**.
-3. Premium results by line: Strength II 4:00, Swiftness II 4:00, Leaping II 4:00, Regeneration II 1:30 (from extended 3:00... see table), Poison II 1:30, Slowness IV 2:00, Turtle Master II 2:00, Resistance II 4:00, Absorption II 4:00, Haste II 10:00. The general formula: `premium duration = long-variant duration ÷ 2`, amplifier = the strong variant's.
+3. Premium results by line: Strength II 4:00, Swiftness II 4:00, Leaping II 4:00, Regeneration II 1:30 (from extended 3:00... see table), Poison II 1:30, Slowness IV 2:00, Turtle Master II 2:00, Resistance II 4:00, Absorption II 4:00, Haste II 10:00, Health Boost II 4:00. The general formula: `premium duration = long-variant duration ÷ 2`, amplifier = the strong variant's.
 4. On a **non-concentrated** potion, redstone and glowstone keep exact vanilla behavior (including vanilla's trades when applied to an already-modified potion). Concentration entries are graph conversions like any other — hintable, discoverable, murk-able.
 
 ### Edge Cases
 
-- **Effects with no strong form** (Fire Resistance, Night Vision, Invisibility, Water Breathing, Slow Falling, Luck, Glowing): concentration is an invalid pair (→ Murky Draught; the missing vapor hint warns first).
+- **Effects with no strong form** (Fire Resistance, Night Vision, Invisibility, Water Breathing, Slow Falling, Luck, Glowing, Levitation): concentration is an invalid pair (→ Murky Draught; the missing vapor hint warns first).
 - **Concentrating an already-modified potion** (long or strong) is invalid — concentration applies to the base potion only. The order is always: brew → concentrate → dusts.
 - **Splash/lingering:** gunpowder and dragon's breath apply to premium potions as to any potion (§7).
 - **Multiplayer:** world rules, identical for everyone.
