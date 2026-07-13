@@ -64,6 +64,7 @@ public class DistillationConfig {
     public int tippedArrowsPerDip = 8;
     public boolean enableHonestDurations = true;
     public boolean enableDraughts = true;
+    public boolean enableTopUpDrinking = true;
     public boolean enablePremiumBrews = true;
     public boolean enableAntidotes = true;
     public boolean enableThrownRebalance = true;

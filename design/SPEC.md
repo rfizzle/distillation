@@ -131,7 +131,7 @@ Seven new potion lines, registered under the `distillation:` namespace and brewe
 
 - Vanilla's recipe-less `minecraft:luck` potion item is left untouched (still obtainable only by command); the brewed line is Distillation's own. Commands/loot referencing the vanilla potion keep working.
 - **Luck's vanilla surface is fishing:** the fishing loot table is vanilla's only consumer of the luck attribute — each luck point shifts the junk/treasure split, stacking with Luck of the Sea. Distillation never widens what luck touches (loot tables belong to the world); siblings that consume the attribute do so in their own repos.
-- **Absorption stacking:** drinking Absorption while holding golden-apple absorption follows vanilla effect-merge rules (higher amplifier wins; equal amplifier takes the longer duration). No special casing.
+- **Absorption stacking:** drinking Absorption at a *different* amplifier from a running golden-apple absorption follows vanilla effect-merge rules (higher amplifier wins). At the *same* amplifier the drink tops up the running timer per §4 Top-up drinking — the source (a golden apple, another bottle) does not matter, since the drink is the trigger — capped at 2× the potion's base and never reduced. With `enableTopUpDrinking=false` it reverts to vanilla merge (the longer duration wins). No amplifier-specific special casing either way.
 - **Multiplayer:** none beyond §1 discovery — recipes are world rules, identical for everyone.
 - **Disabled** (`enableMissingBrews=false`): the conversions leave the graph (existing bottles keep working; hints and murky logic follow the graph).
 
@@ -225,14 +225,23 @@ Unchanged (combat/mobility class): Swiftness, Leaping, Strength, Regeneration, P
 2. Drinking a half draught (sneaking or not) is the same quick swallow: it applies the remaining half and returns the glass bottle. Halves do not split further.
 3. A half-measure — a sip or a stored half — is the only fast drink; a full potion keeps the vanilla drink time (32 ticks, 1.6s), and milk and food are untouched. The animation stays vanilla's drink; only its length shortens. The sip-or-full choice is fixed when the drink starts, from the crouch and stack at that instant, so releasing the sneak mid-drink flips neither the dose nor the speed — no full dose at a sip's pace.
 4. Instant potions (Healing, Harming, antidotes §6) cannot be sipped — sneak-use drinks them whole at full time. Splash, lingering, and Murky Draughts cannot be sipped.
-5. Effect stacking follows vanilla merge rules — sipping the second half while the first is active extends the timer by replacing it with the fresh half duration if longer.
+5. Effect stacking for a drink follows **Top-up drinking** below — a second sip while the first is active tops up the running timer rather than resetting it.
+
+### Behavior — Top-up drinking
+
+Re-drinking a brew resets its timer under vanilla's merge (the longer of the two durations wins, never the sum), so a bottle drunk with time left on the buff wastes almost all of itself.
+
+1. Drinking a potion whose effect is **already running at the same amplifier** *extends* the running timer: the dose is **added** to the remaining duration, capped at **2× the brew's base (full-dose) duration** and never reduced below the current remainder. A first drink — nothing of that effect active — applies normally. The 2× cap keeps top-ups a planning tool without letting a hoarded batch build an hour-long buff.
+2. A **sip** (a fresh sip or a stored half) tops up by **half a dose** — ⌊base ÷ 2⌋ — against the same 2×-base cap, so sips and full drinks saturate at the same ceiling.
+3. **Different amplifiers keep vanilla merge:** a stronger dose replaces the weaker (which resurfaces when the stronger ends) and a weaker dose over a stronger one is held hidden, exactly as vanilla does — the top-up applies only between doses of the same strength. An **infinite-duration** effect on either side is left to vanilla.
+4. Top-up is **bottles topping up bottles** — the *trigger* is drinking a potion. Beacon, conduit, food, splash, lingering, and the Murky flicker never *initiate* a top-up: they don't route through the drink seam, so their own application stays vanilla. A drink does extend a coincident same-strength effect whatever granted it (a running beacon Haste, a food Absorption), since the seam reads only the effect and amplifier, not the source — and vanilla's rule that a re-application never shortens a longer active effect keeps that beacon or conduit effect from later trimming the topped-up buff.
 
 ### Edge Cases
 
-- **Half draughts and brewing:** a half draught is not a receptive bottle — the stand rejects it (no topping up).
+- **Half draughts and brewing:** a half draught is not a receptive bottle — the stand rejects it (it won't refill a half).
 - **Existing worlds:** potions bottled before install retune on next effect application (duration is resolved at drink time, not stored in the item).
 - **Multiplayer:** per-player consumption; nothing shared.
-- **Disabled:** `enableHonestDurations=false` restores vanilla timers (already-applied effects tick out unchanged); `enableDraughts=false` makes sneak-use drink normally (existing half draughts remain drinkable — and still swallow quick — for their stored half).
+- **Disabled:** `enableHonestDurations=false` restores vanilla timers (already-applied effects tick out unchanged); `enableDraughts=false` makes sneak-use drink normally (existing half draughts remain drinkable — and still swallow quick — for their stored half); `enableTopUpDrinking=false` restores vanilla's merge for every drink (re-drinking resets rather than extends).
 
 ### Config
 
@@ -240,11 +249,13 @@ Unchanged (combat/mobility class): Swiftness, Leaping, Strength, Regeneration, P
 |---|---|---|---|
 | `enableHonestDurations` | bool | true | — |
 | `enableDraughts` | bool | true | — |
+| `enableTopUpDrinking` | bool | true | — |
 
 ### Implementation Notes
 
 - Duration overrides: an internal map (potion id → base ticks) applied at the single seam where potion contents instantiate their `MobEffectInstance`s (a `PotionContents` mixin), so loot/trade/creative potions retune identically. §2's own lines bake their durations at registration and skip the map.
 - Draughts: a `distillation:draught` item component (fraction consumed); interaction via `use` interception on potion items when sneaking; the half state drives an item-model override (half-full bottle texture) and tooltip lines. The same classification that halves the dose halves `PotionItem.getUseDuration` (a `PotionItem` mixin returning half vanilla's ticks for any half-measure), so the shorter client animation lands the drink on the tick the server completes it. The kind is latched at `LivingEntity.startUsingItem` (a `LivingEntity` mixin exposing it through the `DraughtDrinker` seam) and read back for both the duration and the completion, so the speed fixed at the start and the dose applied at the end stay in lockstep regardless of a mid-drink sneak toggle; a direct completion with no use started (a test, a foreign consumer) classifies live.
+- Top-up: a pure decision (`TopUpDrinking.resolve`) over the running effect's remainder/amplifier and the incoming dose, applied at the two drink seams only — a `PotionItem` mixin wrapping the single `LivingEntity.addEffect` a drunk full potion lands (the effect-applier consumer `forEachEffect` runs), and the sip's own `addEffect` in the draught completion. Both read the live effect server-side and hand `addEffect` a duration-extended copy; splash and lingering land a different `addEffect` overload and beacon/conduit/food never reach these seams, so the top-up is drink-only with no new stored state and no config migration.
 
 ---
 
@@ -602,6 +613,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 
 - Recipe graph: construction from a synthetic registry, stable id derivation (namespaced ingredients), per-bottle validity resolution, murky hint-candidate selection (seeded determinism, candidate always valid for the input potion, empty candidate set → hintless draught)
 - Duration retune math: override table application, §2 lines exempt from double-scaling, splash factor application, draught halving (⌊÷2⌋, no quarter-splits)
+- Top-up drinking math: a same-amplifier re-drink sums onto the remainder, clamps at 2× base, never reduces; a sip tops up ⌊base ÷ 2⌋ against the same cap; different amplifier and infinite-duration effects defer to vanilla merge
 - Premium formula: `long ÷ 2` durations and amplifiers per line; concentration validity (strong-form-only, base-potion-only)
 - Discovery set semantics: idempotent re-discovery, forget, stale-id hiding vs retention
 - Tipped-arrow dip: per-dip count caps (rate, arrows held, empty hand), the charge gate over discovered producers, charged-cauldron NBT round-trip (sorted order, malformed-entry skip)
@@ -615,6 +627,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 - Output extraction records discovery exactly once and fires the callback; hopper extraction records nothing
 - Batch rig: detection across all six heat sources; missing water/heat/cauldron fails; engaged pass consumes 3 ingredients + 2 fuel + 1 water level and fills six bottles; undiscovered batch-row bottle skipped untouched; hopper insert clears owner and blocks batching; hoppers cannot reach batch slots
 - Draughts: sneak-drink halves duration and yields a half; half returns bottle; a half-measure swallows in half the drink time while a full potion keeps vanilla's; instants and splash refuse to sip
+- Top-up drinking: re-drinking a running brew extends its timer (not a reset), clamps at 2× base, a sip tops up half a dose, a stronger re-drink keeps vanilla merge, and `enableTopUpDrinking=false` restores vanilla's max-merge
 - Concentration → both dusts (either order) yields premium at `long ÷ 2`; concentrating a modified potion murks
 - Each antidote brews from a Thick base (Awkward + the same reagent murks) and strips exactly its effect and nothing else; absent-effect drink consumes silently; splash antidote cures a poisoned entity; lingering antidote cloud lasts 1200 ticks at 4.5 radius
 - Discovering the final graph recipe grants Every Drop

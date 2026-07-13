@@ -27,6 +27,7 @@
             ["<code>tippedArrowsPerDip</code>", "int (1–16)", "8", "Arrows tipped per dip; each dip spends one cauldron water level"],
             ["<code>enableHonestDurations</code>", "bool", "true", "The utility-potion duration retune"],
             ["<code>enableDraughts</code>", "bool", "true", "Sneak-drink half potions"],
+            ["<code>enableTopUpDrinking</code>", "bool", "true", "Re-drinking a brew extends its timer (capped at 2× base) instead of resetting it"],
             ["<code>enablePremiumBrews</code>", "bool", "true", "Concentration and the both-dusts premium path"],
             ["<code>enableAntidotes</code>", "bool", "true", "The eight antidote lines"],
             ["<code>enableThrownRebalance</code>", "bool", "true", "The splash/lingering rebalance"],

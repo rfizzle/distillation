@@ -62,6 +62,8 @@ Utility potions (Fire Resistance, Water Breathing, Night Vision, Invisibility)
 base at **8:00 instead of 3:00**; combat potions keep their short timers.
 Sneak-drink to sip half a potion now and stopper the other half for later — and
 a half goes down in half the time, a quick swallow you can afford mid-fight.
+Re-drinking a brew that is still running tops its timer up instead of resetting
+it, up to twice the base duration — no bottle wasted for being drunk early.
 
 ### Premium Brews
 
