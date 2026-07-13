@@ -65,11 +65,14 @@ public final class PotionCauldrons {
      */
     public static void forEachCharged(ServerLevel level, BiConsumer<BlockPos, Holder<Potion>> visitor) {
         PotionCauldronData data = PotionCauldronData.getIfPresent(level);
-        if (data == null) {
+        if (data == null || data.isEmpty()) {
             return;
         }
         for (var entry : data.entries()) {
             BlockPos pos = BlockPos.of(entry.getKey());
+            if (!level.isLoaded(pos)) {
+                continue; // an unloaded cauldron is not stale — never force-load a chunk here; revisit it when resident
+            }
             if (!isChargeableWater(level.getBlockState(pos))) {
                 data.remove(entry.getKey());
                 continue;

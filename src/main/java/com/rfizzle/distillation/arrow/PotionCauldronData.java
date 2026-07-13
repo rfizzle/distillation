@@ -80,6 +80,16 @@ public class PotionCauldronData extends SavedData {
         return new ArrayList<>(charges.entrySet());
     }
 
+    boolean isEmpty() {
+        return charges.isEmpty();
+    }
+
+    /**
+     * Bounds the map at {@link #MAX_ENTRIES}. Realistic worlds hold a handful of charged cauldrons,
+     * so this only ever fires under abuse or a tampered save; eviction drops the lowest-keyed
+     * position (a deterministic, cheap choice — not strictly FIFO, which does not matter at a cap
+     * this far above real use).
+     */
     private boolean evictIfOversized() {
         boolean evicted = false;
         while (charges.size() > MAX_ENTRIES) {

@@ -40,12 +40,17 @@ public final class ChargedCauldronParticles {
         if (PotionCauldronData.getIfPresent(level) == null) {
             return; // nothing charged in this dimension — never create the store just to read it
         }
-        PotionCauldrons.forEachCharged(level, (pos, potion) -> {
-            ColorParticleOption particle =
-                    ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, PotionContents.getColor(potion));
-            level.sendParticles(particle,
-                    pos.getX() + 0.5, pos.getY() + SURFACE_HEIGHT, pos.getZ() + 0.5,
-                    PARTICLES_PER_CAULDRON, SPREAD, 0.0, SPREAD, 0.0);
-        });
+        // Guard the sweep: one bad entry must log and skip, never escape into the shared tick event.
+        try {
+            PotionCauldrons.forEachCharged(level, (pos, potion) -> {
+                ColorParticleOption particle =
+                        ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, PotionContents.getColor(potion));
+                level.sendParticles(particle,
+                        pos.getX() + 0.5, pos.getY() + SURFACE_HEIGHT, pos.getZ() + 0.5,
+                        PARTICLES_PER_CAULDRON, SPREAD, 0.0, SPREAD, 0.0);
+            });
+        } catch (Exception e) {
+            Distillation.LOGGER.error("Failed to sweep charged cauldrons in {}", level.dimension().location(), e);
+        }
     }
 }

@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The charged-cauldron persistence format ({@code mc-persistence}): a {@code packed BlockPos →
@@ -39,6 +40,20 @@ class PotionCauldronDataTest {
 
         assertEquals(7L, tag.getCompound(0).getLong("pos"), "lowest packed pos serializes first");
         assertEquals(42L, tag.getCompound(1).getLong("pos"));
+    }
+
+    @Test
+    void boundsTheMapAtTheCapEvictingTheLowestKey() {
+        PotionCauldronData data = new PotionCauldronData();
+        ResourceLocation potion = ResourceLocation.parse("minecraft:swiftness");
+        // Fill one past the cap; the lowest-keyed entry (0) is evicted, size holds at the cap.
+        for (long pos = 0; pos <= PotionCauldronData.MAX_ENTRIES; pos++) {
+            data.put(pos, potion);
+        }
+
+        assertEquals(PotionCauldronData.MAX_ENTRIES, data.entries().size(), "the map is bounded at the cap");
+        assertTrue(data.get(0L).isEmpty(), "the lowest-keyed entry is evicted");
+        assertTrue(data.get((long) PotionCauldronData.MAX_ENTRIES).isPresent(), "the newest entry survives");
     }
 
     @Test
