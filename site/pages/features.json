@@ -68,7 +68,7 @@
           "type": "prose",
           "html": [
             "Utility potions stop expiring in transit: Fire Resistance, Water Breathing, Night Vision, and Invisibility base at <strong class='text-bone'>8:00</strong> instead of 3:00 (20:00 extended), and Slow Falling at 4:00. Combat potions — Strength, Swiftness, Poison, and the rest — keep their short vanilla timers.",
-            "Sneak-drink any duration potion to sip half: 4:00 of an 8:00 potion now, and the bottle stays in your hand as a stoppered half for later. Drinking the half returns the glass bottle as usual."
+            "Sneak-drink any duration potion to sip half: 4:00 of an 8:00 potion now, and the bottle stays in your hand as a stoppered half for later. Drinking the half returns the glass bottle as usual — and a half goes down in half the time (~0.8s), a quick swallow you can afford mid-fight where a full bottle would cost you the exchange."
           ]
         }
       ]

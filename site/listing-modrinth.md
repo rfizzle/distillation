@@ -60,7 +60,8 @@ shortcut is earned: undiscovered recipes still brew three at a time.
 
 Utility potions (Fire Resistance, Water Breathing, Night Vision, Invisibility)
 base at **8:00 instead of 3:00**; combat potions keep their short timers.
-Sneak-drink to sip half a potion now and stopper the other half for later.
+Sneak-drink to sip half a potion now and stopper the other half for later — and
+a half goes down in half the time, a quick swallow you can afford mid-fight.
 
 ### Premium Brews
 
