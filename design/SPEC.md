@@ -421,7 +421,7 @@ So `done ⇔ signal ≥ 8`; the count is the signal while working, or the signal
 
 - **The feature replaces a signal, it doesn't add one:** vanilla brewing stands already emit a container-fullness signal. With `enableComparatorOutput` off, the stand keeps that exact vanilla signal — off means untouched vanilla, not a silenced stand.
 - **Idle bottles read done:** water bottles or finished potions sitting in an unpowered stand read the done band; the comparator reports state, not an event.
-- **Rig transitions:** the batch row counts only while rigged. A rig forms on an empty row and un-rigs by ejecting the row, so forming or breaking a rig never strands a count.
+- **Rig transitions:** the batch row counts only while rigged, so forming or dropping a rig while the row holds bottles (a cauldron dried out, then refilled) changes the reading. An idle stand fires no per-tick update, so the stand nudges its comparator to repaint on the transition.
 - **Server-authoritative:** the signal is computed server-side from the block entity; nothing is synced to the client.
 
 ### Config
@@ -432,7 +432,7 @@ So `done ⇔ signal ≥ 8`; the count is the signal while working, or the signal
 
 ### Implementation Notes
 
-- One server-side mixin on `BrewingStandBlock` intercepts `getAnalogOutputSignal`; when the feature is off it falls through to vanilla's fullness signal. `hasAnalogOutputSignal` is left vanilla — already true in both modes. The scale is a pure core (`ComparatorSignal.of(brewing, bottleCount)`) behind a thin shell that counts occupied bottle slots (0–2, plus 5–7 when rigged) and reads `brewTime > 0`. No comparator-refresh plumbing is added: vanilla's own `setChanged` cascade already notifies comparators at brew start, on completion (the working→done edge), and on every slot write.
+- One server-side mixin on `BrewingStandBlock` intercepts `getAnalogOutputSignal`; when the feature is off it falls through to vanilla's fullness signal. `hasAnalogOutputSignal` is left vanilla — already true in both modes. The scale is a pure core (`ComparatorSignal.of(brewing, bottleCount)`) behind a thin shell that counts occupied bottle slots (0–2, plus 5–7 when rigged) and reads `brewTime > 0`. Brew-driven transitions ride vanilla's own `setChanged` cascade, which already notifies comparators at brew start, on completion (the working→done edge), and on every slot write; the one seam vanilla can't cover — the idle rig-forming/dropping transition, which changes whether slots 5–7 count without any slot write — nudges the comparator explicitly from the batch tick.
 
 ---
 

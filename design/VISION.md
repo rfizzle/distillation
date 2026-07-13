@@ -121,12 +121,11 @@ line.
 Every piece switches off on its own — discovery hints, Murky Draughts, recipe
 notes, batch brewing, the comparator read, the new recipes, the longer
 durations, cauldron-tipped arrows, the splash and lingering rebalance — so a
-server can run any slice of
-the mod, or start everyone with the full recipes page unlocked. Change nothing and the
-defaults are exactly this document; whatever you change, every vanilla recipe
-still brews, milk still cures all, and golden apples are untouched. Discoveries
-are per player
-— your recipes page fills only with what you have brewed.
+server can run any slice of the mod, or start everyone with the full recipes
+page unlocked. Change nothing and the defaults are exactly this document;
+whatever you change, every vanilla recipe still brews, milk still cures all, and
+golden apples are untouched. Discoveries are per player — your recipes page
+fills only with what you have brewed.
 
 ## Better together
 
