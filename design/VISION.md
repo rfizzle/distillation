@@ -77,7 +77,9 @@ line.
   in halves.
 - **How you use it** — Utility potions (Fire Resistance, Water Breathing,
   Night Vision) base at 8:00 instead of 3:00; combat potions keep their short
-  timers. Sneak-drink to sip half: 4:00 now, a stoppered 4:00 for later.
+  timers. Sneak-drink to sip half: 4:00 now, a stoppered 4:00 for later —
+  and a half goes down in half the time, a quick swallow you can afford
+  mid-fight.
 - **What changes for you** — A potion becomes a commitment you plan around,
   not a timer that expires in transit.
 
