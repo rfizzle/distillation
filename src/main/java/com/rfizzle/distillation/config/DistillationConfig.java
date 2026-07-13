@@ -58,6 +58,8 @@ public class DistillationConfig {
     public boolean enableBatchBrewing = true;
     public int batchIngredientCost = 3;
     public int batchFuelCost = 2;
+    public boolean enableTippedArrows = true;
+    public int tippedArrowsPerDip = 8;
     public boolean enableHonestDurations = true;
     public boolean enableDraughts = true;
     public boolean enablePremiumBrews = true;
@@ -212,6 +214,7 @@ public class DistillationConfig {
     public void clamp() {
         batchIngredientCost = clampIntRange("batchIngredientCost", batchIngredientCost, 2, 6);
         batchFuelCost = clampIntRange("batchFuelCost", batchFuelCost, 1, 4);
+        tippedArrowsPerDip = clampIntRange("tippedArrowsPerDip", tippedArrowsPerDip, 1, 16);
         splashDurationFactor = clampFloatRange("splashDurationFactor", splashDurationFactor, 0.5f, 1.0f);
         lingeringCloudDurationTicks = clampIntRange("lingeringCloudDurationTicks", lingeringCloudDurationTicks, 600, 2400);
         lingeringCloudRadius = clampFloatRange("lingeringCloudRadius", lingeringCloudRadius, 3.0f, 6.0f);

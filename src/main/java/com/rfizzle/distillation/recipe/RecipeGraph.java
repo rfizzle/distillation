@@ -219,6 +219,23 @@ public final class RecipeGraph {
         return List.copyOf(matches);
     }
 
+    /**
+     * Every conversion whose output is this potion — the reverse of the ingredient-keyed indices,
+     * walked linearly. There is no reverse index (this runs only on a cauldron-charge interaction,
+     * never per tick), and only a {@link PotionConversion} can produce a potion — a container
+     * conversion keeps the bottle's potion unchanged. Backs the tipped-arrow discovery gate
+     * ({@code design/SPEC.md} §Tipped arrows).
+     */
+    public List<PotionConversion> conversionsProducing(Holder<Potion> potion) {
+        List<PotionConversion> matches = new ArrayList<>();
+        for (Conversion conversion : conversions) {
+            if (conversion instanceof PotionConversion potionConversion && potionConversion.to().is(potion)) {
+                matches.add(potionConversion);
+            }
+        }
+        return List.copyOf(matches);
+    }
+
     /** The conversion carrying this recipe id, if the current graph has one — an O(1) lookup. */
     public Optional<Conversion> conversionById(ResourceLocation recipeId) {
         return Optional.ofNullable(byId.get(recipeId));
