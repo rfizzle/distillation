@@ -17,7 +17,7 @@
           "html": [
             "Hold an ingredient over the stand's ingredient slot and the vapor clouds with a color hint of what it would become; once you know a recipe, the hint names the output outright. A failed combination still bottles: a <strong class='text-bone'>Murky Draught</strong> whose tooltip names one ingredient that would have worked with that base — a failure that teaches. Every successful brew you take from the stand is written permanently into your recipes page, right in the brewing screen, with a running count that gilds when you have learned them all.",
             "Discovery is per player and survives death and relog, but knowledge can travel: copy any recipe you've learned onto paper from the recipes page — a tradeable, giftable <strong class='text-bone'>Recipe Note</strong> to sell, gift, or leave in a chest. Its tooltip reads <em>input + ingredient → output</em>; the reader still brews it once at a stand to learn it, so a note points the way without ever handing out a recipe for free.",
-            "Recipe viewers (EMI/REI/JEI) show only what you've discovered by default, so they never spoil what the stand wants to teach — a server can open them up, or start everyone fully unlocked. Seven advancements branch off vanilla's Local Brewery to mark the milestones: your first Murky Draught, ten recipes learned, all five missing brews, a six-bottle batch, a surgical cure, a premium potion, and the full graph discovered."
+            "Recipe viewers (EMI/REI/JEI) show only what you've discovered by default, so they never spoil what the stand wants to teach — a server can open them up, or start everyone fully unlocked. Seven advancements branch off vanilla's Local Brewery to mark the milestones: your first Murky Draught, ten recipes learned, all the missing brews, a six-bottle batch, a surgical cure, a premium potion, and the full graph discovered."
           ]
         }
       ]
@@ -36,9 +36,11 @@
             ["Haste", "Potion of Swiftness + Honey Bottle", "8:00", "20:00", "II · 4:00"],
             ["Absorption", "Awkward + Golden Apple", "3:00", "8:00", "II · 1:30"],
             ["Luck", "Awkward + Nautilus Shell", "8:00", "20:00", "—"],
-            ["Glowing", "Awkward + Glow Ink Sac", "3:00", "8:00", "—"]
+            ["Glowing", "Awkward + Glow Ink Sac", "3:00", "8:00", "—"],
+            ["Levitation", "Awkward + Chorus Fruit", "0:30", "1:00", "—"],
+            ["Health Boost", "Awkward + Pumpkin Pie", "3:00", "8:00", "II · 1:30"]
           ],
-          "note": "Haste routes through Swiftness deliberately — honey over a sugar brew. Fermented spider eye corrupts Haste into Mining Fatigue and Luck into Bad Luck; all five lines take gunpowder and dragon's breath as usual."
+          "note": "Haste routes through Swiftness deliberately — honey over a sugar brew. Levitation stays deliberately short, a novelty rather than a weapon. Fermented spider eye corrupts Haste into Mining Fatigue and Luck into Bad Luck; every line takes gunpowder and dragon's breath as usual."
         }
       ]
     },
