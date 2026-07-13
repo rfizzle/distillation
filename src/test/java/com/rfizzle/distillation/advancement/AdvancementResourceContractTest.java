@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Pins the hand-written §10 advancement tree against SPEC: the seven ids ship, each parents under
  * vanilla's Local Brewery, keeps telemetry off, fires only {@code distillation:} triggers, and has
- * a non-blank title and description lang key. The Missing Shelf must carry exactly the five §2 lines.
+ * a non-blank title and description lang key. The Missing Shelf must carry exactly every §2 line.
  * The live-registry parse (that each trigger id resolves) is the gametest's job; this guards the
  * static resources without a running server.
  */
@@ -75,7 +75,7 @@ class AdvancementResourceContractTest {
     }
 
     @Test
-    void theMissingShelfCoversTheFiveSection2Lines() throws IOException {
+    void theMissingShelfCoversAllSection2Lines() throws IOException {
         JsonObject json = JsonParser.parseString(
                 Files.readString(DIR.resolve("the_missing_shelf.json"), StandardCharsets.UTF_8)).getAsJsonObject();
         JsonObject criteria = json.getAsJsonObject("criteria");

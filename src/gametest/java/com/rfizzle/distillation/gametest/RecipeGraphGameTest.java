@@ -71,7 +71,7 @@ public class RecipeGraphGameTest implements FabricGameTest {
         try {
             RecipeGraph graph = RecipeGraphs.forLevel(helper.getLevel());
             helper.assertTrue(!graph.contains(ResourceLocation.parse("distillation:shulker_shell/awkward")),
-                    "with enableMissingBrews=false the five lines leave the graph");
+                    "with enableMissingBrews=false the missing-brew lines leave the graph");
             helper.assertTrue(graph.contains(ResourceLocation.parse("distillation:nether_wart/water")),
                     "vanilla conversions stay in the graph");
             // The line's premium concentration goes with it, so the reagent leaves the graph entirely.
