@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * The {@code /distillation} command surface ({@code design/SPEC.md} §9) on a live dispatcher:
+ * The {@code /distillation} command surface ({@code design/SPEC.md} §10) on a live dispatcher:
  * per-node permission gating, recipe-id suggestions, and the discover/forget/recipes/reload verbs
  * mutating real player state through the manager.
  */

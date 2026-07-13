@@ -67,10 +67,21 @@ abstract class BrewingStandBlockEntityMixin implements BatchStand {
     private static void distillation$batchTick(Level level, BlockPos pos, BlockState state,
                                                BrewingStandBlockEntity stand, CallbackInfo ci) {
         BatchStand batch = (BatchStand) stand;
+        boolean wasRigged = batch.distillation$isRigged();
         boolean batchEnabled = Distillation.getConfig().enableBatchBrewing;
         BatchRig.Status rig = batchEnabled ? BatchRig.detect(level, pos) : null;
         boolean rigged = rig != null && rig.rigged();
         batch.distillation$setRigged(rigged);
+        // A rig forming or dropping while the batch row holds bottles flips whether the brew-state
+        // comparator (SPEC §9) counts slots 5–7, but an idle stand fires no per-tick setChanged, so
+        // nudge neighbours to repaint on the transition. Gated on the feature because vanilla's
+        // fullness signal counts the hidden row either way and needs no nudge — feature-off stays
+        // behaviorally vanilla. (Set the rigged flag first, above, so the fresh state is what a
+        // repainting comparator reads back.)
+        if (wasRigged != rigged && Distillation.getConfig().enableComparatorOutput
+                && distillation$batchRowOccupied(batch.distillation$items())) {
+            stand.setChanged();
+        }
         // Take over for a rigged stand, or one still finishing a committed batch pass; hand every
         // other stand back to untouched vanilla.
         boolean brewing = BatchStates.get(stand).brewing();
@@ -88,6 +99,15 @@ abstract class BrewingStandBlockEntityMixin implements BatchStand {
         }
         ci.cancel();
         BatchBrewTick.serverTick(level, pos, state, stand);
+    }
+
+    private static boolean distillation$batchRowOccupied(NonNullList<ItemStack> items) {
+        for (int slot = BatchBrew.FIRST_BATCH_SLOT; slot <= BatchBrew.LAST_BATCH_SLOT; slot++) {
+            if (!items.get(slot).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // The one brew-completion choke point for the vanilla (non-rigged) path: replace doBrew with the

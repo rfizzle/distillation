@@ -397,7 +397,46 @@ Vanilla tips arrows only through a lingering potion — dragon's breath per batc
 
 ---
 
-## 9. Commands
+## 9. Comparator Output
+
+The stand reads its brew state to a comparator.
+
+### Problem
+
+A comparator against a brewing stand reads generic container fullness — a lerp over every slot, bottles and ingredient and fuel alike — so it can't tell a stand mid-cycle from a finished one, and the "batch is done" bell every automation-minded player wants means watching the bubbles yourself. The stand pours the potion; reading its progress is Distillation's to fix.
+
+### Behavior
+
+A comparator against the stand (rigged or not) reads brew state on a two-band scale: a low **working** band while a cycle runs, and a high **done** band while the stand sits idle holding bottles, with the bottle count carried in both. The batch row (slots 5–7) counts toward the total only while the stand is rigged. The signal is a read of the stand's current state, not a completion pulse — bottles sitting idle read the done band whether they were just brewed or placed by hand.
+
+| State | Signal |
+|---|---|
+| Idle, no bottles in the bottle slots | **0** |
+| Brewing | **1–6** — the bottle count (normal 1–3, rigged batch up to 6) |
+| Idle, bottles present | **8–13** — bottle count + 7 |
+
+So `done ⇔ signal ≥ 8`; the count is the signal while working, or the signal − 7 when done. The unused 7 is the gap that keeps a single threshold clean. A lamp wired to "signal ≥ 8" lights the moment a pass finishes — the working→done rising edge is "the batch is done."
+
+### Edge Cases
+
+- **The feature replaces a signal, it doesn't add one:** vanilla brewing stands already emit a container-fullness signal. With `enableComparatorOutput` off, the stand keeps that exact vanilla signal — off means untouched vanilla, not a silenced stand.
+- **Idle bottles read done:** water bottles or finished potions sitting in an unpowered stand read the done band; the comparator reports state, not an event.
+- **Rig transitions:** the batch row counts only while rigged. A rig forms on an empty row and un-rigs by ejecting the row, so forming or breaking a rig never strands a count.
+- **Server-authoritative:** the signal is computed server-side from the block entity; nothing is synced to the client.
+
+### Config
+
+| Key | Type | Default | Range |
+|---|---|---|---|
+| `enableComparatorOutput` | bool | true | — |
+
+### Implementation Notes
+
+- One server-side mixin on `BrewingStandBlock` intercepts `getAnalogOutputSignal`; when the feature is off it falls through to vanilla's fullness signal. `hasAnalogOutputSignal` is left vanilla — already true in both modes. The scale is a pure core (`ComparatorSignal.of(brewing, bottleCount)`) behind a thin shell that counts occupied bottle slots (0–2, plus 5–7 when rigged) and reads `brewTime > 0`. No comparator-refresh plumbing is added: vanilla's own `setChanged` cascade already notifies comparators at brew start, on completion (the working→done edge), and on every slot write.
+
+---
+
+## 10. Commands
 
 ### `/distillation` Command Tree
 
@@ -414,7 +453,7 @@ All feedback is localized (`command.distillation.*`). Diagnostic density is favo
 
 ---
 
-## 10. Advancements
+## 11. Advancements
 
 Seven entries, parented under vanilla's **Local Brewery** (`minecraft:nether/brew_potion`) — extending the brewing story vanilla already tells.
 
@@ -447,6 +486,7 @@ All features are independently toggleable via a ModMenu / Cloth Config screen an
 | `enableBatchBrewing` | bool | true | The heated-cauldron batch rig (§3) |
 | `batchIngredientCost` | int | 3 | Ingredients consumed per six-bottle pass |
 | `batchFuelCost` | int | 2 | Fuel charges consumed per six-bottle pass |
+| `enableComparatorOutput` | bool | true | Comparator reads brew state; off restores vanilla fullness (§9) |
 | `enableTippedArrows` | bool | true | Cauldron potion-charging + arrow dipping (§8) |
 | `tippedArrowsPerDip` | int | 8 | Arrows tipped per dip, one water level each |
 | `enableHonestDurations` | bool | true | Utility-potion duration retune (§4) |

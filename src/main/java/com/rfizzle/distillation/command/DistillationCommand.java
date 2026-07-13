@@ -35,7 +35,7 @@ import net.minecraft.world.phys.HitResult;
 import java.util.List;
 
 /**
- * The {@code /distillation} command tree ({@code design/SPEC.md} §9). Reads about yourself are
+ * The {@code /distillation} command tree ({@code design/SPEC.md} §10). Reads about yourself are
  * open (perm 0); reads about others and every mutation are op-gated (perm 2) on the exact node
  * where privilege starts. All mutations route through {@link DiscoveryManager} so the client sync
  * fires exactly as it does in play, and all feedback is localized {@code command.distillation.*}.
@@ -172,7 +172,7 @@ public final class DistillationCommand {
 
     /**
      * Reports the batch-rig status of the brewing stand the caller is looking at, within 10 blocks
-     * ({@code design/SPEC.md} §9): the water level and heat source when rigged, or the first missing
+     * ({@code design/SPEC.md} §10): the water level and heat source when rigged, or the first missing
      * piece top-down (cauldron, then water, then heat). All output is localized.
      */
     private static int runRig(CommandSourceStack source) throws CommandSyntaxException {

@@ -59,6 +59,7 @@ public class DistillationConfig {
     public boolean enableBatchBrewing = true;
     public int batchIngredientCost = 3;
     public int batchFuelCost = 2;
+    public boolean enableComparatorOutput = true;
     public boolean enableTippedArrows = true;
     public int tippedArrowsPerDip = 8;
     public boolean enableHonestDurations = true;

@@ -53,7 +53,8 @@
           "type": "prose",
           "html": [
             "Set your brewing stand on a water cauldron heated from below — a lit campfire or soul campfire, fire or soul fire, a lava source, or a magma block — and the stand's screen grows a second row of three bottle slots. Brewing a recipe from <em>your</em> recipes page fills all six bottles in one pass, consuming 3 ingredients (against 2 for two normal passes — the 1.5× cost), 2 fuel charges, and 1 water level from the cauldron.",
-            "The shortcut is earned: bottles whose recipe you haven't discovered are skipped untouched, hoppers can neither see nor fill the batch row, and an automated stand never batch-brews. Jade and WTHIT read the rig at a glance — brew progress, water level and heat, and the batch owner on the stand, a batch-rig line on the cauldron below."
+            "The shortcut is earned: bottles whose recipe you haven't discovered are skipped untouched, hoppers can neither see nor fill the batch row, and an automated stand never batch-brews. Jade and WTHIT read the rig at a glance — brew progress, water level and heat, and the batch owner on the stand, a batch-rig line on the cauldron below.",
+            "For redstone builders, a comparator against any stand reads its brew state rather than raw fullness: <strong>0</strong> when idle and empty, a low band while a cycle runs (the value is the bottle count, up to six on a rigged batch), and a high band once the bottles are done — so a lamp or bell can fire the moment a pass finishes. It replaces vanilla's container-fullness signal, and switches off back to that signal."
           ]
         }
       ]

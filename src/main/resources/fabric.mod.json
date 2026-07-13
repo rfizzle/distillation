@@ -36,7 +36,8 @@
             "com.rfizzle.distillation.gametest.ThrownRebalanceGameTest",
             "com.rfizzle.distillation.gametest.TippedArrowCauldronGameTest",
             "com.rfizzle.distillation.gametest.AdvancementGameTest",
-            "com.rfizzle.distillation.gametest.ProbeTooltipGameTest"
+            "com.rfizzle.distillation.gametest.ProbeTooltipGameTest",
+            "com.rfizzle.distillation.gametest.ComparatorGameTest"
         ]
     },
     "suggests": {

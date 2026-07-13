@@ -6,7 +6,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 /**
- * The custom advancement criterion triggers of {@code design/SPEC.md} §10, registered into
+ * The custom advancement criterion triggers of {@code design/SPEC.md} §11, registered into
  * {@link BuiltInRegistries#TRIGGER_TYPES} under {@code distillation:} ids. Five milestones are plain
  * "player did the thing" moments and reuse vanilla's {@link PlayerTrigger} under our own ids; two
  * carry a magnitude (a discovery count, a §2 line) and get a bespoke trigger.

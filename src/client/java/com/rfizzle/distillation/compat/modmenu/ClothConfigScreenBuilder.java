@@ -98,6 +98,13 @@ final class ClothConfigScreenBuilder {
                 .setSaveConsumer(v -> config.batchFuelCost = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
+                        Component.translatable("config.distillation.enable_comparator_output"),
+                        config.enableComparatorOutput)
+                .setTooltip(Component.translatable("config.distillation.enable_comparator_output.tooltip"))
+                .setDefaultValue(defaults.enableComparatorOutput)
+                .setSaveConsumer(v -> config.enableComparatorOutput = v)
+                .build());
+        server.addEntry(entry.startBooleanToggle(
                         Component.translatable("config.distillation.enable_tipped_arrows"),
                         config.enableTippedArrows)
                 .setTooltip(Component.translatable("config.distillation.enable_tipped_arrows.tooltip"))
