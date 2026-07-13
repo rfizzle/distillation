@@ -510,6 +510,7 @@ All features are independently toggleable via a ModMenu / Cloth Config screen an
 |---|---|---|---|
 | `showVaporHints` | bool | true | Color hints over the ingredient slot (§1) |
 | `recipeViewerShowsUndiscovered` | bool | false | Recipe viewers list conversions you haven't discovered |
+| `smoothNightVisionFade` | bool | true | Fade Night Vision out over its final seconds instead of flickering |
 
 ---
 

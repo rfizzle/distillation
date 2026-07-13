@@ -201,6 +201,13 @@ final class ClothConfigScreenBuilder {
                 .setDefaultValue(defaults.client.recipeViewerShowsUndiscovered)
                 .setSaveConsumer(v -> config.client.recipeViewerShowsUndiscovered = v)
                 .build());
+        client.addEntry(entry.startBooleanToggle(
+                        Component.translatable("config.distillation.smooth_night_vision_fade"),
+                        config.client.smoothNightVisionFade)
+                .setTooltip(Component.translatable("config.distillation.smooth_night_vision_fade.tooltip"))
+                .setDefaultValue(defaults.client.smoothNightVisionFade)
+                .setSaveConsumer(v -> config.client.smoothNightVisionFade = v)
+                .build());
 
         return builder.build();
     }
