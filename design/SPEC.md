@@ -123,7 +123,7 @@ Seven new potion lines, registered under the `distillation:` namespace and brewe
 - Levitation carries a deliberately short base — mobility of that order stays a novelty, not a weapon — and a raw Chorus Fruit reagent, where the *popped* fruit brews the §8 Levitation Antidote.
 - The Honey Bottle is consumed whole (no empty bottle back), matching the dragon's-breath precedent.
 - Luck, Glowing, and Levitation have no meaningful second level; glowstone on them is an invalid pair (→ Murky Draught, which the absent vapor hint warns about).
-- **Corruptions** (fermented spider eye): Haste → Mining Fatigue 3:00 (+redstone 8:00); Luck → Bad Luck 8:00 (+redstone 20:00). Resistance, Absorption, Glowing, Levitation, and Health Boost have no corruption (invalid pair).
+- **Corruptions** (fermented spider eye): the eye inverts any effect with a sensible opposite into that opposite, completing the set vanilla ships (Swiftness/Leaping → Slowness, Night Vision → Invisibility, Healing/Poison → Harming, Water → Weakness). Distillation adds the rest: Haste → Mining Fatigue 3:00 (+redstone 8:00); Luck → Bad Luck 8:00 (+redstone 20:00); Strength → Weakness; Regeneration → Poison; Glowing → Invisibility; Slow Falling → Levitation. Each extended input inverts to the extended opposite (and Regeneration → Poison the amplified one), landing on the target potion at its own duration; strong_strength alone has no partner (no Strong Weakness exists) and stays an invalid pair. Resistance, Absorption, Health Boost, Fire Resistance, Water Breathing, and Turtle Master have no sensible opposite — no edge, and the vapor gives no hint.
 - Every line takes gunpowder (splash) and dragon's breath (lingering) as vanilla, subject to §7.
 - **The Mundane bottle's onward arrow:** Mundane Potion + Fermented Spider Eye → Weakness 1:30 (+redstone 4:00 as vanilla), alongside vanilla's untouched water-bottle route. With §6's Thick base, neither of vanilla's dead-end base bottles ends the graph — every conversion the stand teaches leads somewhere.
 
@@ -561,7 +561,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 
 ### Gametests (Fabric Gametest API)
 
-- Brew each §2 line (base, redstone, glowstone where defined); glowstone on Luck murks; corruptions brew; Mundane + Fermented Spider Eye brews Weakness while the water-bottle route stays intact
+- Brew each §2 line (base, redstone, glowstone where defined); glowstone on Luck murks; every corruption inverts (Haste→Mining Fatigue, Luck→Bad Luck, Strength→Weakness, Regeneration→Poison, Glowing→Invisibility, Slow Falling→Levitation) while an effect with no opposite (Resistance, Absorption, Health Boost) murks; Mundane + Fermented Spider Eye brews Weakness while the water-bottle route stays intact
 - Invalid pair produces Murky Draughts with a valid hint ingredient; `enableMurkyDraughts=false` leaves bottles unbrewed; murky bottles are inert to further brewing
 - Drinking a Murky Draught applies Nausea 0:15 plus the hinted output's flicker (amplifier 0, 400 ticks); a hintless draught (lingering-potion input) applies nausea alone; the flicker records no discovery
 - Output extraction records discovery exactly once and fires the callback; hopper extraction records nothing

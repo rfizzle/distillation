@@ -195,6 +195,89 @@ public class MissingBrewsGameTest implements FabricGameTest {
                 "minecraft:weakness");
     }
 
+    // --- The completed inversion table (§2): every effect with a sensible opposite corrupts ---
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void strengthCorruptsToWeakness(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.STRENGTH), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "minecraft:weakness");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void longStrengthCorruptsToLongWeakness(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.LONG_STRENGTH), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "minecraft:long_weakness");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void regenerationCorruptsToPoison(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.REGENERATION), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "minecraft:poison");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void longRegenerationCorruptsToLongPoison(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.LONG_REGENERATION), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "minecraft:long_poison");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void strongRegenerationCorruptsToStrongPoison(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.STRONG_REGENERATION), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "minecraft:strong_poison");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void glowingCorruptsToInvisibility(GameTestHelper helper) {
+        assertBrewsTo(helper, distillationBottle("glowing"), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "minecraft:invisibility");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void longGlowingCorruptsToLongInvisibility(GameTestHelper helper) {
+        assertBrewsTo(helper, distillationBottle("long_glowing"), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "minecraft:long_invisibility");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void slowFallingCorruptsToLevitation(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.SLOW_FALLING), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "distillation:levitation");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void longSlowFallingCorruptsToLongLevitation(GameTestHelper helper) {
+        assertBrewsTo(helper, bottle(Potions.LONG_SLOW_FALLING), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "distillation:long_levitation");
+    }
+
+    // --- No sensible opposite: no edge, so the pair is invalid and murks (no false vapor hint) ---
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void resistanceHasNoCorruption(GameTestHelper helper) {
+        assertMurks(helper, distillationBottle("resistance"), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "distillation:resistance");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void absorptionHasNoCorruption(GameTestHelper helper) {
+        assertMurks(helper, distillationBottle("absorption"), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "distillation:absorption");
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void healthBoostHasNoCorruption(GameTestHelper helper) {
+        assertMurks(helper, distillationBottle("health_boost"), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "distillation:health_boost");
+    }
+
+    /** Strength and Long Strength corrupt, but Strong Strength has no partner — no Strong Weakness. */
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
+    public void strongStrengthHasNoCorruption(GameTestHelper helper) {
+        assertMurks(helper, bottle(Potions.STRONG_STRENGTH), new ItemStack(Items.FERMENTED_SPIDER_EYE),
+                "minecraft:strong_strength");
+    }
+
     // --- helpers ---
 
     private static ItemStack bottle(Holder<Potion> potion) {

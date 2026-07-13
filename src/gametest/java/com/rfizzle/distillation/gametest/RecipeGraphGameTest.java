@@ -42,6 +42,10 @@ public class RecipeGraphGameTest implements FabricGameTest {
         assertContains(helper, graph, "distillation:honey_bottle/swiftness");
         assertContains(helper, graph, "distillation:redstone/distillation/haste");
         assertContains(helper, graph, "distillation:fermented_spider_eye/mundane");
+        // The completed inversion table (§2): a vanilla-input corruption and a mod-input one (the
+        // latter deriving a prefixed segment) both ingest through the same vanilla registry.
+        assertContains(helper, graph, "distillation:fermented_spider_eye/strength");
+        assertContains(helper, graph, "distillation:fermented_spider_eye/distillation/glowing");
         helper.succeed();
     }
 
@@ -72,6 +76,9 @@ public class RecipeGraphGameTest implements FabricGameTest {
             RecipeGraph graph = RecipeGraphs.forLevel(helper.getLevel());
             helper.assertTrue(!graph.contains(ResourceLocation.parse("distillation:shulker_shell/awkward")),
                     "with enableMissingBrews=false the missing-brew lines leave the graph");
+            // The completed inversion table rides the same kill switch — the corruption edges leave too.
+            helper.assertTrue(!graph.contains(ResourceLocation.parse("distillation:fermented_spider_eye/strength")),
+                    "with enableMissingBrews=false the mod's corruption edges leave the graph");
             helper.assertTrue(graph.contains(ResourceLocation.parse("distillation:nether_wart/water")),
                     "vanilla conversions stay in the graph");
             // The line's premium concentration goes with it, so the reagent leaves the graph entirely.
