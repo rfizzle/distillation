@@ -5,6 +5,7 @@ import com.rfizzle.distillation.batch.BatchBrew;
 import com.rfizzle.distillation.item.DistillationItems;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -15,6 +16,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Item;
@@ -240,6 +242,97 @@ public class DraughtGameTest implements FabricGameTest {
         });
     }
 
+    // --- top-up drinking (SPEC §4) ---
+
+    private static final int FIRE_RES_CAP = 2 * FIRE_RES_HONEST; // 2× base: 16:00
+    private static final int STRENGTH_II_VANILLA = 1800; // Strong Strength, vanilla 1:30
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void reDrinkingTheSameBrewExtendsTheTimer(GameTestHelper helper) {
+        ServerPlayer player = survivalPlayer(helper);
+        try {
+            // A running Fire Resistance with 5:00 left; re-drinking adds a fresh 8:00 dose on top of
+            // the remainder (13:00, under the cap) instead of resetting to 8:00.
+            forceRemaining(player, MobEffects.FIRE_RESISTANCE, 6000, 0);
+            drink(helper, player, "minecraft:fire_resistance");
+            assertDuration(helper, player.getEffect(MobEffects.FIRE_RESISTANCE), 6000 + FIRE_RES_HONEST,
+                    "re-drinking a running brew must add the dose to the remaining timer");
+        } finally {
+            player.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void topUpClampsAtTwiceTheBaseDuration(GameTestHelper helper) {
+        ServerPlayer player = survivalPlayer(helper);
+        try {
+            // 15:00 remaining + an 8:00 dose = 23:00, past 2× base; the cap holds it at 16:00.
+            forceRemaining(player, MobEffects.FIRE_RESISTANCE, 18000, 0);
+            drink(helper, player, "minecraft:fire_resistance");
+            assertDuration(helper, player.getEffect(MobEffects.FIRE_RESISTANCE), FIRE_RES_CAP,
+                    "the topped-up timer must clamp at twice the base duration");
+        } finally {
+            player.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void differentAmplifierKeepsVanillaMerge(GameTestHelper helper) {
+        ServerPlayer player = survivalPlayer(helper);
+        try {
+            // Strength I running, then a Strength II drink: vanilla merge replaces with the stronger
+            // effect at its own duration rather than summing timers.
+            forceRemaining(player, MobEffects.DAMAGE_BOOST, 1200, 0);
+            drink(helper, player, "minecraft:strong_strength");
+            MobEffectInstance strength = player.getEffect(MobEffects.DAMAGE_BOOST);
+            helper.assertTrue(strength != null && strength.getAmplifier() == 1,
+                    "a stronger re-drink must win by vanilla merge, not top up");
+            assertDuration(helper, strength, STRENGTH_II_VANILLA,
+                    "Strength II keeps its own vanilla 1:30, not a summed timer");
+        } finally {
+            player.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void sipsTopUpAtHalfValue(GameTestHelper helper) {
+        ServerPlayer player = survivalPlayer(helper);
+        player.setShiftKeyDown(true);
+        try {
+            // A running Fire Resistance with 3:00 left; a sip adds ⌊8:00 ÷ 2⌋ = 4:00 on top (7:00).
+            forceRemaining(player, MobEffects.FIRE_RESISTANCE, 3600, 0);
+            drink(helper, player, "minecraft:fire_resistance");
+            assertDuration(helper, player.getEffect(MobEffects.FIRE_RESISTANCE), 3600 + FIRE_RES_HALF,
+                    "a sip must top up the running timer by half a dose");
+        } finally {
+            player.discard();
+        }
+        helper.succeed();
+    }
+
+    /** Own batch: flips the live server config, so it must never overlap tests running under defaults. */
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "distillationTopUpOff")
+    public void topUpOffRestoresVanillaMerge(GameTestHelper helper) {
+        boolean saved = Distillation.getConfig().enableTopUpDrinking;
+        Distillation.getConfig().enableTopUpDrinking = false;
+        ServerPlayer player = survivalPlayer(helper);
+        try {
+            // With top-up off, re-drinking over a shorter remainder resets to the fresh dose (vanilla
+            // max-merge), not a sum.
+            forceRemaining(player, MobEffects.FIRE_RESISTANCE, 6000, 0);
+            drink(helper, player, "minecraft:fire_resistance");
+            assertDuration(helper, player.getEffect(MobEffects.FIRE_RESISTANCE), FIRE_RES_HONEST,
+                    "with top-up off, re-drinking resets to a fresh dose, not a summed timer");
+        } finally {
+            Distillation.getConfig().enableTopUpDrinking = saved;
+            player.discard();
+        }
+        helper.succeed();
+    }
+
     /** Own batch: flips the live server config, so it must never overlap tests running under defaults. */
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "distillationHonestOff")
     public void honestDurationsOffRestoresVanillaTimers(GameTestHelper helper) {
@@ -291,6 +384,18 @@ public class DraughtGameTest implements FabricGameTest {
     }
 
     // --- helpers ---
+
+    /** Drinks a fresh bottle of the given potion; the player's crouch decides sip vs full. */
+    private static void drink(GameTestHelper helper, ServerPlayer player, String potionId) {
+        ItemStack stack = potion(potionId);
+        stack.getItem().finishUsingItem(stack, helper.getLevel(), player);
+    }
+
+    /** Puts a known remainder of an effect on the player so top-up math is deterministic in one tick. */
+    private static void forceRemaining(ServerPlayer player, Holder<MobEffect> effect, int ticks, int amplifier) {
+        player.removeEffect(effect);
+        player.addEffect(new MobEffectInstance(effect, ticks, amplifier));
+    }
 
     private static ItemStack potion(String potionId) {
         var holder = BuiltInRegistries.POTION

@@ -1,6 +1,7 @@
 package com.rfizzle.distillation.item;
 
 import com.rfizzle.distillation.brew.HonestDurations;
+import com.rfizzle.distillation.brew.TopUpDrinking;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.component.DataComponents;
@@ -123,12 +124,17 @@ public final class Draughts {
         }
         if (!level.isClientSide) {
             PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+            boolean topUp = RecipeGraphs.effectiveConfig().enableTopUpDrinking;
             contents.forEachEffect(instance -> {
                 if (instance.getEffect().value().isInstantenous()) {
                     instance.getEffect().value().applyInstantenousEffect(
                             player, player, entity, instance.getAmplifier(), 1.0);
                 } else {
-                    entity.addEffect(HonestDurations.withDuration(instance, HonestDurations.half(instance.getDuration())));
+                    // The sip applies ⌊base ÷ 2⌋ (SPEC §4); top-up tops it up against the same 2×-base
+                    // cap as a full drink, so the un-halved base is passed through unchanged.
+                    int base = instance.getDuration();
+                    MobEffectInstance dose = HonestDurations.withDuration(instance, HonestDurations.half(base));
+                    entity.addEffect(topUp ? TopUpDrinking.resolveInstance(entity, dose, base) : dose);
                 }
             });
         }
