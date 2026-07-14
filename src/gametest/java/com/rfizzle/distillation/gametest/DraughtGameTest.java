@@ -194,6 +194,50 @@ public class DraughtGameTest implements FabricGameTest {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void utilityPotionRetuneListCachedAcrossCalls(GameTestHelper helper) {
+        // getAllEffects feeds getColor and tooltip rendering once per frame; the retune memoizes its
+        // list per PotionContents instance, so repeat calls on unchanged inputs must not reallocate.
+        PotionContents contents = potion("minecraft:fire_resistance")
+                .getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        Iterable<MobEffectInstance> first = contents.getAllEffects();
+        Iterable<MobEffectInstance> second = contents.getAllEffects();
+        helper.assertTrue(first == second,
+                "repeat getAllEffects on unchanged inputs must return the cached list, not a new one");
+        // Pin that the shared list is the retuned one, so identity can't be satisfied by vanilla's
+        // shared getEffects() reference if this ever ran with honest durations off.
+        MobEffectInstance effect = second.iterator().next();
+        helper.assertTrue(Math.abs(effect.getDuration() - FIRE_RES_HONEST) <= TOLERANCE,
+                "the cached list must carry the honest duration, was " + effect.getDuration());
+        helper.succeed();
+    }
+
+    /** Own batch: flips the live server config, so it must never overlap tests running under defaults. */
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "distillationHonestFlipCache")
+    public void honestDurationsFlipInvalidatesRetuneCache(GameTestHelper helper) {
+        boolean saved = Distillation.getConfig().enableHonestDurations;
+        // The same bottle must retune live: a config flip changes what an already-created instance
+        // shows, so the per-instance cache re-derives from live config instead of baking a duration.
+        PotionContents contents = potion("minecraft:fire_resistance")
+                .getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        try {
+            Distillation.getConfig().enableHonestDurations = true;
+            MobEffectInstance honest = contents.getAllEffects().iterator().next();
+            helper.assertTrue(Math.abs(honest.getDuration() - FIRE_RES_HONEST) <= TOLERANCE,
+                    "with honest durations on, getAllEffects surfaces the honest duration, was "
+                            + honest.getDuration());
+
+            Distillation.getConfig().enableHonestDurations = false;
+            MobEffectInstance vanilla = contents.getAllEffects().iterator().next();
+            helper.assertTrue(Math.abs(vanilla.getDuration() - FIRE_RES_VANILLA) <= TOLERANCE,
+                    "flipping honest durations off must retune the same bottle back to vanilla, was "
+                            + vanilla.getDuration());
+        } finally {
+            Distillation.getConfig().enableHonestDurations = saved;
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void halfDraughtTooltipHalvesTheDuration(GameTestHelper helper) {
         helper.assertTrue(tooltipHasDuration(potion("minecraft:fire_resistance"), "8:00"),
                 "a full utility potion's tooltip shows the honest 8:00");
