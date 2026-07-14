@@ -168,9 +168,10 @@ public class PremiumBrewsGameTest implements FabricGameTest {
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void concentratedTagAppearsOnEveryPotionForm(GameTestHelper helper) {
-        // Drink, splash, and lingering — the last overrides appendHoverText without super, so it is
-        // a distinct mixin target. A premium bottle is in the family, so it carries the tag too.
-        for (Item item : new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION}) {
+        // Drink, splash, lingering, and the tipped arrow crafted from a lingering one — the last two
+        // are distinct mixin targets (lingering overrides appendHoverText without super; the arrow is
+        // a TippedArrowItem, not a PotionItem). A premium bottle is in the family, so all carry the tag.
+        for (Item item : new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION, Items.TIPPED_ARROW}) {
             ItemStack stack = PotionContents.createItemStack(item, PremiumBrews.potion("premium_strength"));
             List<Component> lines = stack.getTooltipLines(Item.TooltipContext.of(helper.getLevel()), null,
                     TooltipFlag.NORMAL);
