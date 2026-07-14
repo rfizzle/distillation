@@ -28,8 +28,9 @@ import java.util.List;
 /**
  * The multi-dose flask ({@code design/SPEC.md} §12): a copper-and-glass vessel holding up to three
  * doses of one discovered brew, drunk a dose at a time and refillable forever. The brew rides the
- * vanilla {@link DataComponents#POTION_CONTENTS} on the stack (so effects, color, name, and the §4
- * honest durations all reuse vanilla's machinery) and the remaining half-doses ride {@link
+ * vanilla {@link DataComponents#POTION_CONTENTS} on the stack (so effects, color, and the §4 honest
+ * durations all reuse vanilla's machinery; the item name stays "Flask" and the tooltip names the
+ * contents) and the remaining half-doses ride {@link
  * DistillationItems#FLASK_DOSES}. Drinking composes with the sip-half draughts of §4 — a sneak-sip
  * takes half a dose and leaves a pending half — through the shared {@link Draughts.DrinkKind} state
  * machine and the same drink-time and top-up seams a potion draught uses. Filling is a pour ({@link
