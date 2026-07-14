@@ -2,6 +2,7 @@ package com.rfizzle.distillation.mixin;
 
 import com.rfizzle.distillation.item.DraughtDrinker;
 import com.rfizzle.distillation.item.Draughts;
+import com.rfizzle.distillation.item.FlaskItem;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +21,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * and the halved dose in agreement even if the drinker releases their sneak mid-drink. {@link
  * Draughts#kindFor(ItemStack, LivingEntity)} reads this back for both potion seams; a null latch (no
  * potion in use, or a direct {@code finishUsingItem} call that never started a use) falls back to a
- * live classification.
+ * live classification. The multi-dose flask (§12) sips half the same way, so its drink latches here
+ * too, read back through {@link FlaskItem#kindFor(ItemStack, LivingEntity)}.
  */
 @Mixin(LivingEntity.class)
 abstract class LivingEntityMixin implements DraughtDrinker {
@@ -39,8 +41,12 @@ abstract class LivingEntityMixin implements DraughtDrinker {
     private void distillation$latchDrinkKind(InteractionHand hand, CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
         ItemStack stack = self.getItemInHand(hand);
-        this.distillation$latchedKind = stack.getItem() instanceof PotionItem
-                ? Draughts.classify(stack, self)
-                : null;
+        if (stack.getItem() instanceof PotionItem) {
+            this.distillation$latchedKind = Draughts.classify(stack, self);
+        } else if (stack.getItem() instanceof FlaskItem) {
+            this.distillation$latchedKind = FlaskItem.classifyKind(stack, self);
+        } else {
+            this.distillation$latchedKind = null;
+        }
     }
 }
