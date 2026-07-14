@@ -65,6 +65,7 @@ public class DistillationConfig {
     public boolean enableHonestDurations = true;
     public boolean enableDraughts = true;
     public boolean enableTopUpDrinking = true;
+    public boolean enableFlask = true;
     public boolean enablePremiumBrews = true;
     public boolean enableAntidotes = true;
     public boolean enableThrownRebalance = true;

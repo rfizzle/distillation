@@ -140,6 +140,13 @@ final class ClothConfigScreenBuilder {
                 .setSaveConsumer(v -> config.enableTopUpDrinking = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
+                        Component.translatable("config.distillation.enable_flask"),
+                        config.enableFlask)
+                .setTooltip(Component.translatable("config.distillation.enable_flask.tooltip"))
+                .setDefaultValue(defaults.enableFlask)
+                .setSaveConsumer(v -> config.enableFlask = v)
+                .build());
+        server.addEntry(entry.startBooleanToggle(
                         Component.translatable("config.distillation.enable_premium_brews"),
                         config.enablePremiumBrews)
                 .setTooltip(Component.translatable("config.distillation.enable_premium_brews.tooltip"))

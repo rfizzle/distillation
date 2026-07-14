@@ -1,0 +1,14 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "distillation:item/flask"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "distillation:filled": 1
+            },
+            "model": "distillation:item/flask_filled"
+        }
+    ]
+}
