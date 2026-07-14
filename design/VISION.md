@@ -85,6 +85,18 @@ line.
   not a timer that expires in transit — and no bottle is wasted for being
   drunk a few seconds early.
 
+### The flask
+- **What it is** — A copper-and-glass flask that carries three doses of one
+  brew in a single slot.
+- **How you use it** — Pour bottles of a brew you have discovered into a flask
+  — each bottle one dose, the empty glass handed back — or fill one straight
+  from a batch pass alongside its six bottles. Drink a dose at a time; sneak to
+  sip a half like any draught. It holds one brew at a time, never fills from a
+  Murky Draught, and refills forever.
+- **What changes for you** — A raid loadout stops being two rows of single
+  bottles. The system that makes brewing at scale worth doing finally makes
+  carrying the result worth it too.
+
 ### Both, not either/or
 - **What it is** — Redstone and glowstone stop being mutually exclusive.
 - **How you use it** — Add both, at double the base ingredient — two blaze
@@ -129,9 +141,9 @@ line.
 
 Every piece switches off on its own — discovery hints, Murky Draughts, recipe
 notes, batch brewing, the comparator read, the new recipes, the longer
-durations, cauldron-tipped arrows, the splash and lingering rebalance — so a
-server can run any slice of the mod, or start everyone with the full recipes
-page unlocked. Change nothing and the defaults are exactly this document;
+durations, the flask, cauldron-tipped arrows, the splash and lingering
+rebalance — so a server can run any slice of the mod, or start everyone with
+the full recipes page unlocked. Change nothing and the defaults are exactly this document;
 whatever you change, every vanilla recipe still brews, milk still cures all, and
 golden apples are untouched. Discoveries are per player — your recipes page
 fills only with what you have brewed.

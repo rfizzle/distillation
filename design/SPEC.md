@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1 Fabric mod. Alchemy overhaul.
 
-**Architectural philosophy:** Vanilla-stand deepening. Distillation never replaces the brewing stand block, its block entity type, or its screen type — it widens what the existing stand accepts, resolves every brew through a single recipe-graph seam built over vanilla's own brewing registry, and extends the stand's screen in place (a recipes page and a batch row, not a new menu). Per-player state (recipe discovery) lives in a persistent Fabric data attachment; per-stand state (batch owner) lives in the block entity's existing NBT. New registered content is potion types, two custom sounds, and one item (the Murky Draught) — nothing block-shaped, no world generation, no new mobs. All gameplay decisions are server-side; the client receives render-only sync (discovery set for hints and the recipes page).
+**Architectural philosophy:** Vanilla-stand deepening. Distillation never replaces the brewing stand block, its block entity type, or its screen type — it widens what the existing stand accepts, resolves every brew through a single recipe-graph seam built over vanilla's own brewing registry, and extends the stand's screen in place (a recipes page and a batch row, not a new menu). Per-player state (recipe discovery) lives in a persistent Fabric data attachment; per-stand state (batch owner) lives in the block entity's existing NBT. New registered content is potion types, two custom sounds, and a few items (the Murky Draught, the Recipe Note, and the Flask) — nothing block-shaped, no world generation, no new mobs. All gameplay decisions are server-side; the client receives render-only sync (discovery set for hints and the recipes page).
 
 **Asset philosophy:** Bottles and reagents stay vanilla wherever vanilla is right — new potion types color themselves through vanilla's tint-layer system with no new textures. Custom pixel art is limited to what has no vanilla analogue: the Murky Draught, the half-drunk draught bottle, one shared antidote bottle, and two small GUI sprites, all through Concord's glyph pipeline (concord `design/DESIGN-SYSTEM.md` §8; see `design/DESIGN.md` §3 and `design/ASSETS.md`). Sound is vanilla except two earned custom cues — the discovery chime and the murky fizzle — through the `.sfx` pipeline (§9 of the design system; see Sound Design below).
 
@@ -488,6 +488,49 @@ Custom criterion triggers fired from the §1 brew/discovery choke points, the §
 
 ---
 
+## 12. The Flask
+
+A copper-and-glass vessel that carries a discovered brew in bulk, drunk a dose at a time.
+
+### Problem
+
+Potions don't stack, so carrying a raid loadout is rows of single bottles — and batch brewing (§3) makes the pile bigger, not lighter. The system that makes brewing at scale worth doing leaves carrying the result as vanilla's worst inventory problem.
+
+### Behavior
+
+A **Flask** (`distillation:flask`) holds up to **three doses of a single brew**, drunk one dose at a time and refillable forever. It is crafted from copper and glass — no new ingredients — and holds one brew at a time, never a mixed-dose bag.
+
+- **What it holds.** The brew rides the stack's own `PotionContents`; the doses remaining ride a `flask_doses` component counted in **half-units** (a full dose is two, so a full flask is six). An empty flask carries no brew and accepts any discovered one; a partial flask accepts only more of the brew it already holds.
+- **Drinking.** Right-click-use to drink one dose — a normal potion swallow that applies the brew exactly as the bottled potion would, composing with §4 top-up drinking. It composes with §4 draughts too: **sneak-drink to sip half a dose** — half applied now (a quick swallow, half the drink time), the other half left pending in the flask; the next drink finishes that pending half, sneaking or not. An **instant** brew (Healing, Harming, an antidote) drinks a whole dose per swallow and cannot be sipped, exactly as an instant potion cannot (§4). Draining the last half empties the flask, which is then refillable with any discovered brew.
+- **Filling by bottle (the pour).** With a compatible flask in the **off hand**, right-click-using a bottled potion in the **main hand** pours one dose into the flask and returns the empty glass bottle, instead of drinking. The poured potion sets an empty flask's brew. Only a normal, discovered, non-water, full potion pours — a splash or lingering potion (which throws instead of drinking), a water bottle, or a half draught never do. A full or brew-mismatched flask is left alone and the potion drinks as usual.
+- **Filling from a batch pass (§3).** A flask placed in a **batch-row slot** fills from the pass alongside its bottles: when an engaged pass resolves, the flask fills to its three-dose cap with the pass's output brew, provided it is empty or already holds that brew. A flask never triggers a pass on its own and is never converted or murked — it is a fill target, not a bottle. A flask holding a different brew is left untouched.
+
+### Discovery gate
+
+Filling is discovery-gated like batch brewing (§1, §3): a flask fills only with a brew the filler has learned, and a **Murky Draught never enters one** (a murky draught carries no producible potion and is excluded from the pour). With discovery off, any drinkable brew fills. A pour of a producible-but-unlearned brew names the gate in the action bar and does nothing — the potion is not drunk away. The batch pour needs no separate check: the stand owner already discovered the brew the sibling bottles produced.
+
+### Edge Cases
+
+- **One brew per flask.** The vessel is not a bag: it holds a single `PotionContents` and refuses a pour or batch fill of any other brew until it empties. No mixed-dose flask composes through components.
+- **Drink-kind latch.** As with §4 draughts, the sip/full choice is latched when the drink starts, so releasing the sneak mid-drink flips neither the dose nor the swallow speed.
+- **Creative.** A creative drinker spends no dose (nothing is consumed to keep) and a creative pour costs no bottle — mirroring §4's creative handling.
+- **Comparator, eject, hoppers.** A flask in a batch slot counts as an occupied slot for the §9 comparator, ejects like a bottle when the rig is dismantled, and is unreachable by hoppers — all by the same slot machinery a bottle rides (§3, §9).
+- **Multiplayer.** Per player: a pour reads the pourer's own discovery, a batch fill the stand owner's; nothing shared.
+- **Disabled** (`enableFlask=false`): no pour and no batch fill, and the stand refuses a flask in its row; an already-filled flask still drinks (production is gated, not consumption). The flask item and its recipe remain — an empty flask is an inert vessel — matching the Murky-Draught and draught precedent.
+
+### Config
+
+| Key | Type | Default | Range |
+|---|---|---|---|
+| `enableFlask` | bool | true | — |
+
+### Implementation Notes
+
+- The flask is one registered `Item` (`distillation:flask`, `stacksTo(1)`), not a `PotionItem` subclass — it carries the brew as the vanilla `POTION_CONTENTS` component (reusing effect application, honest durations, color, and name) plus a `flask_doses` int component in half-units. The pure dose arithmetic and the sip/full/half classification live in a core (`Flask`) behind the item shell; the drink reuses §4's `HonestDurations`/`TopUpDrinking` and the shared `DraughtDrinker` latch.
+- The pour is one `PotionItem#use` HEAD mixin: an off-hand flask diverts the potion's use to a server-side pour (`FlaskPour`) that reuses the §8 discovery-producer lookup; splash/lingering override `use`, so they never reach it. The batch fill rides §1's brew choke point — after the batch row's bottles resolve, a flask slot fills to full with the pass's output brew. Slot acceptance widens `BatchBottleSlot` and the block-entity `canPlaceItem` gate for the batch row only. Comparator counting, rig eject, and hopper sidedness need no change — all are item-agnostic.
+
+---
+
 ## Configuration
 
 All features are independently toggleable via a ModMenu / Cloth Config screen and a JSON config file (`config/distillation.json`), created with defaults on first launch. `configVersion` is **1**. Unknown/missing fields are filled with defaults and clamped to valid ranges after load; a corrupted file falls back to defaults and is left untouched.
@@ -508,6 +551,7 @@ All features are independently toggleable via a ModMenu / Cloth Config screen an
 | `tippedArrowsPerDip` | int | 8 | Arrows tipped per dip, one water level each |
 | `enableHonestDurations` | bool | true | Utility-potion duration retune (§4) |
 | `enableDraughts` | bool | true | Sneak-drink half potions (§4) |
+| `enableFlask` | bool | true | The copper-and-glass multi-dose flask (§12) |
 | `enablePremiumBrews` | bool | true | Concentration + both-dusts premium path (§5) |
 | `enableAntidotes` | bool | true | The eight antidote lines (§6) |
 | `enableThrownRebalance` | bool | true | Splash/lingering rebalance (§7) |
@@ -617,6 +661,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 - Premium formula: `long ÷ 2` durations and amplifiers per line; concentration validity (strong-form-only, base-potion-only)
 - Discovery set semantics: idempotent re-discovery, forget, stale-id hiding vs retention
 - Tipped-arrow dip: per-dip count caps (rate, arrows held, empty hand), the charge gate over discovered producers, charged-cauldron NBT round-trip (sorted order, malformed-entry skip)
+- Flask dose arithmetic and drink classification: half-unit accounting (three doses = six halves), sip/full/half by crouch and pending-half parity, the instant-brew never-sips rule, the pour cap, and the pour gate (discovery, brew compatibility, room)
 - Config round-trip, clamping, corrupted-file fallback
 
 ### Gametests (Fabric Gametest API)
@@ -634,6 +679,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 - Tipped arrows: a discovered drinkable potion charges a water cauldron and returns a bottle; dipping tips `tippedArrowsPerDip` arrows and spends one water level; draining the last level clears the charge; an undiscovered brew does not charge; splash/lingering potions have no cauldron handler; the feature off is inert
 - Splash potion applies 87.5% duration; dispenser-thrown identical
 - Attuned splash: a player's beneficial splash/cloud reaches a pet and the player but not a hostile or a bystander; harmful and instant effects and ownerless throws stay indiscriminate; the `enableAttunedSplash` toggle off restores vanilla targeting
+- Flask: drinking a dose applies the full brew and spends it; a sneak-sip spends a half and leaves a pending half the next drink finishes; an instant brew drinks whole per dose; the off-hand pour fills a dose and returns the glass, gated on discovery and refused for a full or brew-mismatched flask; a batch pass fills a flask in the row to three doses and skips a mismatched one; the feature off refuses pours and stand placement while an existing filled flask still drinks
 - Commands: `recipes`, `discover`, `forget`, `rig` behave and permission-gate as specced
 
 ### Manual Testing
