@@ -3,6 +3,7 @@ package com.rfizzle.distillation.brew;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,5 +53,19 @@ public final class HonestDurations {
     public static MobEffectInstance withDuration(MobEffectInstance instance, int ticks) {
         return new MobEffectInstance(instance.getEffect(), ticks, instance.getAmplifier(),
                 instance.isAmbient(), instance.isVisible(), instance.showIcon());
+    }
+
+    /**
+     * An immutable snapshot of a retuned effect list at the {@code ticks} duration it was built for —
+     * the payload the {@code getAllEffects} seam memoizes per {@code PotionContents} instance so it
+     * stops rebuilding the list every render frame. {@code ticks} is the whole cache key: a §4
+     * potion's base effects are fixed by its immutable {@code PotionContents}, so a live config flip
+     * changes {@code ticks} and busts the snapshot, keeping the duration resolved at read time.
+     *
+     * <p>The list is unmodifiable, but its {@link MobEffectInstance} elements are mutable — the seam
+     * relies on the {@code getAllEffects} contract that callers read the returned instances and never
+     * mutate one in place (vanilla's tooltip, {@code getColor}, and thrown-potion paths all copy first).
+     */
+    public record Retuned(int ticks, List<MobEffectInstance> effects) {
     }
 }

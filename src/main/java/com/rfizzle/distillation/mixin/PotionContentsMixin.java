@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -30,6 +31,15 @@ import java.util.function.Consumer;
  * there builds a fresh copy list and never mutates it in place, so an overridden potion's registry
  * entry is untouched. The override applies only to a plain registered potion with no custom effects,
  * so a tipped arrow or custom-effect bottle is left to vanilla.
+ *
+ * <p>{@code getAllEffects} feeds {@code getColor()} and tooltip rendering, so an on-screen utility
+ * potion resolves it once per frame — so the retuned list is memoized per {@code PotionContents}
+ * instance in {@link #distillation$retuneCache}. Validity is keyed on the retuned {@code ticks},
+ * re-derived every call from live config: a config flip changes {@code ticks} and rebuilds, so the
+ * duration is still resolved at read time and never baked. The cache is one {@code volatile} field
+ * swapped by whole-reference assignment to an immutable snapshot, so a render-thread reader and a
+ * server-thread {@code getAllEffects} (thrown-potion application) never see a torn read; a cache-miss
+ * race merely rebuilds an equivalent snapshot.
  */
 @Mixin(PotionContents.class)
 abstract class PotionContentsMixin {
@@ -41,6 +51,13 @@ abstract class PotionContentsMixin {
     @Shadow
     @Final
     private List<MobEffectInstance> customEffects;
+
+    /**
+     * The memoized {@code getAllEffects} retune for this contents, or {@code null} until first built.
+     * Volatile, whole-reference swap, immutable payload — see the class doc for the threading model.
+     */
+    @Unique
+    private volatile HonestDurations.Retuned distillation$retuneCache;
 
     /**
      * The §4 duration for this contents' potion, or {@code -1} when honest durations are off, the
@@ -77,10 +94,17 @@ abstract class PotionContentsMixin {
         if (ticks < 0) {
             return;
         }
+        HonestDurations.Retuned cached = this.distillation$retuneCache; // single volatile read
+        if (cached != null && cached.ticks() == ticks) {
+            cir.setReturnValue(cached.effects());
+            return;
+        }
         List<MobEffectInstance> retuned = new ArrayList<>();
         for (MobEffectInstance base : cir.getReturnValue()) {
             retuned.add(HonestDurations.withDuration(base, ticks));
         }
-        cir.setReturnValue(retuned);
+        List<MobEffectInstance> published = Collections.unmodifiableList(retuned);
+        this.distillation$retuneCache = new HonestDurations.Retuned(ticks, published);
+        cir.setReturnValue(published);
     }
 }
