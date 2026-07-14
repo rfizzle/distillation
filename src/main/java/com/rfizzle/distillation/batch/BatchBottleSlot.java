@@ -1,7 +1,9 @@
 package com.rfizzle.distillation.batch;
 
 import com.rfizzle.distillation.discovery.DiscoveryManager;
+import com.rfizzle.distillation.item.DistillationItems;
 import com.rfizzle.distillation.item.Draughts;
+import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
@@ -28,10 +30,16 @@ public class BatchBottleSlot extends Slot {
     @Override
     public boolean mayPlace(ItemStack stack) {
         // Exactly what a vanilla bottle slot accepts, minus a half draught — not a receptive
-        // bottle (SPEC §4), rejected here as it is on the bottom row.
-        return !Draughts.isDraught(stack)
-                && (stack.is(Items.POTION) || stack.is(Items.SPLASH_POTION)
-                || stack.is(Items.LINGERING_POTION) || stack.is(Items.GLASS_BOTTLE));
+        // bottle (SPEC §4), rejected here as it is on the bottom row — plus a flask, which the batch
+        // rig fills from the pass alongside its bottles (§12), only while the feature is on.
+        if (Draughts.isDraught(stack)) {
+            return false;
+        }
+        if (stack.is(DistillationItems.FLASK)) {
+            return RecipeGraphs.effectiveConfig().enableFlask;
+        }
+        return stack.is(Items.POTION) || stack.is(Items.SPLASH_POTION)
+                || stack.is(Items.LINGERING_POTION) || stack.is(Items.GLASS_BOTTLE);
     }
 
     @Override

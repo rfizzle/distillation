@@ -6,6 +6,7 @@ import com.rfizzle.distillation.batch.BatchBrewTick;
 import com.rfizzle.distillation.batch.BatchRig;
 import com.rfizzle.distillation.batch.BatchStand;
 import com.rfizzle.distillation.batch.BatchStates;
+import com.rfizzle.distillation.item.DistillationItems;
 import com.rfizzle.distillation.item.Draughts;
 import com.rfizzle.distillation.recipe.BrewSeam;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
@@ -137,6 +138,14 @@ abstract class BrewingStandBlockEntityMixin implements BatchStand {
             // A half draught is not a receptive bottle (SPEC §4) — no topping up, in any slot,
             // including the batch row (5–7) which vanilla's own canPlaceItem would otherwise accept.
             cir.setReturnValue(false);
+            return;
+        }
+        if (slot >= BatchBrew.FIRST_BATCH_SLOT && slot <= BatchBrew.LAST_BATCH_SLOT
+                && stack.is(DistillationItems.FLASK)) {
+            // A flask is a valid batch-row occupant (§12) that vanilla's own canPlaceItem rejects;
+            // accept it only while the feature is on, so an off flask stays a plain drink item. The
+            // bottom row and ingredient/fuel slots never take a flask.
+            cir.setReturnValue(RecipeGraphs.effectiveConfig().enableFlask);
             return;
         }
         if (slot != 3) {
