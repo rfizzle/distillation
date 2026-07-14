@@ -91,6 +91,33 @@ public class FlaskGameTest implements FabricGameTest {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void aSipLatchesAndSurvivesReleasingTheSneak(GameTestHelper helper) {
+        // SPEC §12: the sip/full choice is latched when the drink starts (shared DraughtDrinker seam),
+        // so releasing the sneak mid-drink flips neither the swallow speed nor the half-dose spent.
+        ServerPlayer player = survivalPlayer(helper);
+        player.setShiftKeyDown(true);
+        try {
+            ItemStack flask = flask("minecraft:fire_resistance", 6);
+            player.setItemInHand(InteractionHand.MAIN_HAND, flask);
+            player.startUsingItem(InteractionHand.MAIN_HAND); // latches SIP_HALF from the crouch at start
+
+            player.setShiftKeyDown(false); // let go of the sneak before the drink finishes
+            ItemStack using = player.getUseItem();
+            helper.assertTrue(using.getItem().getUseDuration(using, player) == 16,
+                    "a latched sip keeps the quick half-swallow time after the crouch is released");
+
+            using.getItem().finishUsingItem(using, helper.getLevel(), player);
+            assertDuration(helper, player, MobEffects.FIRE_RESISTANCE, FIRE_RES_HALF,
+                    "a latched sip applies the half dose even though the crouch was released");
+            helper.assertTrue(FlaskItem.doses(using) == 5,
+                    "a latched sip spends only one half-unit, never a full dose");
+        } finally {
+            player.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void anInstantBrewDrinksWholePerDoseEvenSneaking(GameTestHelper helper) {
         ServerPlayer player = survivalPlayer(helper);
         player.setShiftKeyDown(true);
@@ -167,6 +194,15 @@ public class FlaskGameTest implements FabricGameTest {
                     player.getMainHandItem(), flask);
             helper.assertTrue(FlaskItem.doses(flask) == 0,
                     "an undiscovered brew must not pour with discovery on");
+
+            // An unproducible base/foreign potion is not a pourable brew (SPEC §12): it falls through
+            // to a normal drink, never a false discovery gate. minecraft:luck has no producing edge.
+            ItemStack unproducible = new ItemStack(DistillationItems.FLASK);
+            player.setItemInHand(InteractionHand.MAIN_HAND, potion("minecraft:luck"));
+            helper.assertTrue(FlaskPour.tryPour(helper.getLevel(), player, InteractionHand.MAIN_HAND,
+                    player.getMainHandItem(), unproducible) == null,
+                    "an unproducible potion falls through to a normal drink, not a false discovery gate");
+            helper.assertTrue(FlaskItem.doses(unproducible) == 0, "and it does not pour");
 
             DiscoveryManager.discoverAll(player, RecipeGraphs.forLevel(helper.getLevel()));
             player.setItemInHand(InteractionHand.MAIN_HAND, potion("minecraft:fire_resistance"));

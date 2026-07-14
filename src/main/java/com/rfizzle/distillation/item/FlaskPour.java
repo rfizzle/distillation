@@ -75,6 +75,11 @@ public final class FlaskPour {
                     .anyMatch(conversion -> DiscoveryManager.data(serverPlayer).contains(conversion.id()));
         }
         if (!FlaskFill.discoveredProducer(config.enableDiscovery, discoveredAny, producing)) {
+            if (producing == 0) {
+                // Not a brew the stand produces at all (a base or foreign potion): not pourable, so
+                // fall through to a normal drink rather than a discovery gate it could never satisfy.
+                return null;
+            }
             // A brew the player could pour but has not learned: name the gate, and don't drink it away.
             serverPlayer.displayClientMessage(
                     Component.translatable("message.distillation.flask_undiscovered", potion.getHoverName()), true);
