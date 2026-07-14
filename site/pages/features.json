@@ -1,9 +1,9 @@
 {
   "nav": "Features",
   "metaTitle": "Features — Distillation",
-  "metaDescription": "Distillation's feature set as specced: recipe discovery at the stand, the missing brews, batch brewing, honest durations and draughts, premium potions, antidotes, and rebalanced thrown potions.",
+  "metaDescription": "Distillation's feature set as specced: recipe discovery at the stand, the missing brews, batch brewing, honest durations and draughts, premium potions, antidotes, rebalanced thrown potions, and the multi-dose flask.",
   "title": "Features",
-  "lede": "The seven headline systems, as specced in <a href='https://github.com/rfizzle/distillation/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Distillation is in development — these are commitments, not yet a shipped jar.",
+  "lede": "The headline systems, as specced in <a href='https://github.com/rfizzle/distillation/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Distillation is in development — these are commitments, not yet a shipped jar.",
   "width": "5xl",
   "scale": "lg",
   "sections": [
@@ -153,6 +153,20 @@
           "type": "prose",
           "html": [
             "Right-click a water cauldron with a potion you have <strong class='text-bone'>discovered</strong> to charge it with that brew, then dip a stack of arrows to tip <strong class='text-bone'>eight at a time</strong> — each dip spends one water level, so a full cauldron tips two dozen before running dry. Only drinkable potions charge; vanilla's lingering-potion recipe still works untouched. Arrows of Slowness or Poison become part of the brewing you already do, and an undiscovered brew still pays vanilla's dragon's-breath price."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flask",
+      "title": "The Flask",
+      "intro": "A copper-and-glass vessel that carries a brew in bulk.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Potions don't stack, so a raid loadout is rows of single bottles — and batch brewing makes the pile bigger, not lighter. The <strong class='text-bone'>flask</strong>, crafted from copper and glass, holds <strong class='text-bone'>three doses of one discovered brew</strong> in a single slot and refills forever. Pour bottles into it — each bottle one dose, the empty glass handed back — or fill one straight from a batch pass, alongside its six bottles, in one go.",
+            "Drink a dose at a time, a normal swallow that tops up like any bottle; sneak to sip a half, composing with draughts. It holds one brew at a time — never a mixed-dose bag — and a Murky Draught never enters one. Discovery-gated like batch brewing: the shortcut is earned. Turn it off with <code>enableFlask</code> and an existing filled flask still drinks; you just can't fill new ones."
           ]
         }
       ]

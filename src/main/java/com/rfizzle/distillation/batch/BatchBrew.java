@@ -2,6 +2,7 @@ package com.rfizzle.distillation.batch;
 
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.discovery.DiscoveryManager;
+import com.rfizzle.distillation.item.FlaskItem;
 import com.rfizzle.distillation.recipe.RecipeGraph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -99,7 +100,9 @@ public final class BatchBrew {
                                                          ItemStack ingredient, ItemStack bottle,
                                                          RecipeGraph graph, DistillationConfig config,
                                                          boolean lenient) {
-        if (bottle.isEmpty()) {
+        if (bottle.isEmpty() || bottle.getItem() instanceof FlaskItem) {
+            // A flask is a fill target, not a bottle to convert (§12) — it never counts toward
+            // engagement nor resolves here; BrewSeam fills it separately from the pass's output.
             return null;
         }
         RecipeGraph.Conversion conversion = graph.matchConversion(ingredient, bottle);

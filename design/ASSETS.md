@@ -25,6 +25,8 @@
 | Murky Draught item 16×16 | `art/glyphs/murky_draught.glyph` | `assets/distillation/textures/item/murky_draught.png` |
 | Recipe Note item 16×16 | `art/glyphs/recipe_note.glyph` | `assets/distillation/textures/item/recipe_note.png` |
 | Half-draught liquid overlay 16×16 (potion model override, tint-layered) | `art/glyphs/draught_half.gen.sh` (derived from vanilla `item/potion_overlay`, lower bulb kept) | `assets/distillation/textures/item/draught_half.png` |
+| Flask item 16×16 (copper-and-glass vessel, hollow bulb) | `art/glyphs/flask.glyph` | `assets/distillation/textures/item/flask.png` |
+| Flask liquid overlay 16×16 (filled model, tinted per brew in code) | `art/glyphs/flask_liquid.glyph` | `assets/distillation/textures/item/flask_liquid.png` |
 | Recipes-page tab button 16×16 (brewing screen) | `art/glyphs/recipes_tab.glyph` | `assets/distillation/textures/gui/recipes_tab.png` |
 
 ## Audio

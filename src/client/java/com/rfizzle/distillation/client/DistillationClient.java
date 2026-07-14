@@ -6,9 +6,11 @@ import com.rfizzle.distillation.client.config.ClientDistillationConfig;
 import com.rfizzle.distillation.client.discovery.ClientDiscoveryState;
 import com.rfizzle.distillation.client.net.ClientPayloadHandlers;
 import com.rfizzle.distillation.item.DistillationItems;
+import com.rfizzle.distillation.item.FlaskItem;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.Holder;
@@ -32,6 +34,16 @@ public class DistillationClient implements ClientModInitializer {
         // tinted per cure by the vanilla potion color provider reading the deepened liquid color.
         ItemProperties.register(Items.POTION, Distillation.id("antidote"),
                 (stack, level, entity, seed) -> isAntidote(stack) ? 1.0F : 0.0F);
+        // The flask render (SPEC §12): a "filled" predicate routes a flask holding a dose to the
+        // filled model (copper-and-glass base plus a liquid layer), and an item color tints only that
+        // liquid layer (tintIndex 1) to the stored brew's color — the vessel (tintIndex 0) stays bare.
+        ItemProperties.register(DistillationItems.FLASK, Distillation.id("filled"),
+                (stack, level, entity, seed) -> FlaskItem.doses(stack) > 0 ? 1.0F : 0.0F);
+        ColorProviderRegistry.ITEM.register(
+                (stack, tintIndex) -> tintIndex == 1
+                        ? stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).getColor()
+                        : -1,
+                DistillationItems.FLASK);
         // Client-side graph lookups (the menu's ingredient slot) honor the server's synced
         // gameplay config, falling back to the local file offline.
         RecipeGraphs.setClientConfigSupplier(ClientDistillationConfig::effective);

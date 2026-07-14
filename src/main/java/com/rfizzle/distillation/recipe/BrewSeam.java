@@ -8,6 +8,7 @@ import com.rfizzle.distillation.brew.DistillationBrews;
 import com.rfizzle.distillation.config.DistillationConfig;
 import com.rfizzle.distillation.discovery.BrewProvenances;
 import com.rfizzle.distillation.item.DistillationItems;
+import com.rfizzle.distillation.item.FlaskItem;
 import com.rfizzle.distillation.item.MurkyDraughtContents;
 import com.rfizzle.distillation.sound.DistillationSounds;
 import net.minecraft.core.BlockPos;
@@ -94,15 +95,42 @@ public final class BrewSeam {
 
         // Batch row: a committed pass fills a batch bottle only when the ingredient takes it to a
         // conversion the owner may brew (lenient — the pass was paid for at start; see BatchBrew).
-        // Everything else in the row is left untouched, never murked.
+        // Everything else in the row is left untouched, never murked. A flask in the row is not a
+        // bottle to convert but a fill target (§12): it fills to full with the pass's own output
+        // brew, alongside the bottles, once they have resolved.
         if (batch) {
+            PotionContents fillBrew = null;
+            List<Integer> flaskSlots = null;
             for (int slot = BatchBrew.FIRST_BATCH_SLOT; slot <= BatchBrew.LAST_BATCH_SLOT; slot++) {
                 ItemStack bottle = items.get(slot);
+                if (bottle.getItem() instanceof FlaskItem) {
+                    if (flaskSlots == null) {
+                        flaskSlots = new ArrayList<>();
+                    }
+                    flaskSlots.add(slot);
+                    continue;
+                }
                 RecipeGraph.Conversion conversion =
                         BatchBrew.batchConversion(stand, level, ingredient, bottle, graph, config, true);
                 if (conversion != null) {
-                    items.set(slot, graph.outputOf(conversion, bottle));
+                    ItemStack output = graph.outputOf(conversion, bottle);
+                    items.set(slot, output);
                     produced.put(slot, conversion.id());
+                    if (fillBrew == null) {
+                        fillBrew = output.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+                    }
+                }
+            }
+            // The pass's fill brew is the output the row produced; a flask empty or already holding it
+            // fills to its three-dose cap (a mismatched or full flask is left untouched, never murked).
+            // The owner already discovered that brew — it is what the sibling bottles just resolved to.
+            if (flaskSlots != null && config.enableFlask
+                    && fillBrew != null && !fillBrew.equals(PotionContents.EMPTY)) {
+                for (int slot : flaskSlots) {
+                    ItemStack flask = items.get(slot);
+                    if (FlaskItem.canFill(flask, fillBrew)) {
+                        FlaskItem.fillToFull(flask, fillBrew);
+                    }
                 }
             }
         }
