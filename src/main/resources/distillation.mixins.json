@@ -19,7 +19,8 @@
         "PotionItemMixin",
         "PotionItemPourMixin",
         "PotionItemTooltipMixin",
-        "ThrownPotionMixin"
+        "ThrownPotionMixin",
+        "TippedArrowTooltipMixin"
     ],
     "client": [],
     "injectors": {
