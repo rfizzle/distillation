@@ -305,14 +305,25 @@ tasks.register('verifyDatagenIdempotent') {
     dependsOn 'runDatagen'
     doLast {
         def genDir = file('src/main/generated').absolutePath
+        // The '--' separator is required: without it git parses the path as a revision-or-path,
+        // and aborts with exit 128 ("ambiguous argument") whenever src/main/generated is neither
+        // tracked nor present — which is the steady state while no fabric-datagen entrypoint is
+        // declared. With it, a missing directory is simply an empty pathspec and exits 0.
         def diffResult = providers.exec {
-            commandLine 'git', 'diff', '--exit-code', genDir
+            commandLine 'git', 'diff', '--exit-code', '--', genDir
             ignoreExitValue = true
         }
-        if (diffResult.result.get().exitValue != 0) {
+        // git diff --exit-code uses 1 for "differences found" and reserves other nonzero codes
+        // for git's own failures. Discriminate so a broken git is never reported as datagen drift.
+        def diffExit = diffResult.result.get().exitValue
+        if (diffExit == 1) {
             throw new GradleException(
                     'src/main/generated/ has unstaged changes after runDatagen. ' +
                     'Run ./gradlew runDatagen and commit the results.')
+        } else if (diffExit != 0) {
+            throw new GradleException(
+                    "git diff failed with exit ${diffExit} while checking src/main/generated/:\n" +
+                    diffResult.standardError.asText.get().trim())
         }
         def untrackedOutput = providers.exec {
             commandLine 'git', 'ls-files', '--others', '--exclude-standard', genDir
