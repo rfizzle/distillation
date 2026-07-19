@@ -303,18 +303,44 @@ tasks.register('verifyDatagenIdempotent') {
     description = 'Runs datagen and asserts no tracked diffs or untracked files in src/main/generated/'
     group = 'verification'
     dependsOn 'runDatagen'
+    // Both checks shell out to git against live working-tree state, which Gradle cannot model as
+    // task inputs. Declaring the incompatibility keeps the intent explicit rather than leaving a
+    // hard failure for whoever enables the configuration cache.
+    notCompatibleWithConfigurationCache('shells out to git against live working-tree state')
     doLast {
         def genDir = file('src/main/generated').absolutePath
+        // Fail with an actionable message when git itself cannot run. ignoreExitValue covers a
+        // nonzero exit, not a process that never starts, so an absent binary surfaces here as a
+        // bare process-start exception naming neither datagen nor a remedy.
+        def runGit = { List<String> argv ->
+            try {
+                def out = providers.exec {
+                    commandLine argv
+                    ignoreExitValue = true
+                }
+                // providers.exec is lazy — the process starts on the first result read, so force
+                // it here to keep a failure to start inside this catch rather than at the use site.
+                out.result.get()
+                return out
+            } catch (Exception e) {
+                throw new GradleException(
+                        'verifyDatagenIdempotent needs git on PATH to compare src/main/generated/ ' +
+                        'against the index, and could not run it: ' + e.message, e)
+            }
+        }
+        // Keep git's own diagnostics readable: outside a working tree git falls back toward
+        // --no-index and dumps its full usage text, which would otherwise be inlined wholesale.
+        def firstLines = { String text ->
+            text.trim().readLines().take(5).join('\n')
+        }
         // The '--' separator is required: without it git parses the path as a revision-or-path,
         // and aborts with exit 128 ("ambiguous argument") whenever src/main/generated is neither
         // tracked nor present — which is the steady state while no fabric-datagen entrypoint is
         // declared. With it, a missing directory is simply an empty pathspec and exits 0.
-        def diffResult = providers.exec {
-            commandLine 'git', 'diff', '--exit-code', '--', genDir
-            ignoreExitValue = true
-        }
-        // git diff --exit-code uses 1 for "differences found" and reserves other nonzero codes
-        // for git's own failures. Discriminate so a broken git is never reported as datagen drift.
+        // --quiet implies --exit-code while suppressing the patch body, which nothing here reads.
+        def diffResult = runGit(['git', 'diff', '--quiet', '--', genDir])
+        // git diff --quiet uses 1 for "differences found" and reserves other nonzero codes for
+        // git's own failures. Discriminate so a broken git is never reported as datagen drift.
         def diffExit = diffResult.result.get().exitValue
         if (diffExit == 1) {
             throw new GradleException(
@@ -323,11 +349,17 @@ tasks.register('verifyDatagenIdempotent') {
         } else if (diffExit != 0) {
             throw new GradleException(
                     "git diff failed with exit ${diffExit} while checking src/main/generated/:\n" +
-                    diffResult.standardError.asText.get().trim())
+                    firstLines(diffResult.standardError.asText.get()))
         }
-        def untrackedOutput = providers.exec {
-            commandLine 'git', 'ls-files', '--others', '--exclude-standard', genDir
-            ignoreExitValue = true
+        def untrackedOutput = runGit(['git', 'ls-files', '--others', '--exclude-standard', genDir])
+        // A failing ls-files writes nothing to stdout, so an unchecked exit code would read as
+        // "no untracked files" — a verification task reporting clean because its tool broke.
+        def untrackedExit = untrackedOutput.result.get().exitValue
+        if (untrackedExit != 0) {
+            throw new GradleException(
+                    "git ls-files failed with exit ${untrackedExit} while checking " +
+                    "src/main/generated/:\n" +
+                    firstLines(untrackedOutput.standardError.asText.get()))
         }
         def untracked = untrackedOutput.standardOutput.asText.get().trim()
         if (!untracked.isEmpty()) {
