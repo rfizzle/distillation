@@ -16,6 +16,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +35,18 @@ class ManifestEntrypointTest {
     private static final Path GAMETEST_MANIFEST = Path.of("src/gametest/resources/fabric.mod.json");
     private static final Path GAMETEST_SOURCE_ROOT = Path.of("src/gametest/java");
 
-    /** Matches the gametest annotations, but not an {@code import ...GameTest;} line. */
+    /**
+     * Matches a gametest annotation in declaration position — at the start of a line, modulo
+     * indentation. Anchoring this way skips prose that merely mentions {@code @GameTest} in a
+     * comment or string, which would otherwise add a spurious class to the discovered set and
+     * fail the parity assertion while pointing at a manifest that is actually correct.
+     */
     private static final Pattern GAMETEST_ANNOTATION =
-            Pattern.compile("@GameTest(Generator)?\\b");
+            Pattern.compile("(?m)^\\s*@GameTest(Generator)?\\b");
 
     @Test
     void shippedManifestDeclaresNoGametestEntrypoints() {
-        JsonObject entrypoints = readJson(MAIN_MANIFEST).getAsJsonObject("entrypoints");
+        JsonObject entrypoints = readEntrypoints(MAIN_MANIFEST);
         assertFalse(
                 entrypoints.has("fabric-gametest"),
                 "src/main/resources/fabric.mod.json must not declare fabric-gametest entrypoints — "
@@ -73,7 +79,7 @@ class ManifestEntrypointTest {
     }
 
     private static Set<String> declaredGametestEntrypoints() {
-        JsonObject entrypoints = readJson(GAMETEST_MANIFEST).getAsJsonObject("entrypoints");
+        JsonObject entrypoints = readEntrypoints(GAMETEST_MANIFEST);
         assertTrue(
                 entrypoints.has("fabric-gametest"),
                 GAMETEST_MANIFEST + " must declare the fabric-gametest entrypoints");
@@ -98,8 +104,23 @@ class ManifestEntrypointTest {
     }
 
     private static String toClassName(Path source) {
-        String relative = GAMETEST_SOURCE_ROOT.relativize(source).toString();
-        return relative.substring(0, relative.length() - ".java".length()).replace('/', '.');
+        // Joins the path segments rather than replacing a separator character, so the derived
+        // name is identical on platforms whose Path.toString() is not '/'-separated.
+        Path relative = GAMETEST_SOURCE_ROOT.relativize(source);
+        String className = StreamSupport.stream(relative.spliterator(), false)
+                .map(Path::toString)
+                .collect(Collectors.joining("."));
+        return className.substring(0, className.length() - ".java".length());
+    }
+
+    /**
+     * Reads a manifest's {@code entrypoints} object, asserting its presence first so a renamed or
+     * missing key fails with the offending path rather than an unexplained NPE.
+     */
+    private static JsonObject readEntrypoints(Path path) {
+        JsonObject root = readJson(path);
+        assertTrue(root.has("entrypoints"), path + " has no \"entrypoints\" object");
+        return root.getAsJsonObject("entrypoints");
     }
 
     private static JsonObject readJson(Path path) {
