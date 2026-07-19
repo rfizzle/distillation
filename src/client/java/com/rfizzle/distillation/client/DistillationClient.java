@@ -5,6 +5,7 @@ import com.rfizzle.distillation.brew.Antidotes;
 import com.rfizzle.distillation.client.config.ClientDistillationConfig;
 import com.rfizzle.distillation.client.discovery.ClientDiscoveryState;
 import com.rfizzle.distillation.client.net.ClientPayloadHandlers;
+import com.rfizzle.distillation.compat.viewer.BrewingViewerRefresh;
 import com.rfizzle.distillation.item.DistillationItems;
 import com.rfizzle.distillation.item.FlaskItem;
 import com.rfizzle.distillation.recipe.RecipeGraphs;
@@ -25,6 +26,9 @@ public class DistillationClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientPayloadHandlers.register();
+        // Coalesces the viewer rebuilds the syncs above ask for into one per client tick, so the
+        // config and discovery syncs that land together on join rebuild each viewer once.
+        BrewingViewerRefresh.register();
         // The half-empty bottle render (SPEC §4): a model-override predicate on the vanilla potion,
         // 1 when the stack carries the draught marker. The vanilla potion tint (keyed on item
         // identity) still colors the liquid layer, so no ItemColor of our own is needed.

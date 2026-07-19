@@ -29,7 +29,7 @@ public final class ClientPayloadHandlers {
                     context.client().execute(() -> {
                         ClientDistillationConfig.setServerConfig(synced);
                         // A config change can add or drop §2/§5/§6 lines from the graph — rebuild viewers.
-                        BrewingViewerRefresh.refreshViewers();
+                        BrewingViewerRefresh.requestRefresh();
                     });
                 });
         ClientPlayNetworking.registerGlobalReceiver(DiscoverySyncPayload.TYPE,
@@ -40,7 +40,7 @@ public final class ClientPayloadHandlers {
                         ClientDiscoveryState.addAll(payload.recipeIds());
                     }
                     // A new discovery unhides its conversion in the (filtered) recipe viewers.
-                    BrewingViewerRefresh.refreshViewers();
+                    BrewingViewerRefresh.requestRefresh();
                 }));
     }
 }
