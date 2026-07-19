@@ -182,11 +182,6 @@ loom {
             vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
             vmArg "-Dfabric-api.datagen.modid=distillation"
             runDir "build/datagen"
-            // fabric-gametest-api's initializer eagerly instantiates every `fabric-gametest`
-            // entrypoint class on any server launch, so the datagen server needs the gametest source
-            // set on its classpath or it crashes with ClassNotFoundException before generating. The
-            // gametests only *register* here (they run under -Dfabric-api.gametest, which datagen omits).
-            source sourceSets.gametest
         }
         gametest {
             server()
@@ -284,6 +279,15 @@ configurations.testRuntimeClasspath {
 
 test {
     useJUnitPlatform()
+    // ManifestEntrypointTest reads the gametest sources and the shipped manifest off disk at
+    // runtime, which Gradle cannot infer. Declaring them as inputs keeps a gametest-only change
+    // from leaving this task UP-TO-DATE and skipping the entrypoint parity guard.
+    inputs.files(sourceSets.gametest.allSource)
+            .withPropertyName('gametestSources')
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file('src/main/resources/fabric.mod.json')
+            .withPropertyName('shippedManifest')
+            .withPathSensitivity(PathSensitivity.RELATIVE)
     finalizedBy jacocoTestReport
 }
 
@@ -326,6 +330,10 @@ tasks.register('verifyDatagenIdempotent') {
 processResources {
     inputs.property "version", project.version
 
+    // Scoped to the main source set: the gametest source set gets its own
+    // processGametestResources task with no expand filter, so a "${version}" placeholder in
+    // src/gametest/resources/fabric.mod.json would reach the loader as that literal string and
+    // fail semver parsing. That manifest hardcodes its version instead.
     filesMatching("fabric.mod.json") {
         expand "version": project.version
     }
