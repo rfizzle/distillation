@@ -69,6 +69,22 @@ class ManifestEntrypointTest {
     }
 
     @Test
+    void gametestManifestDependsOnlyOnTheMainMod() {
+        JsonObject root = readJson(GAMETEST_MANIFEST);
+        assertTrue(root.has("depends"), GAMETEST_MANIFEST + " has no \"depends\" object");
+        Set<String> depends = new TreeSet<>(root.getAsJsonObject("depends").keySet());
+
+        assertEquals(
+                Set.of("distillation"),
+                depends,
+                GAMETEST_MANIFEST + " must depend on the main mod alone. The loader, Minecraft, "
+                        + "Java, and Fabric API floors are enforced transitively — this mod cannot "
+                        + "load unless distillation did, and distillation declares them itself. "
+                        + "Restating them here makes every toolchain bump a two-file edit, where "
+                        + "the missed one fails only under runGametest as a confusing load error.");
+    }
+
+    @Test
     void everyDeclaredGametestEntrypointHasASourceFile() {
         for (String className : declaredGametestEntrypoints()) {
             Path source = GAMETEST_SOURCE_ROOT.resolve(className.replace('.', '/') + ".java");
