@@ -18,8 +18,8 @@ stand teaches its own recipes, brews the effects vanilla shipped without one,
 scales known recipes to six bottles, and makes curing a decision instead of a
 bucket of milk.
 
-**In development.** The design and full behavioral spec are committed and
-features are being built against them; this page describes the first release.
+**Not yet released.** The mod is implemented against its committed design and
+behavioral spec; this page describes the first release.
 
 ## At a glance
 

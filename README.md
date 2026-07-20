@@ -15,8 +15,9 @@
 Distillation makes brewing a system you learn by playing. The stand teaches its
 own recipes through vapor hints and failures that name a working ingredient;
 the vanilla effects that shipped without recipes become brewable; a heated
-cauldron brews six bottles at once; utility potions get honest durations with
-half-drinkable draughts; and antidotes cure one affliction at a time.
+cauldron scales a recipe you have learned to six bottles at once; utility
+potions get honest durations with half-drinkable draughts; and antidotes cure
+one affliction at a time.
 
 The full player-experience promise lives in
 [`design/VISION.md`](design/VISION.md) and the behavioral contract in

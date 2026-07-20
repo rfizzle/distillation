@@ -14,9 +14,9 @@
   },
   "sections": [
     {
-      "title": "In Development",
+      "title": "Not Yet Released",
       "band": true,
-      "lede": "Distillation is fully designed and specced — implementation is underway. Nothing is released yet; everything below describes the design.",
+      "lede": "Distillation is implemented against its spec. Nothing is released yet; there is no download today.",
       "blocks": [
         {
           "type": "cards",
