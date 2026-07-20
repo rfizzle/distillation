@@ -13,7 +13,7 @@
           "items": [
             {
               "q": "Is Distillation released?",
-              "a": "Not yet — the repo is in development. The full design and behavioral spec are committed (<code>design/VISION.md</code> and <code>design/SPEC.md</code> on GitHub) and features are being built against them. This site describes the first release."
+              "a": "Not yet — no version has been tagged or published. The mod is implemented against its committed design and behavioral spec (<code>design/VISION.md</code> and <code>design/SPEC.md</code> on GitHub). This site describes the first release."
             },
             {
               "q": "Does it break the brewing I already know?",

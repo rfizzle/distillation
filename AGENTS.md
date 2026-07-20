@@ -13,14 +13,14 @@ shipped without them, six-bottle batch brewing over a heated cauldron, honest
 utility durations with half-drinkable draughts, an extended-and-amplified
 premium path, targeted antidotes, and rebalanced splash/lingering potions.
 
-**The repo is in the design phase: the Gradle skeleton builds and launches,
-but no feature code exists yet.** The player promise is
-[`design/VISION.md`](design/VISION.md), the behavioral contract is
-[`design/SPEC.md`](design/SPEC.md), and the brand is
-[`design/DESIGN.md`](design/DESIGN.md). Implementation follows the spec — an
-implementer builds from it, and a reviewer calls divergence a bug. Work is
-tracked in GitHub Issues — see the
-[Development lifecycle](#development-lifecycle) section below.
+Feature code covering the spec lives in `src/main/java` and `src/client/java`,
+with unit tests in `src/test/java` and in-world coverage in `src/gametest`.
+There is no released version yet — the `v*` tag that would cut one has not been
+pushed. The player promise is [`design/VISION.md`](design/VISION.md), the
+behavioral contract is [`design/SPEC.md`](design/SPEC.md), and the brand is
+[`design/DESIGN.md`](design/DESIGN.md). The implementation conforms to the
+spec, and a reviewer calls divergence a bug. Work is tracked in GitHub
+Issues — see the [Development lifecycle](#development-lifecycle) section below.
 
 ## Suite standards (Concord)
 
@@ -48,7 +48,7 @@ before running any Gradle command.
 
 ## Key conventions
 
-Standing rules that apply from the first code commit:
+Standing rules for every change in this repository:
 
 - **Mod ID:** `distillation` — use `Distillation.id("path")` to create
   `ResourceLocation`s. Never construct `ResourceLocation` directly with the
@@ -78,7 +78,7 @@ Standing rules that apply from the first code commit:
 
 | Path | Purpose |
 |---|---|
-| `README.md` | What is shipped today (currently: the design pointer). |
+| `README.md` | The mod at a glance — what it does and its release status. |
 | `design/VISION.md` | The player-experience promise — written for players. |
 | `design/SPEC.md` | The behavioral contract — every rule, number, and edge case. |
 | `design/DESIGN.md` | Brand: motif, palette, logo, HUD decision. |
