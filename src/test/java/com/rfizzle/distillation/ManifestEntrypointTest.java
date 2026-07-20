@@ -28,12 +28,21 @@ import org.junit.jupiter.api.Test;
  * crashes any other server launch (runServer, runDatagen) with ClassNotFoundException. The
  * entrypoints therefore live in {@code src/gametest/resources/fabric.mod.json} under a separate
  * mod id, which exists only where the classes do.
+ *
+ * <p>That split makes the shipped manifest the single declaration of the loader, Minecraft, Java,
+ * and Fabric API floors, since the gametest manifest inherits them transitively through its
+ * dependency on the main mod. The {@code depends} assertions below hold both halves of that
+ * arrangement in place: the floors stay declared once, and they stay declared where they are.
  */
 class ManifestEntrypointTest {
 
     private static final Path MAIN_MANIFEST = Path.of("src/main/resources/fabric.mod.json");
     private static final Path GAMETEST_MANIFEST = Path.of("src/gametest/resources/fabric.mod.json");
     private static final Path GAMETEST_SOURCE_ROOT = Path.of("src/gametest/java");
+
+    /** The dependency floors the shipped manifest is the sole declaration of. */
+    private static final Set<String> REQUIRED_FLOORS =
+            Set.of("fabricloader", "minecraft", "java", "fabric-api");
 
     /**
      * Matches a gametest annotation in declaration position — at the start of a line, modulo
@@ -68,15 +77,34 @@ class ManifestEntrypointTest {
                         + "the gametest server at startup.");
     }
 
+    /**
+     * Asserts the presence of the floor keys, never their version strings. The values move on
+     * every toolchain bump — they are pinned suite-wide in concord's
+     * {@code versions-common.properties} — so restating them here would make every bump a
+     * two-file edit, with the missed one caught by nothing.
+     */
+    @Test
+    void shippedManifestDeclaresItsDependencyFloors() {
+        Set<String> depends = declaredDependencies(MAIN_MANIFEST);
+
+        // Collected rather than asserted one at a time, so a thinned block names every floor it
+        // dropped instead of reporting only the first.
+        Set<String> missing = new TreeSet<>(REQUIRED_FLOORS);
+        missing.removeAll(depends);
+
+        assertTrue(
+                missing.isEmpty(),
+                MAIN_MANIFEST + " must declare its dependency floors, and is missing " + missing
+                        + ". This is the only manifest that declares them: the gametest manifest "
+                        + "depends on the main mod alone and inherits them transitively, so a "
+                        + "floor dropped here is a floor the mod enforces nowhere.");
+    }
+
     @Test
     void gametestManifestDependsOnlyOnTheMainMod() {
-        JsonObject root = readJson(GAMETEST_MANIFEST);
-        assertTrue(root.has("depends"), GAMETEST_MANIFEST + " has no \"depends\" object");
-        Set<String> depends = new TreeSet<>(root.getAsJsonObject("depends").keySet());
-
         assertEquals(
                 Set.of("distillation"),
-                depends,
+                declaredDependencies(GAMETEST_MANIFEST),
                 GAMETEST_MANIFEST + " must depend on the main mod alone. The loader, Minecraft, "
                         + "Java, and Fabric API floors are enforced transitively — this mod cannot "
                         + "load unless distillation did, and distillation declares them itself. "
@@ -127,6 +155,18 @@ class ManifestEntrypointTest {
                 .map(Path::toString)
                 .collect(Collectors.joining("."));
         return className.substring(0, className.length() - ".java".length());
+    }
+
+    /**
+     * Reads a manifest's declared dependency ids, asserting the shape of {@code depends} first so
+     * a renamed key or a block edited to the wrong JSON type fails with the offending path rather
+     * than an unexplained NPE or a bare "Not a JSON Object".
+     */
+    private static Set<String> declaredDependencies(Path path) {
+        JsonObject root = readJson(path);
+        assertTrue(root.has("depends"), path + " has no \"depends\" object");
+        assertTrue(root.get("depends").isJsonObject(), path + " has a non-object \"depends\"");
+        return new TreeSet<>(root.getAsJsonObject("depends").keySet());
     }
 
     /**
