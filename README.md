@@ -12,8 +12,18 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue"></a>
 </p>
 
-Distillation is in design. The player-experience promise lives in
-[`design/VISION.md`](design/VISION.md); this page will describe features as they ship.
+Distillation makes brewing a system you learn by playing. The stand teaches its
+own recipes through vapor hints and failures that name a working ingredient;
+the vanilla effects that shipped without recipes become brewable; a heated
+cauldron brews six bottles at once; utility potions get honest durations with
+half-drinkable draughts; and antidotes cure one affliction at a time.
+
+The full player-experience promise lives in
+[`design/VISION.md`](design/VISION.md) and the behavioral contract in
+[`design/SPEC.md`](design/SPEC.md).
+
+**No version has been released yet.** The mod is implemented against the spec
+but has not been tagged or published; there is nothing to download today.
 
 ---
 
