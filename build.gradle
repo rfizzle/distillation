@@ -300,10 +300,10 @@ jacocoTestReport {
 }
 
 tasks.register('verifyDatagenIdempotent') {
-    description = 'Runs datagen and asserts no tracked diffs or untracked files in src/main/generated/'
+    description = 'Runs datagen and asserts git reports no changes in src/main/generated/'
     group = 'verification'
     dependsOn 'runDatagen'
-    // Both checks shell out to git against live working-tree state, which Gradle cannot model as
+    // The check shells out to git against live working-tree state, which Gradle cannot model as
     // task inputs. Declaring the incompatibility keeps the intent explicit rather than leaving a
     // hard failure for whoever enables the configuration cache.
     notCompatibleWithConfigurationCache('shells out to git against live working-tree state')
@@ -324,47 +324,41 @@ tasks.register('verifyDatagenIdempotent') {
                 return out
             } catch (Exception e) {
                 throw new GradleException(
-                        'verifyDatagenIdempotent needs git on PATH to compare src/main/generated/ ' +
-                        'against the index, and could not run it: ' + e.message, e)
+                        'verifyDatagenIdempotent needs git on PATH to inspect src/main/generated/, ' +
+                        'and could not run it: ' + e.message, e)
             }
         }
-        // Keep git's own diagnostics readable: outside a working tree git falls back toward
-        // --no-index and dumps its full usage text, which would otherwise be inlined wholesale.
+        // Keep both git outputs readable, and say so when truncating: a run that rewrites a large
+        // provider's output lists hundreds of files, and git's own diagnostics are unbounded too.
         def firstLines = { String text ->
-            text.trim().readLines().take(5).join('\n')
+            def lines = text.trim().readLines()
+            lines.size() > 5 ? lines.take(5).join('\n') + "\n… (${lines.size()} lines total)"
+                             : lines.join('\n')
         }
         // The '--' separator is required: without it git parses the path as a revision-or-path,
         // and aborts with exit 128 ("ambiguous argument") whenever src/main/generated is neither
         // tracked nor present — which is the steady state while no fabric-datagen entrypoint is
         // declared. With it, a missing directory is simply an empty pathspec and exits 0.
-        // --quiet implies --exit-code while suppressing the patch body, which nothing here reads.
-        def diffResult = runGit(['git', 'diff', '--quiet', '--', genDir])
-        // git diff --quiet uses 1 for "differences found" and reserves other nonzero codes for
-        // git's own failures. Discriminate so a broken git is never reported as datagen drift.
-        def diffExit = diffResult.result.get().exitValue
-        if (diffExit == 1) {
+        //
+        // --porcelain reports all three drift shapes in one machine-readable listing: staged
+        // ('M '), unstaged (' M'), and untracked ('??'). A git diff check sees only the
+        // worktree-versus-index delta, so drift that has been git add-ed slips past it while
+        // staying invisible to ls-files --others as well — a verification task passing on real
+        // drift. Reading stdout also frees every nonzero exit to mean git itself failed, and
+        // unlike 'git diff HEAD' this works in a repository with no commits yet.
+        def statusResult = runGit(['git', 'status', '--porcelain', '--', genDir])
+        // A failing git writes nothing to stdout, so an unchecked exit code would read as
+        // "no changes" — a verification task reporting clean because its tool broke.
+        def statusExit = statusResult.result.get().exitValue
+        if (statusExit != 0) {
             throw new GradleException(
-                    'src/main/generated/ has unstaged changes after runDatagen. ' +
-                    'Run ./gradlew runDatagen and commit the results.')
-        } else if (diffExit != 0) {
-            throw new GradleException(
-                    "git diff failed with exit ${diffExit} while checking src/main/generated/:\n" +
-                    firstLines(diffResult.standardError.asText.get()))
+                    "git status failed with exit ${statusExit} while checking src/main/generated/:\n" +
+                    firstLines(statusResult.standardError.asText.get()))
         }
-        def untrackedOutput = runGit(['git', 'ls-files', '--others', '--exclude-standard', genDir])
-        // A failing ls-files writes nothing to stdout, so an unchecked exit code would read as
-        // "no untracked files" — a verification task reporting clean because its tool broke.
-        def untrackedExit = untrackedOutput.result.get().exitValue
-        if (untrackedExit != 0) {
+        def dirty = statusResult.standardOutput.asText.get().trim()
+        if (!dirty.isEmpty()) {
             throw new GradleException(
-                    "git ls-files failed with exit ${untrackedExit} while checking " +
-                    "src/main/generated/:\n" +
-                    firstLines(untrackedOutput.standardError.asText.get()))
-        }
-        def untracked = untrackedOutput.standardOutput.asText.get().trim()
-        if (!untracked.isEmpty()) {
-            throw new GradleException(
-                    'src/main/generated/ has untracked files after runDatagen:\n' + untracked +
+                    'src/main/generated/ changed after runDatagen:\n' + firstLines(dirty) +
                     '\nRun ./gradlew runDatagen, then git add and commit the results.')
         }
     }
