@@ -299,6 +299,61 @@ jacocoTestReport {
     }
 }
 
+// Attach the JaCoCo agent to the gametest server so code only exercised in-game
+// (brew completion, batch stands, commands, registration) counts toward coverage. The
+// includes filter keeps the agent from instrumenting Minecraft/Fabric classes.
+// Matched lazily for the same reason as the onlyIf guard above: Loom registers
+// runGametest during afterEvaluate, so it cannot be resolved by name here.
+tasks.matching { it.name == 'runGametest' }.configureEach {
+    jacoco.applyTo(it)
+    it.jacoco.destinationFile = layout.buildDirectory.file('jacoco/runGametest.exec').get().asFile
+    it.jacoco.includes = ['com.rfizzle.distillation.*']
+}
+
+// Single source of coverage truth: unit tests + gametests merged over src/main.
+// jacocoTestReport covers the test task alone, which reads every gametest-only line
+// as a miss — read per-package coverage from this report, never from that one.
+tasks.register('jacocoMergedReport', JacocoReport) {
+    description = 'Merges unit-test and gametest execution data into one coverage report'
+    group = 'verification'
+    // The report reads compileJava/processResources output, so it must depend on them —
+    // without this, any invocation that compiles without also scheduling a test task
+    // (e.g. `gradlew jar jacocoMergedReport`) fails Gradle's implicit-dependency validation.
+    dependsOn tasks.named('classes')
+    // Ordering only — not dependsOn, so the report can run from existing exec data
+    // without forcing a gametest server spin-up.
+    mustRunAfter test, tasks.matching { it.name == 'runGametest' }
+    // fileTree only picks up exec files that exist, so the report still runs when
+    // one of the two sweeps hasn't.
+    executionData fileTree(layout.buildDirectory.dir('jacoco')) {
+        include 'test.exec', 'runGametest.exec'
+    }
+    // A sweep that never ran leaves its exec file absent, and one that was interrupted
+    // leaves it empty — Gradle deletes the file before the run and the agent only dumps
+    // at JVM exit. Either way the result is a partial number under the "merged" label
+    // with no indication, so say so.
+    doFirst {
+        ['test.exec', 'runGametest.exec'].each { name ->
+            def execFile = layout.buildDirectory.file("jacoco/${name}").get().asFile
+            if (!execFile.exists() || execFile.length() == 0) {
+                logger.warn("jacocoMergedReport: ${name} is missing or empty — this report is NOT merged coverage")
+            }
+        }
+    }
+    sourceSets sourceSets.main
+    // Mixin bodies execute inside the transformed vanilla classes, so the agent can
+    // never attribute coverage to the mixin class files — excluding them keeps the
+    // denominator honest. What branching does live in a mixin body (the brewing-stand
+    // takeover dispatch) is covered indirectly through the handlers it delegates to.
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: ['com/rfizzle/distillation/mixin/**'])
+    }))
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
 tasks.register('verifyDatagenIdempotent') {
     description = 'Runs datagen and asserts git reports no changes in src/main/generated/'
     group = 'verification'
