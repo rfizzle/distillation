@@ -44,6 +44,8 @@ before running any Gradle command.
 - `make build` — compile, run unit tests, assemble the jar
 - `make test` — JUnit only
 - `./gradlew runGametest` — the Fabric gametest server
+- `make coverage` — unit tests + gametests, merged JaCoCo report (the mod's real
+  coverage number; `build/reports/jacoco/test/` is unit-tests-only)
 - `make run-client` / `make run-server` — dev launches
 
 ## Key conventions
