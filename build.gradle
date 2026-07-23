@@ -308,6 +308,11 @@ tasks.matching { it.name == 'runGametest' }.configureEach {
     jacoco.applyTo(it)
     it.jacoco.destinationFile = layout.buildDirectory.file('jacoco/runGametest.exec').get().asFile
     it.jacoco.includes = ['com.rfizzle.distillation.*']
+    // The agent's exec file is an @OutputFile, which would otherwise make this
+    // JavaExec up-to-date-checkable and silently skip the whole in-world suite on
+    // a repeat run — re-emitting the previous coverage number as if it were fresh.
+    // A gametest sweep must always execute.
+    it.outputs.upToDateWhen { false }
 }
 
 // Single source of coverage truth: unit tests + gametests merged over src/main.
