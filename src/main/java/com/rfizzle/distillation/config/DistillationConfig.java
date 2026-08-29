@@ -226,25 +226,42 @@ public class DistillationConfig {
         lingeringCloudRadius = clampFloatRange("lingeringCloudRadius", lingeringCloudRadius, 3.0f, 6.0f);
     }
 
+    /**
+     * A closed integer range. Gson rejects a non-finite token into an {@code int} before any clamp
+     * runs, so the ordering comparisons alone are sound here.
+     *
+     * <p>The message names the bounds, not just the substituted value: a player who typed 12 into a
+     * 2–6 field learns what the field accepts from the log, rather than only that their number went
+     * away.
+     */
     private static int clampIntRange(String name, int value, int min, int max) {
         if (value < min) {
-            Distillation.LOGGER.warn("clamped {} from {} to {}", name, value, min);
+            Distillation.LOGGER.warn("{} must be in [{}, {}], got {}; clamped to {}", name, min, max, value, min);
             return min;
         }
         if (value > max) {
-            Distillation.LOGGER.warn("clamped {} from {} to {}", name, value, max);
+            Distillation.LOGGER.warn("{} must be in [{}, {}], got {}; clamped to {}", name, min, max, value, max);
             return max;
         }
         return value;
     }
 
+    /**
+     * A closed floating-point range, and the reason every float field here has a finite ceiling.
+     * Gson yields a non-finite float from a bare {@code NaN} or {@code Infinity} token, from their
+     * quoted forms, and from any legal-JSON overflow like {@code 1e400}. The negated lower bound
+     * folds {@code NaN} into the underflow branch — {@code NaN} is false against every ordering
+     * comparison, so {@code value < min} would pass it straight through — and the finite {@code max}
+     * catches {@code +Infinity}, which satisfies every lower bound. An open-topped helper would need
+     * an explicit {@code isFinite} gate; this one does not.
+     */
     private static float clampFloatRange(String name, float value, float min, float max) {
         if (!(value >= min)) { // also catches NaN
-            Distillation.LOGGER.warn("clamped {} from {} to {}", name, value, min);
+            Distillation.LOGGER.warn("{} must be in [{}, {}], got {}; clamped to {}", name, min, max, value, min);
             return min;
         }
         if (value > max) {
-            Distillation.LOGGER.warn("clamped {} from {} to {}", name, value, max);
+            Distillation.LOGGER.warn("{} must be in [{}, {}], got {}; clamped to {}", name, min, max, value, max);
             return max;
         }
         return value;
