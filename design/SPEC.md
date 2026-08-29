@@ -47,7 +47,7 @@ With `enableMurkyDraughts=false`, invalid pairs simply do not brew (the bottle p
 ### Behavior — Discovery & the Recipes Page
 
 1. When a player **removes a brewed output** from a bottle slot, the conversion that produced it is recorded in that player's persistent discovery set. First-time discovery shows the ✦ toast (action bar): *"✦ Recipe learned: Potion of Resistance"* and plays the discovery chime (Sound Design).
-2. The stand screen carries a **recipes page button** (a small bottle-glyph tab, top-right of the panel). It opens a paged overlay listing every discovered conversion as `input + ingredient → output`, in discovery order, with page arrows and a running count (`23 / 61`). At full discovery the count renders gilded with the discovery marker (`✦ 61 / 61`). It is a screen overlay, not a HUD surface.
+2. The stand screen carries a **recipes page button** (a small bottle-glyph tab, top-right of the panel). It opens a paged overlay listing every discovered conversion as `input + ingredient → output`, in discovery order, with page arrows and a running count (`23 / 61`). At full discovery the count renders gilded (`61 / 61`). It is a screen overlay, not a HUD surface.
 3. Discovery is permanent: it survives death, relog, and dimension change. `/distillation forget` (Commands) is the only removal.
 4. With `startDiscovered=true`, every player's set starts (and joins) complete — for servers of veterans.
 
@@ -684,7 +684,7 @@ Distillation ships **no HUD element**. The slot decision and reasoning live in `
 
 ### Manual Testing
 
-- Vapor hint tinting (single and blended outputs), tooltip gating on discovery, recipes page paging and count, the gilded `✦` count at full discovery
+- Vapor hint tinting (single and blended outputs), tooltip gating on discovery, recipes page paging and count, the gilded count at full discovery
 - Half-bottle, murky, antidote, and concentrated item rendering; recipe-viewer filtering with and without `recipeViewerShowsUndiscovered`
 - The two custom cues at vanilla loudness beside stand foley; subtitles
 - Batch row appearing/ejecting as the rig is built/broken; Jade/WTHIT lines
