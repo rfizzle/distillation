@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit
+
 plugins {
     id 'fabric-loom' version "${loom_version}"
     id 'jacoco'
@@ -58,7 +60,20 @@ def runGitDescribe(String tagPrefix) {
                 .directory(rootDir)
                 .redirectErrorStream(true)
                 .start()
-        proc.waitFor()
+        // Bounded, never a bare waitFor(): this runs in the configuration phase, so a
+        // hung git wedges every task in the build, not just the version computation.
+        // Git does hang — a stale index.lock from a killed process, an unresponsive
+        // network filesystem, a credential helper waiting on a prompt with no terminal.
+        def finished = proc.waitFor(10, TimeUnit.SECONDS)
+        if (!finished) {
+            // destroyForcibly so the orphaned git process cannot outlive the daemon.
+            proc.destroyForcibly()
+            // Degrading to the mod_version base is right; doing it silently is not. On a
+            // machine where git is merely slow, every invocation pays the full ten seconds
+            // and then produces a jar versioned from the base with nothing in the log.
+            logger.warn('git describe timed out after 10s — version falls back to the mod_version base')
+            return null
+        }
         def out = proc.inputStream.text.trim()
         if (proc.exitValue() != 0) return null
         return out
@@ -108,7 +123,12 @@ repositories {
     }
     // GitHub Releases — resolves sibling Concord mods straight from their release jars while
     // their Modrinth projects are not publicly resolvable. Artifact-only (no metadata), scoped
-    // to the rfizzle org so it never shadows a real Maven group.
+    // to the rfizzle org so it never shadows a real Maven group. This is the resolution path
+    // API-STANDARD §4 prescribes for a `modCompileOnly "rfizzle:<sibling>:<version>"` line;
+    // Distillation currently declares none — its sibling story runs the other way, through
+    // DistillationAPI.registerAntidote, which a sibling calls without Distillation ever
+    // compiling against it — so nothing resolves through here today. Kept because the group
+    // filter means it is never queried, and because re-deriving it is the expensive part.
     ivy {
         name = 'GitHubReleases'
         url = 'https://github.com'
@@ -252,12 +272,6 @@ dependencies {
         transitive = false
     }
 
-    // Tribulation — sibling Concord mod; soft dependency for the shard-debuff antidote lines.
-    // Compile-only against its api package behind isModLoaded guards, never bundled. Resolved
-    // from the GitHub release jar (GitHubReleases ivy repo) because the Modrinth project is not
-    // publicly resolvable; swap to maven.modrinth once it is.
-    modCompileOnly "rfizzle:tribulation:${project.tribulation_version}"
-
     // Tests
     testImplementation platform("org.junit:junit-bom:${project.junit_version}")
     testImplementation "org.junit.jupiter:junit-jupiter"
@@ -336,13 +350,19 @@ tasks.register('jacocoMergedReport', JacocoReport) {
     }
     // A sweep that never ran leaves its exec file absent, and one that was interrupted
     // leaves it empty — Gradle deletes the file before the run and the agent only dumps
-    // at JVM exit. Either way the result is a partial number under the "merged" label
-    // with no indication, so say so.
+    // at JVM exit. A sweep that ran before the last recompile is worse: JaCoCo matches
+    // execution data by class ID, so a stale exec contributes nothing and its classes
+    // read 0% rather than failing. Every one of those is a partial number under the
+    // "merged" label with no indication, so say so.
     doFirst {
+        def newestClass = classDirectories.asFileTree.files*.lastModified().max() ?: 0L
         ['test.exec', 'runGametest.exec'].each { name ->
             def execFile = layout.buildDirectory.file("jacoco/${name}").get().asFile
             if (!execFile.exists() || execFile.length() == 0) {
                 logger.warn("jacocoMergedReport: ${name} is missing or empty — this report is NOT merged coverage")
+            } else if (execFile.lastModified() < newestClass) {
+                logger.warn("jacocoMergedReport: ${name} predates the compiled classes — anything recompiled " +
+                        'since that sweep reads 0%; re-run `make coverage`')
             }
         }
     }
