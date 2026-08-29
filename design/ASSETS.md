@@ -34,7 +34,7 @@
 | Asset | `.sfx` source | Final asset |
 |---|---|---|
 | Discovery chime | `art/audio/recipe_learned.sfx` | `assets/distillation/sounds/ui/recipe_learned.ogg` |
-| Murky fizzle | `art/audio/murky_fizzle.sfx` | `assets/distillation/sounds/block/brewing_stand/murky.ogg` |
+| Murky fizzle | `art/audio/murky.sfx` | `assets/distillation/sounds/block/brewing_stand/murky.ogg` |
 
 ## Not yet created
 

@@ -631,7 +631,7 @@ All user-facing text uses translation keys in `assets/distillation/lang/en_us.js
 
 | Pattern | Example | Used for |
 |---|---|---|
-| `config.distillation.*` (+ `.tooltip`) | `config.distillation.enable_batch_brewing` | Cloth Config labels and descriptions |
+| `config.distillation.*` (+ `.tooltip`) | `config.distillation.enableBatchBrewing` | Cloth Config labels and descriptions |
 | `command.distillation.*` | `command.distillation.rig.not_rigged` | Command feedback |
 | `notification.distillation.*` | `notification.distillation.recipe_learned` | The ✦ discovery toast (marker inside the localized value) |
 | `tooltip.distillation.*` | `tooltip.distillation.murky.hint` | Murky hint line, draught "(Half)" lines, Concentrated tag, Jade/WTHIT lines |
