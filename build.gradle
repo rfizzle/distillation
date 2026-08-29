@@ -279,14 +279,15 @@ configurations.testRuntimeClasspath {
 
 test {
     useJUnitPlatform()
-    // ManifestEntrypointTest reads the gametest sources and the shipped manifest off disk at
-    // runtime, which Gradle cannot infer. Declaring them as inputs keeps a gametest-only change
-    // from leaving this task UP-TO-DATE and skipping the entrypoint parity guard.
-    inputs.files(sourceSets.gametest.allSource)
-            .withPropertyName('gametestSources')
-            .withPathSensitivity(PathSensitivity.RELATIVE)
-    inputs.file('src/main/resources/fabric.mod.json')
-            .withPropertyName('shippedManifest')
+    // GametestRegistrationTest reads the gametest source tree and both manifests off disk at
+    // runtime. Gradle sees no dependency between the test task and a source tree it never
+    // compiles, so without this block the guard reports UP-TO-DATE exactly when registration has
+    // drifted. The shipped manifest also arrives transitively through processResources, so listing
+    // it is not a live staleness hole — it is here so the block reads as "what this guard reads".
+    inputs.files(fileTree('src/gametest/java'),
+                 file('src/gametest/resources/fabric.mod.json'),
+                 file('src/main/resources/fabric.mod.json'))
+            .withPropertyName('gametestRegistration')
             .withPathSensitivity(PathSensitivity.RELATIVE)
     finalizedBy jacocoTestReport
 }

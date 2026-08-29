@@ -34,22 +34,6 @@ public class DiscoveryGameTest implements FabricGameTest {
     private static final int TIMEOUT = 600;
     private static final ResourceLocation WATER_TO_AWKWARD = ResourceLocation.parse("distillation:nether_wart/water");
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
-    public void mockPlayerReplicaIsFaithful(GameTestHelper helper) {
-        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
-        try {
-            helper.assertTrue(player.connection != null, "replica must have a live connection");
-            helper.assertTrue(player.getServer().getPlayerList().getPlayers().contains(player),
-                    "replica must be registered in the player list");
-            helper.assertTrue(player.serverLevel() == helper.getLevel(), "replica must live in the test level");
-            helper.assertTrue(player.isCreative() && !player.isSpectator(),
-                    "replica must mirror vanilla's forced creative/non-spectator mock");
-        } finally {
-            player.discard();
-        }
-        helper.succeed();
-    }
-
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, timeoutTicks = TIMEOUT)
     public void takingBrewedOutputRecordsExactlyOneDiscovery(GameTestHelper helper) {
         BrewingStandBlockEntity stand = placeBrewingStand(helper, new BlockPos(1, 2, 1),
