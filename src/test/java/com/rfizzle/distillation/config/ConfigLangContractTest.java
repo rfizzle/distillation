@@ -13,15 +13,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tier 1 — the config lang contract: every {@link DistillationConfig} key (server and client) has a
- * {@code config.distillation.<snake_case>} label and a non-blank {@code .tooltip}, plus the screen
+ * Tier 1 — the config lang contract: every {@link DistillationConfig} field (server and client) has a
+ * {@code config.distillation.<fieldName>} label and a non-blank {@code .tooltip}, plus the screen
  * title and both category headers, so the Cloth screen never renders a raw translation key. The key
  * roster is derived from the POJO by reflection, so a field added without its lang pair fails here
  * instead of in-game.
+ *
+ * <p>The label key <em>is</em> the Java field name, verbatim. DESIGN-SYSTEM §10's casing table rules
+ * casing by surface rather than globally, and puts {@code config.<mod>.<field>} labels and their
+ * {@code .tooltip} pairs in camelCase on exactly this basis: "the key mirrors the Java config field
+ * it labels, so field and key stay mechanically aligned". Deriving the key by identity rather than
+ * by a snake_case transform is what makes that alignment mechanical instead of a convention someone
+ * has to remember — a renamed field now fails here by construction.
+ *
+ * <p>{@code config.<mod>.category.<name>} stays snake_case (a category names a section, not a
+ * field), which is why the categories are asserted separately below.
  */
 class ConfigLangContractTest {
 
@@ -46,17 +57,13 @@ class ConfigLangContractTest {
             if (Modifier.isStatic(field.getModifiers())) continue;
             String name = field.getName();
             if (name.equals("configVersion") || name.equals("client")) continue;
-            keys.add(toSnakeCase(name));
+            keys.add(name);
         }
         for (Field field : DistillationConfig.Client.class.getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) continue;
-            keys.add(toSnakeCase(field.getName()));
+            keys.add(field.getName());
         }
         return keys;
-    }
-
-    private static String toSnakeCase(String camel) {
-        return camel.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toLowerCase();
     }
 
     @Test
@@ -108,5 +115,36 @@ class ConfigLangContractTest {
         }
         assertTrue(orphaned.isEmpty(),
                 "config lang keys with no matching DistillationConfig field (renamed or removed?): " + orphaned);
+    }
+
+    /**
+     * The §10 casing rule, stated directly rather than left implicit in the identity mapping above.
+     * A field label reintroduced in snake_case would still fail {@code everyConfigKeyHasLabelAndTooltip}
+     * — but as "missing key", which points at the wrong problem. This names it.
+     */
+    @Test
+    void fieldLabelsAreCamelCaseAndCategoriesAreSnakeCase() {
+        JsonObject lang = lang();
+        List<String> wrongCase = new ArrayList<>();
+        for (String langKey : lang.keySet()) {
+            if (!langKey.startsWith(PREFIX)) continue;
+            String remainder = langKey.substring(PREFIX.length());
+            if (remainder.equals("title")) continue;
+            if (remainder.startsWith("category.")) {
+                // A category names a section, not a field — snake_case, and never camelCase.
+                if (!remainder.equals(remainder.toLowerCase(Locale.ROOT))) {
+                    wrongCase.add(langKey + " (category keys stay snake_case)");
+                }
+                continue;
+            }
+            String base = remainder.endsWith(".tooltip")
+                    ? remainder.substring(0, remainder.length() - ".tooltip".length())
+                    : remainder;
+            if (base.indexOf('_') >= 0) {
+                wrongCase.add(langKey + " (field labels are camelCase, mirroring the Java field)");
+            }
+        }
+        assertTrue(wrongCase.isEmpty(),
+                "config lang keys violating DESIGN-SYSTEM §10 casing: " + wrongCase);
     }
 }

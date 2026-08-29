@@ -42,157 +42,157 @@ final class ClothConfigScreenBuilder {
                 Component.translatable("config.distillation.category.server"));
 
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_discovery"),
+                        Component.translatable("config.distillation.enableDiscovery"),
                         config.enableDiscovery)
-                .setTooltip(Component.translatable("config.distillation.enable_discovery.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableDiscovery.tooltip"))
                 .setDefaultValue(defaults.enableDiscovery)
                 .setSaveConsumer(v -> config.enableDiscovery = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_murky_draughts"),
+                        Component.translatable("config.distillation.enableMurkyDraughts"),
                         config.enableMurkyDraughts)
-                .setTooltip(Component.translatable("config.distillation.enable_murky_draughts.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableMurkyDraughts.tooltip"))
                 .setDefaultValue(defaults.enableMurkyDraughts)
                 .setSaveConsumer(v -> config.enableMurkyDraughts = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.start_discovered"),
+                        Component.translatable("config.distillation.startDiscovered"),
                         config.startDiscovered)
-                .setTooltip(Component.translatable("config.distillation.start_discovered.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.startDiscovered.tooltip"))
                 .setDefaultValue(defaults.startDiscovered)
                 .setSaveConsumer(v -> config.startDiscovered = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_recipe_notes"),
+                        Component.translatable("config.distillation.enableRecipeNotes"),
                         config.enableRecipeNotes)
-                .setTooltip(Component.translatable("config.distillation.enable_recipe_notes.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableRecipeNotes.tooltip"))
                 .setDefaultValue(defaults.enableRecipeNotes)
                 .setSaveConsumer(v -> config.enableRecipeNotes = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_missing_brews"),
+                        Component.translatable("config.distillation.enableMissingBrews"),
                         config.enableMissingBrews)
-                .setTooltip(Component.translatable("config.distillation.enable_missing_brews.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableMissingBrews.tooltip"))
                 .setDefaultValue(defaults.enableMissingBrews)
                 .setSaveConsumer(v -> config.enableMissingBrews = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_batch_brewing"),
+                        Component.translatable("config.distillation.enableBatchBrewing"),
                         config.enableBatchBrewing)
-                .setTooltip(Component.translatable("config.distillation.enable_batch_brewing.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableBatchBrewing.tooltip"))
                 .setDefaultValue(defaults.enableBatchBrewing)
                 .setSaveConsumer(v -> config.enableBatchBrewing = v)
                 .build());
         server.addEntry(entry.startIntSlider(
-                        Component.translatable("config.distillation.batch_ingredient_cost"),
+                        Component.translatable("config.distillation.batchIngredientCost"),
                         config.batchIngredientCost, 2, 6)
-                .setTooltip(Component.translatable("config.distillation.batch_ingredient_cost.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.batchIngredientCost.tooltip"))
                 .setDefaultValue(defaults.batchIngredientCost)
                 .setSaveConsumer(v -> config.batchIngredientCost = v)
                 .build());
         server.addEntry(entry.startIntSlider(
-                        Component.translatable("config.distillation.batch_fuel_cost"),
+                        Component.translatable("config.distillation.batchFuelCost"),
                         config.batchFuelCost, 1, 4)
-                .setTooltip(Component.translatable("config.distillation.batch_fuel_cost.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.batchFuelCost.tooltip"))
                 .setDefaultValue(defaults.batchFuelCost)
                 .setSaveConsumer(v -> config.batchFuelCost = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_comparator_output"),
+                        Component.translatable("config.distillation.enableComparatorOutput"),
                         config.enableComparatorOutput)
-                .setTooltip(Component.translatable("config.distillation.enable_comparator_output.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableComparatorOutput.tooltip"))
                 .setDefaultValue(defaults.enableComparatorOutput)
                 .setSaveConsumer(v -> config.enableComparatorOutput = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_tipped_arrows"),
+                        Component.translatable("config.distillation.enableTippedArrows"),
                         config.enableTippedArrows)
-                .setTooltip(Component.translatable("config.distillation.enable_tipped_arrows.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableTippedArrows.tooltip"))
                 .setDefaultValue(defaults.enableTippedArrows)
                 .setSaveConsumer(v -> config.enableTippedArrows = v)
                 .build());
         server.addEntry(entry.startIntSlider(
-                        Component.translatable("config.distillation.tipped_arrows_per_dip"),
+                        Component.translatable("config.distillation.tippedArrowsPerDip"),
                         config.tippedArrowsPerDip, 1, 16)
-                .setTooltip(Component.translatable("config.distillation.tipped_arrows_per_dip.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.tippedArrowsPerDip.tooltip"))
                 .setDefaultValue(defaults.tippedArrowsPerDip)
                 .setSaveConsumer(v -> config.tippedArrowsPerDip = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_honest_durations"),
+                        Component.translatable("config.distillation.enableHonestDurations"),
                         config.enableHonestDurations)
-                .setTooltip(Component.translatable("config.distillation.enable_honest_durations.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableHonestDurations.tooltip"))
                 .setDefaultValue(defaults.enableHonestDurations)
                 .setSaveConsumer(v -> config.enableHonestDurations = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_draughts"),
+                        Component.translatable("config.distillation.enableDraughts"),
                         config.enableDraughts)
-                .setTooltip(Component.translatable("config.distillation.enable_draughts.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableDraughts.tooltip"))
                 .setDefaultValue(defaults.enableDraughts)
                 .setSaveConsumer(v -> config.enableDraughts = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_top_up_drinking"),
+                        Component.translatable("config.distillation.enableTopUpDrinking"),
                         config.enableTopUpDrinking)
-                .setTooltip(Component.translatable("config.distillation.enable_top_up_drinking.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableTopUpDrinking.tooltip"))
                 .setDefaultValue(defaults.enableTopUpDrinking)
                 .setSaveConsumer(v -> config.enableTopUpDrinking = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_flask"),
+                        Component.translatable("config.distillation.enableFlask"),
                         config.enableFlask)
-                .setTooltip(Component.translatable("config.distillation.enable_flask.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableFlask.tooltip"))
                 .setDefaultValue(defaults.enableFlask)
                 .setSaveConsumer(v -> config.enableFlask = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_premium_brews"),
+                        Component.translatable("config.distillation.enablePremiumBrews"),
                         config.enablePremiumBrews)
-                .setTooltip(Component.translatable("config.distillation.enable_premium_brews.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enablePremiumBrews.tooltip"))
                 .setDefaultValue(defaults.enablePremiumBrews)
                 .setSaveConsumer(v -> config.enablePremiumBrews = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_antidotes"),
+                        Component.translatable("config.distillation.enableAntidotes"),
                         config.enableAntidotes)
-                .setTooltip(Component.translatable("config.distillation.enable_antidotes.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableAntidotes.tooltip"))
                 .setDefaultValue(defaults.enableAntidotes)
                 .setSaveConsumer(v -> config.enableAntidotes = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_thrown_rebalance"),
+                        Component.translatable("config.distillation.enableThrownRebalance"),
                         config.enableThrownRebalance)
-                .setTooltip(Component.translatable("config.distillation.enable_thrown_rebalance.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableThrownRebalance.tooltip"))
                 .setDefaultValue(defaults.enableThrownRebalance)
                 .setSaveConsumer(v -> config.enableThrownRebalance = v)
                 .build());
         server.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.enable_attuned_splash"),
+                        Component.translatable("config.distillation.enableAttunedSplash"),
                         config.enableAttunedSplash)
-                .setTooltip(Component.translatable("config.distillation.enable_attuned_splash.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.enableAttunedSplash.tooltip"))
                 .setDefaultValue(defaults.enableAttunedSplash)
                 .setSaveConsumer(v -> config.enableAttunedSplash = v)
                 .build());
         server.addEntry(entry.startFloatField(
-                        Component.translatable("config.distillation.splash_duration_factor"),
+                        Component.translatable("config.distillation.splashDurationFactor"),
                         config.splashDurationFactor)
-                .setTooltip(Component.translatable("config.distillation.splash_duration_factor.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.splashDurationFactor.tooltip"))
                 .setMin(0.5f).setMax(1.0f)
                 .setDefaultValue(defaults.splashDurationFactor)
                 .setSaveConsumer(v -> config.splashDurationFactor = v)
                 .build());
         server.addEntry(entry.startIntSlider(
-                        Component.translatable("config.distillation.lingering_cloud_duration_ticks"),
+                        Component.translatable("config.distillation.lingeringCloudDurationTicks"),
                         config.lingeringCloudDurationTicks, 600, 2400)
-                .setTooltip(Component.translatable("config.distillation.lingering_cloud_duration_ticks.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.lingeringCloudDurationTicks.tooltip"))
                 .setDefaultValue(defaults.lingeringCloudDurationTicks)
                 .setSaveConsumer(v -> config.lingeringCloudDurationTicks = v)
                 .build());
         server.addEntry(entry.startFloatField(
-                        Component.translatable("config.distillation.lingering_cloud_radius"),
+                        Component.translatable("config.distillation.lingeringCloudRadius"),
                         config.lingeringCloudRadius)
-                .setTooltip(Component.translatable("config.distillation.lingering_cloud_radius.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.lingeringCloudRadius.tooltip"))
                 .setMin(3.0f).setMax(6.0f)
                 .setDefaultValue(defaults.lingeringCloudRadius)
                 .setSaveConsumer(v -> config.lingeringCloudRadius = v)
@@ -202,23 +202,23 @@ final class ClothConfigScreenBuilder {
                 Component.translatable("config.distillation.category.client"));
 
         client.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.show_vapor_hints"),
+                        Component.translatable("config.distillation.showVaporHints"),
                         config.client.showVaporHints)
-                .setTooltip(Component.translatable("config.distillation.show_vapor_hints.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.showVaporHints.tooltip"))
                 .setDefaultValue(defaults.client.showVaporHints)
                 .setSaveConsumer(v -> config.client.showVaporHints = v)
                 .build());
         client.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.recipe_viewer_shows_undiscovered"),
+                        Component.translatable("config.distillation.recipeViewerShowsUndiscovered"),
                         config.client.recipeViewerShowsUndiscovered)
-                .setTooltip(Component.translatable("config.distillation.recipe_viewer_shows_undiscovered.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.recipeViewerShowsUndiscovered.tooltip"))
                 .setDefaultValue(defaults.client.recipeViewerShowsUndiscovered)
                 .setSaveConsumer(v -> config.client.recipeViewerShowsUndiscovered = v)
                 .build());
         client.addEntry(entry.startBooleanToggle(
-                        Component.translatable("config.distillation.smooth_night_vision_fade"),
+                        Component.translatable("config.distillation.smoothNightVisionFade"),
                         config.client.smoothNightVisionFade)
-                .setTooltip(Component.translatable("config.distillation.smooth_night_vision_fade.tooltip"))
+                .setTooltip(Component.translatable("config.distillation.smoothNightVisionFade.tooltip"))
                 .setDefaultValue(defaults.client.smoothNightVisionFade)
                 .setSaveConsumer(v -> config.client.smoothNightVisionFade = v)
                 .build());

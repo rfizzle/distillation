@@ -28,7 +28,7 @@ class FlaskResourceContractTest {
                 Path.of("src/main/resources/assets/distillation/lang/en_us.json"));
         for (String key : new String[]{
                 "item.distillation.flask", "tooltip.distillation.flask.empty",
-                "tooltip.distillation.flask.doses", "config.distillation.enable_flask"}) {
+                "tooltip.distillation.flask.doses", "config.distillation.enableFlask"}) {
             assertTrue(lang.has(key) && !lang.get(key).getAsString().isBlank(),
                     "flask lang key must ship and be non-blank: " + key);
         }
