@@ -75,7 +75,7 @@ concentrated brew takes both dusts for an extended *and* amplified result:
 ### Antidotes
 
 Surgical cures brewed from the affliction's own source — poison from a
-fermented spider eye, wither from a wither rose, and four more. Each strips
+fermented spider eye, wither from a wither rose, and six more. Each strips
 exactly one effect and nothing else; milk still clears everything, buffs
 included. Throwable as splash and lingering for mid-fight support.
 
