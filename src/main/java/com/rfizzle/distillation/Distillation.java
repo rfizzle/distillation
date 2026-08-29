@@ -76,14 +76,30 @@ public class Distillation implements ModInitializer {
      * Publishes a fully-built replacement config with a single volatile reference swap — the
      * ModMenu screen's commit point for its clamped working copy. Readers switch snapshots
      * atomically; the live object is never mutated in place.
+     *
+     * <p>Swapped under the same monitor {@link #getConfig()}'s lazy path takes. The volatile write
+     * alone makes the store atomic and visible, but not ordered against that path: a first caller
+     * inside the double-checked block has already seen {@code null} and is waiting on
+     * {@link DistillationConfig#load()} when this runs, and its assignment afterwards would
+     * overwrite this publish with the older on-disk state. Holding the lock makes the two
+     * mutually exclusive, which is the guarantee mc-config states as "reload() swaps the whole
+     * reference under the same lock".
      */
     public static void updateConfig(DistillationConfig updated) {
-        config = updated;
+        synchronized (Distillation.class) {
+            config = updated;
+        }
     }
 
-    /** Re-reads {@code config/distillation.json}; readers see the reference swap atomically. */
+    /**
+     * Re-reads {@code config/distillation.json}; readers see the reference swap atomically. Under
+     * the same lock as {@link #updateConfig}, and for the same reason.
+     */
     public static void reloadConfig() {
-        config = DistillationConfig.load();
+        DistillationConfig reloaded = DistillationConfig.load();
+        synchronized (Distillation.class) {
+            config = reloaded;
+        }
     }
 
     /**
