@@ -10,6 +10,7 @@
     "entrypoints": {
         "fabric-gametest": [
             "com.rfizzle.distillation.gametest.SmokeGameTest",
+            "com.rfizzle.distillation.gametest.MockPlayersGameTest",
             "com.rfizzle.distillation.gametest.MissingBrewsGameTest",
             "com.rfizzle.distillation.gametest.RecipeGraphGameTest",
             "com.rfizzle.distillation.gametest.DiscoveryGameTest",
