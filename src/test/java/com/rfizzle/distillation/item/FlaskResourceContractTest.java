@@ -65,8 +65,10 @@ class FlaskResourceContractTest {
 
     @Test
     void theCraftingRecipeShips() {
+        // Generated since the datagen conversion, so the source-path fallback names the generated
+        // root; the classpath read (build/resources/main, where both main roots merge) is unchanged.
         JsonObject recipe = shippedJson("/data/distillation/recipe/flask.json",
-                Path.of("src/main/resources/data/distillation/recipe/flask.json"));
+                Path.of("src/main/generated/data/distillation/recipe/flask.json"));
         assertTrue(recipe.getAsJsonObject("result").get("id").getAsString().equals("distillation:flask"),
                 "the recipe must produce a flask");
     }
@@ -79,7 +81,10 @@ class FlaskResourceContractTest {
         } catch (IOException ignored) {
             // fall through to the file-path check
         }
-        assertTrue(Files.exists(Path.of("src/main/resources" + resourcePath)),
+        // Both main resource roots — a shipped file may be hand-authored or generated, and this
+        // guard must not care which.
+        assertTrue(Files.exists(Path.of("src/main/resources" + resourcePath))
+                        || Files.exists(Path.of("src/main/generated" + resourcePath)),
                 "missing shipped resource: " + resourcePath);
     }
 

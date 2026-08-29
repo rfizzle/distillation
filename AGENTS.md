@@ -47,6 +47,35 @@ before running any Gradle command.
 - `make coverage` — unit tests + gametests, merged JaCoCo report (the mod's real
   coverage number; `build/reports/jacoco/test/` is unit-tests-only)
 - `make run-client` / `make run-server` — dev launches
+- `make run-datagen` — regenerate `src/main/generated` (see Source layout below)
+
+## Source layout
+
+Loom's `splitEnvironmentSourceSets()` is enabled — three source sets:
+
+| Source set | Root | Purpose |
+|---|---|---|
+| `main` | `src/main/java` | Server + common logic. Entrypoint: `Distillation.java` |
+| `client` | `src/client/java` | Client-only code. Entrypoint: `DistillationClient.java` |
+| `gametest` | `src/gametest/java` | Fabric gametests (run with `runGametest`). Has `main` on its classpath but is NOT included in the jar. Each `*GameTest` class is registered as a `fabric-gametest` entrypoint in `src/gametest/resources/fabric.mod.json` — never in the shipped manifest, which would crash `runServer` and `runDatagen`. |
+
+JUnit tests go in the standard `src/test/java` directory. The test classpath
+includes `fabric-loader-junit` and the `client` source set's compiled output,
+but excludes `fabric-api` — tests that need Fabric APIs must use gametests
+instead.
+
+Resources come from two `main` roots, both processed into the jar and onto the
+test classpath as one merged tree:
+
+| Root | Holds |
+|---|---|
+| `src/main/resources` | Hand-authored: manifest, mixin configs, access widener, lang, sounds, textures, `waila_plugins.json`, and the four models datagen cannot express — `models/item/flask.json` and `assets/minecraft/models/item/potion.json` carry `overrides` blocks keyed on custom item properties, and `models/item/antidote.json`, `flask_filled.json` and `potion_half.json` are override *targets* rather than models of registered items |
+| `src/main/generated` | Datagen output: the seven advancements, the Flask recipe, and the two flat item models. **Never hand-edit** — `./gradlew runDatagen` overwrites it, and `verifyDatagenIdempotent` fails the build if the committed tree drifts from what the providers emit. `.cache/` beside it is per-machine state and is gitignored |
+
+The providers live in `src/main/java/com/rfizzle/distillation/data/`, wired
+through the `fabric-datagen` entrypoint in `src/main/resources/fabric.mod.json`.
+Change a recipe or an advancement there, not in the JSON — then re-run datagen
+and commit the result.
 
 ## Key conventions
 

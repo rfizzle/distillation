@@ -16,6 +16,7 @@
     "entrypoints": {
         "main": ["com.rfizzle.distillation.Distillation"],
         "client": ["com.rfizzle.distillation.client.DistillationClient"],
+        "fabric-datagen": ["com.rfizzle.distillation.data.DistillationDataGenerator"],
         "modmenu": ["com.rfizzle.distillation.compat.modmenu.ModMenuIntegration"],
         "emi": ["com.rfizzle.distillation.compat.emi.DistillationEmiPlugin"],
         "rei_client": ["com.rfizzle.distillation.compat.rei.DistillationReiClientPlugin"],

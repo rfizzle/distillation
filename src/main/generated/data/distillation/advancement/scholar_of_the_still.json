@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:nether/brew_potion",
+  "criteria": {
+    "discovered_ten": {
+      "conditions": {
+        "min_count": 10
+      },
+      "trigger": "distillation:recipes_discovered"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.distillation.scholar_of_the_still.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:book"
+    },
+    "title": {
+      "translate": "advancements.distillation.scholar_of_the_still.title"
+    }
+  },
+  "requirements": [
+    [
+      "discovered_ten"
+    ]
+  ]
+}

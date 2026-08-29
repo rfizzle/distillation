@@ -419,10 +419,15 @@ tasks.register('verifyDatagenIdempotent') {
             lines.size() > 5 ? lines.take(5).join('\n') + "\n… (${lines.size()} lines total)"
                              : lines.join('\n')
         }
+        // --no-optional-locks keeps a read-only check from taking .git/index.lock: git status
+        // rewrites the index when cached stat info is stale, which is exactly the state runDatagen
+        // leaves behind after rewriting every generated file.
+        //
         // The '--' separator is required: without it git parses the path as a revision-or-path,
         // and aborts with exit 128 ("ambiguous argument") whenever src/main/generated is neither
-        // tracked nor present — which is the steady state while no fabric-datagen entrypoint is
-        // declared. With it, a missing directory is simply an empty pathspec and exits 0.
+        // tracked nor present. With it, a missing directory is simply an empty pathspec and exits 0
+        // — which, before a fabric-datagen entrypoint existed, is exactly how this task passed
+        // while verifying nothing at all.
         //
         // --porcelain reports all three drift shapes in one machine-readable listing: staged
         // ('M '), unstaged (' M'), and untracked ('??'). A git diff check sees only the
@@ -430,7 +435,7 @@ tasks.register('verifyDatagenIdempotent') {
         // staying invisible to ls-files --others as well — a verification task passing on real
         // drift. Reading stdout also frees every nonzero exit to mean git itself failed, and
         // unlike 'git diff HEAD' this works in a repository with no commits yet.
-        def statusResult = runGit(['git', 'status', '--porcelain', '--', genDir])
+        def statusResult = runGit(['git', '--no-optional-locks', 'status', '--porcelain', '--', genDir])
         // A failing git writes nothing to stdout, so an unchecked exit code would read as
         // "no changes" — a verification task reporting clean because its tool broke.
         def statusExit = statusResult.result.get().exitValue
