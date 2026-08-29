@@ -1,0 +1,26 @@
+{
+  "parent": "minecraft:nether/brew_potion",
+  "criteria": {
+    "murky_bottled": {
+      "trigger": "distillation:murky_bottled"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.distillation.trial_and_error.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "distillation:murky_draught"
+    },
+    "title": {
+      "translate": "advancements.distillation.trial_and_error.title"
+    }
+  },
+  "requirements": [
+    [
+      "murky_bottled"
+    ]
+  ]
+}

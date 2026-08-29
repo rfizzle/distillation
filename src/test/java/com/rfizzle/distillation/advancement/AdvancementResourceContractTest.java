@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,8 +29,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class AdvancementResourceContractTest {
 
-    private static final Path DIR = Path.of("src/main/resources/data/distillation/advancement");
-    private static final Path LANG = Path.of("src/main/resources/assets/distillation/lang/en_us.json");
+    /**
+     * Read from the test classpath first — {@code build/resources/main} is the merged product of
+     * {@code src/main/resources} and the datagen output in {@code src/main/generated}, and it is
+     * what the jar is built from. The source roots below are an IDE-runner fallback only, searched
+     * in source-set order; the advancements live in the generated root since the datagen
+     * conversion, the lang file in the hand-authored one.
+     */
+    private static final String CLASSPATH_DIR = "/data/distillation/advancement/";
+    private static final List<Path> SOURCE_ROOTS =
+            List.of(Path.of("src/main/resources"), Path.of("src/main/generated"));
+    private static final String LANG_RESOURCE = "/assets/distillation/lang/en_us.json";
     private static final String PARENT = "minecraft:nether/brew_potion";
 
     private static final Set<String> IDS = Set.of(
@@ -37,20 +47,23 @@ class AdvancementResourceContractTest {
             "surgical", "the_good_stuff", "every_drop");
 
     @Test
-    void everyAdvancementShipsAndConforms() throws IOException {
-        JsonObject lang = JsonParser.parseString(Files.readString(LANG, StandardCharsets.UTF_8)).getAsJsonObject();
+    void everyAdvancementShipsAndConforms() {
+        JsonObject lang = shippedJson(LANG_RESOURCE);
         List<String> problems = new ArrayList<>();
         for (String id : IDS) {
-            Path file = DIR.resolve(id + ".json");
-            if (!Files.exists(file)) {
+            JsonObject json = shippedJson(CLASSPATH_DIR + id + ".json");
+            if (json == null) {
                 problems.add(id + ": missing JSON file");
                 continue;
             }
-            JsonObject json = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
             if (!json.has("parent") || !PARENT.equals(json.get("parent").getAsString())) {
                 problems.add(id + ": must parent under " + PARENT);
             }
-            if (!json.has("sends_telemetry_event") || json.get("sends_telemetry_event").getAsBoolean()) {
+            // Absent is false: `sends_telemetry_event` defaults to false in Advancement's codec, so
+            // the datagen providers omit it rather than writing it out. What this guard is for is
+            // the flag being turned *on* — which is what Advancement.Builder.advancement() would do
+            // if a provider were ever switched to it — so only a present-and-true value fails.
+            if (json.has("sends_telemetry_event") && json.get("sends_telemetry_event").getAsBoolean()) {
                 problems.add(id + ": sends_telemetry_event must be false");
             }
             JsonObject display = json.getAsJsonObject("display");
@@ -75,9 +88,8 @@ class AdvancementResourceContractTest {
     }
 
     @Test
-    void theMissingShelfCoversAllSection2Lines() throws IOException {
-        JsonObject json = JsonParser.parseString(
-                Files.readString(DIR.resolve("the_missing_shelf.json"), StandardCharsets.UTF_8)).getAsJsonObject();
+    void theMissingShelfCoversAllSection2Lines() {
+        JsonObject json = shippedJson(CLASSPATH_DIR + "the_missing_shelf.json");
         JsonObject criteria = json.getAsJsonObject("criteria");
         Set<String> lines = new TreeSet<>();
         for (var entry : criteria.entrySet()) {
@@ -96,5 +108,35 @@ class AdvancementResourceContractTest {
         for (var group : requirements) {
             assertFalse(group.getAsJsonArray().isEmpty(), "each requirement group names its criterion");
         }
+    }
+
+    /**
+     * Loads a shipped resource, classpath first. The fallback walks both {@code main} source roots
+     * because the file may be hand-authored or generated, and the guard must not care which.
+     */
+    private static String shipped(String resource) {
+        try (InputStream in = AdvancementResourceContractTest.class.getResourceAsStream(resource)) {
+            if (in != null) {
+                return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            throw new AssertionError("could not read " + resource + " from the test classpath", e);
+        }
+        for (Path root : SOURCE_ROOTS) {
+            Path candidate = root.resolve(resource.substring(1));
+            if (Files.exists(candidate)) {
+                try {
+                    return Files.readString(candidate, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new AssertionError("could not read " + candidate, e);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static JsonObject shippedJson(String resource) {
+        String text = shipped(resource);
+        return text == null ? null : JsonParser.parseString(text).getAsJsonObject();
     }
 }

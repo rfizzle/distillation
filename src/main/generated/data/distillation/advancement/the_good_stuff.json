@@ -1,0 +1,27 @@
+{
+  "parent": "minecraft:nether/brew_potion",
+  "criteria": {
+    "premium_brewed": {
+      "trigger": "distillation:premium_brewed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.distillation.the_good_stuff.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:glowstone_dust"
+    },
+    "title": {
+      "translate": "advancements.distillation.the_good_stuff.title"
+    }
+  },
+  "requirements": [
+    [
+      "premium_brewed"
+    ]
+  ]
+}

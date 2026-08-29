@@ -1,0 +1,27 @@
+{
+  "parent": "minecraft:nether/brew_potion",
+  "criteria": {
+    "batch_completed": {
+      "trigger": "distillation:batch_completed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.distillation.round_for_the_table.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:cauldron"
+    },
+    "title": {
+      "translate": "advancements.distillation.round_for_the_table.title"
+    }
+  },
+  "requirements": [
+    [
+      "batch_completed"
+    ]
+  ]
+}

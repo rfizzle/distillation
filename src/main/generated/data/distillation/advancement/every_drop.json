@@ -1,0 +1,26 @@
+{
+  "parent": "minecraft:nether/brew_potion",
+  "criteria": {
+    "graph_completed": {
+      "trigger": "distillation:graph_completed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.distillation.every_drop.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:experience_bottle"
+    },
+    "title": {
+      "translate": "advancements.distillation.every_drop.title"
+    }
+  },
+  "requirements": [
+    [
+      "graph_completed"
+    ]
+  ]
+}

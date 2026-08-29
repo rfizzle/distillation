@@ -1,0 +1,84 @@
+{
+  "parent": "minecraft:nether/brew_potion",
+  "criteria": {
+    "absorption": {
+      "conditions": {
+        "line": "absorption"
+      },
+      "trigger": "distillation:missing_line_brewed"
+    },
+    "glowing": {
+      "conditions": {
+        "line": "glowing"
+      },
+      "trigger": "distillation:missing_line_brewed"
+    },
+    "haste": {
+      "conditions": {
+        "line": "haste"
+      },
+      "trigger": "distillation:missing_line_brewed"
+    },
+    "health_boost": {
+      "conditions": {
+        "line": "health_boost"
+      },
+      "trigger": "distillation:missing_line_brewed"
+    },
+    "levitation": {
+      "conditions": {
+        "line": "levitation"
+      },
+      "trigger": "distillation:missing_line_brewed"
+    },
+    "luck": {
+      "conditions": {
+        "line": "luck"
+      },
+      "trigger": "distillation:missing_line_brewed"
+    },
+    "resistance": {
+      "conditions": {
+        "line": "resistance"
+      },
+      "trigger": "distillation:missing_line_brewed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.distillation.the_missing_shelf.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:brewing_stand"
+    },
+    "title": {
+      "translate": "advancements.distillation.the_missing_shelf.title"
+    }
+  },
+  "requirements": [
+    [
+      "resistance"
+    ],
+    [
+      "haste"
+    ],
+    [
+      "absorption"
+    ],
+    [
+      "luck"
+    ],
+    [
+      "glowing"
+    ],
+    [
+      "levitation"
+    ],
+    [
+      "health_boost"
+    ]
+  ]
+}
