@@ -22,13 +22,8 @@ dimensions, and no vanilla recipe is taken away.
 
 ## Download
 
-**No version has been released yet.** The mod is implemented against its committed
-design and behavioral spec, but nothing has been tagged or published, so there is
-nothing to install today. The Modrinth and CurseForge listings go live with the first
-release.
-
-| [Website](https://distillation.rfizzle.com) | [GitHub Releases](https://github.com/rfizzle/distillation/releases) | [Report an issue](https://github.com/rfizzle/distillation/issues) |
-| --- | --- | --- |
+| [Modrinth](https://modrinth.com/mod/distillation-alchemy-overhaul) | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/distillation-alchemy-overhaul) | [GitHub Releases](https://github.com/rfizzle/distillation/releases) | [Website](https://distillation.rfizzle.com) | [Report an issue](https://github.com/rfizzle/distillation/issues) |
+| --- | --- | --- | --- | --- |
 
 ---
 
