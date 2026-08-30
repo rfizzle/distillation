@@ -18,8 +18,9 @@ stand teaches its own recipes, brews the effects vanilla shipped without one,
 scales known recipes to six bottles, and makes curing a decision instead of a
 bucket of milk.
 
-**Not yet released.** The mod is implemented against its committed design and
-behavioral spec; this page describes the first release.
+**Beta.** The first public release is out and every system is complete, but it
+has not had a long public soak yet — back up a world before adding it to one
+you care about.
 
 ## At a glance
 
@@ -40,6 +41,9 @@ what it would become. A failed combination bottles a **Murky Draught** whose
 tooltip names one ingredient that would have worked, and every success is
 written permanently into your recipes page, right in the brewing screen. No
 wiki required — the stand is the teacher.
+
+A recipe you know can be copied onto paper as a **Recipe Note** — tradeable,
+giftable, and still asking its reader to brew the thing once themselves.
 
 ### The Missing Brews
 
@@ -79,6 +83,13 @@ fermented spider eye, wither from a wither rose, and six more. Each strips
 exactly one effect and nothing else; milk still clears everything, buffs
 included. Throwable as splash and lingering for mid-fight support.
 
+### The Flask
+
+A copper-and-glass vessel holding three doses of one discovered brew,
+refillable forever. Pour a bottled potion in or fill it straight off a batch
+pass, then drink a dose at a time — or sneak to sip a half. One brew at a
+time, never mixed.
+
 ### Lingering Worth Throwing
 
 Lingering clouds last **60 seconds** at a **4½-block radius**; splash potions
@@ -88,15 +99,17 @@ players and their pets, never the hostiles standing in it — while harmful
 potions stay grenades for everyone. A dedicated brewer becomes a viable
 support role.
 
-## Enhanced by (never required)
-
-- **Tribulation** — its shard debuffs gain brewable antidotes of their own.
-- **Mercantile** — the cleric sells rare brewing ingredients at reputation.
-- **Prosperity** — far-tier chests turn up rare reagents.
-
-With no siblings installed, nothing is missing.
-
 ---
 
-Part of **[Concord](https://concord.rfizzle.com)** — a modular collection of
-system overhauls. Install any, combine all.
+## Companion mods
+
+Distillation is part of [Concord](https://github.com/rfizzle/concord) — a modular collection of
+system overhauls. Install any, combine all:
+
+- [Meridian](https://meridian.rfizzle.com) — Chart your enchantments.
+- [Mercantile](https://mercantile.rfizzle.com) — Every villager remembers.
+- [Tribulation](https://tribulation.rfizzle.com) — Survive what comes next.
+- [Prosperity](https://prosperity.rfizzle.com) — Every chest, yours to discover.
+- [Respite](https://respite.rfizzle.com) — Make the night count.
+- [Cultivation](https://cultivation.rfizzle.com) — Worth growing.
+- [Instinct](https://instinct.rfizzle.com) — Worth raising.
