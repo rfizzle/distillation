@@ -1,9 +1,9 @@
 {
   "nav": "Config",
   "metaTitle": "Config — Distillation",
-  "metaDescription": "Distillation's configuration reference as specced: every feature independently toggleable via Mod Menu / Cloth Config or config/distillation.json.",
+  "metaDescription": "Distillation's configuration reference: every feature independently toggleable via Mod Menu / Cloth Config or config/distillation.json.",
   "title": "Config",
-  "lede": "Every option, as specced. All features are independently toggleable through Mod Menu / Cloth Config or <code>config/distillation.json</code>, created with defaults on first launch; <code>/distillation reload</code> re-reads it live. Change nothing and you get exactly the design defaults.",
+  "lede": "Every option. All features are independently toggleable through Mod Menu / Cloth Config or <code>config/distillation.json</code>, created with defaults on first launch; <code>/distillation reload</code> re-reads it live. Change nothing and you get exactly the design defaults.",
   "width": "5xl",
   "sections": [
     {

@@ -13,7 +13,7 @@
           "items": [
             {
               "q": "Is Distillation released?",
-              "a": "Not yet — no version has been tagged or published. The mod is implemented against its committed design and behavioral spec (<code>design/VISION.md</code> and <code>design/SPEC.md</code> on GitHub). This site describes the first release."
+              "a": "Yes — <code>v1.0.0-beta.1</code> is published on Modrinth and CurseForge. The mod is implemented against its committed design and behavioral spec (<code>design/VISION.md</code> and <code>design/SPEC.md</code> on GitHub). This site describes the first release."
             },
             {
               "q": "Does it break the brewing I already know?",
