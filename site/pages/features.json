@@ -178,9 +178,6 @@
         {
           "type": "list",
           "items": [
-            "<strong class='text-bone'>Tribulation</strong> — its hardened witches throw Distillation's own brews at you; the debuffs its shards inflict (Slowness, Mining Fatigue, Weakness) all have native antidotes, so you are covered with or without it.",
-            "<strong class='text-bone'>Mercantile</strong> — the cleric's stock deepens with your reputation: rare brewing reagents for emeralds.",
-            "<strong class='text-bone'>Prosperity</strong> — far-tier chests turn up reagents you have never held over a stand."
           ]
         }
       ]

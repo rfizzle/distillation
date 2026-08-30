@@ -101,9 +101,6 @@ support role.
 
 ---
 
-Part of **[Concord](https://concord.rfizzle.com)** — a modular collection of
-system overhauls. Install any, combine all.
-
 ## Companion mods
 
 Distillation is part of [Concord](https://github.com/rfizzle/concord) — a modular collection of
