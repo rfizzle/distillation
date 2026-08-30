@@ -1,9 +1,9 @@
 {
   "nav": "Commands",
   "metaTitle": "Commands — Distillation",
-  "metaDescription": "Distillation's command reference as specced: /distillation recipes, discover, forget, rig, and reload.",
+  "metaDescription": "Distillation's command reference: /distillation recipes, discover, forget, rig, and reload.",
   "title": "Commands",
-  "lede": "The <code>/distillation</code> command tree, as specced. Distillation is not yet released; this is the surface the implementation ships.",
+  "lede": "The <code>/distillation</code> command tree as it ships today.",
   "width": "4xl",
   "sections": [
     {

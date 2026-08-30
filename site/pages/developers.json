@@ -1,9 +1,9 @@
 {
   "nav": "Developers",
   "metaTitle": "Developers — Distillation",
-  "metaDescription": "Distillation's public API as specced: com.rfizzle.distillation.api — discovery accessors, the antidote registration point, and the brew/discovery events.",
+  "metaDescription": "Distillation's public API: com.rfizzle.distillation.api — discovery accessors, the antidote registration point, and the brew/discovery events.",
   "title": "Developers",
-  "lede": "The stable integration surface, as specced (<a href='https://github.com/rfizzle/distillation/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> §Public API). The only stable package is <code>com.rfizzle.distillation.api</code>, per the <a href='https://github.com/rfizzle/concord/blob/master/API-STANDARD.md' class='text-accent hover:text-accent2 underline'>Concord API Standard</a>: read-only by default, server-authoritative, consumed via <code>modCompileOnly</code> + <code>isModLoaded</code> guards.",
+  "lede": "The stable integration surface (<a href='https://github.com/rfizzle/distillation/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> §Public API). The only stable package is <code>com.rfizzle.distillation.api</code>, per the <a href='https://github.com/rfizzle/concord/blob/master/API-STANDARD.md' class='text-accent hover:text-accent2 underline'>Concord API Standard</a>: read-only by default, server-authoritative, consumed via <code>modCompileOnly</code> + <code>isModLoaded</code> guards.",
   "width": "5xl",
   "sections": [
     {
