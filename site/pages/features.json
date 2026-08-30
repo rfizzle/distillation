@@ -3,7 +3,7 @@
   "metaTitle": "Features — Distillation",
   "metaDescription": "Distillation's feature set: recipe discovery at the stand, the missing brews, batch brewing, honest durations and draughts, premium potions, antidotes, rebalanced thrown potions, and the multi-dose flask.",
   "title": "Features",
-  "lede": "The headline systems, specified in <a href='https://github.com/rfizzle/distillation/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Distillation is implemented against the spec in design/SPEC.md.",
+  "lede": "The headline systems, specified in <a href='https://github.com/rfizzle/distillation/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Distillation is implemented against that spec.",
   "width": "5xl",
   "scale": "lg",
   "sections": [
