@@ -4,6 +4,7 @@
   "peak_dbfs": -1.0,
   "subtitle": "subtitles.distillation.recipe_learned",
   "seed": 6,
+  "ships": "src/main/resources/assets/distillation/sounds/ui/recipe_learned.ogg",
   "layers": [
     {
       "waveform": "sine",

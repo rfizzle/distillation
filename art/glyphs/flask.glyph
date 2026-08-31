@@ -2,6 +2,8 @@
 # copper collar and stopper, hollow bulb so the tinted liquid layer shows through
 # on the filled model. 3-tone ramps over two base hues (copper, glass) + ink.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/distillation/textures/item/flask.png
 
 legend:
   . transparent

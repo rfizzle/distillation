@@ -3,6 +3,8 @@
 # round-bottomed potion bottle: a slender corked neck over a narrow tapered body.
 # Light from the upper-left; the interior liquid ramps glass -> ash -> smoke.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/distillation/textures/item/antidote.png
 
 legend:
   . transparent

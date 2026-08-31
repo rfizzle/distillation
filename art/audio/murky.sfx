@@ -2,8 +2,10 @@
   "name": "murky",
   "sample_rate": 44100,
   "peak_dbfs": -1.0,
+  "loudness_lufs": null,
   "subtitle": "subtitles.distillation.murky",
   "seed": 7,
+  "ships": "src/main/resources/assets/distillation/sounds/block/brewing_stand/murky.ogg",
   "layers": [
     {
       "waveform": "noise",

@@ -6,6 +6,8 @@
 # Copper #E77C56 (cork); the plate uses vanilla's GUI greys. distillation.* tokens are not yet
 # registered in the concord glyph palette — hex used with the DESIGN.md role named beside each.
 size: 16
+kind: ui
+ships: src/main/resources/assets/distillation/textures/gui/recipes_tab.png
 
 legend:
   . transparent

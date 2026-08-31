@@ -4,6 +4,8 @@
 # Copper (cork), Glass. The Murk ramp and the derived shade tones have no concord
 # glyph tokens — hex used with the DESIGN.md role named beside each entry.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/distillation/textures/item/murky_draught.png
 
 legend:
   . transparent

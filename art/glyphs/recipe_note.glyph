@@ -5,6 +5,8 @@
 # grey-ink writing lines, and one Potion Magenta wax seal (bottom-left) mark it
 # as a brewing recipe. Palette maps to DESIGN.md roles named beside each entry.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/distillation/textures/item/recipe_note.png
 
 legend:
   . transparent

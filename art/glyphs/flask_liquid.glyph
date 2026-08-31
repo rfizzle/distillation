@@ -4,6 +4,8 @@
 # surface line and a shaded base for a little depth. Shape stays within the vessel's
 # hollow interior so the glass walls read around it.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/distillation/textures/item/flask_liquid.png
 
 legend:
   . transparent
