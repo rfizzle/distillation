@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Fired server-side from Distillation's single brew-completion choke point after a brew cycle
@@ -25,13 +26,24 @@ import java.util.UUID;
 @Stable
 public interface DistillationBrewCallback {
 
+    /** One-shot gate so a listener that throws every cycle logs its stack trace once. */
+    AtomicBoolean LISTENER_FAILURE_LOGGED = new AtomicBoolean(false);
+
     Event<DistillationBrewCallback> EVENT = EventFactory.createArrayBacked(DistillationBrewCallback.class,
             listeners -> (level, pos, ingredient, results, batchOwner, batch) -> {
                 for (DistillationBrewCallback listener : listeners) {
                     try {
                         listener.onBrew(level, pos, ingredient, results, batchOwner, batch);
+                    } catch (VirtualMachineError e) {
+                        throw e; // OOME/SOE: the JVM is gone, not the guest
                     } catch (Throwable t) {
-                        Distillation.LOGGER.warn("A DistillationBrewCallback listener threw; skipping", t);
+                        // Throwable, not Exception: a listener compiled against an older
+                        // signature throws Error (AbstractMethodError, NoClassDefFoundError),
+                        // which an Exception catch would let escape and kill the server tick.
+                        if (LISTENER_FAILURE_LOGGED.compareAndSet(false, true)) {
+                            Distillation.LOGGER.warn("A DistillationBrewCallback listener {} threw; skipping",
+                                    listener.getClass().getName(), t);
+                        }
                     }
                 }
             });
