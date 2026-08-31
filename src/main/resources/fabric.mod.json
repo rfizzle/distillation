@@ -30,8 +30,7 @@
         "wthit": "*",
         "emi": "*",
         "roughlyenoughitems": "*",
-        "jei": "*",
-        "tribulation": "*"
+        "jei": "*"
     },
     "mixins": [
         "distillation.mixins.json",
