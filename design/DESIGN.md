@@ -24,7 +24,7 @@ The motif object is the **alchemist's still** — an alembic bench mid-distillat
 
 **Icon (`art/icon-128.png`):** The single potion bottle isolated — round-bottomed flask, cork stopper, liquid glowing potion magenta with a copper-highlight rim, one vapor wisp rising — against a dark/transparent background. Reads cleanly at 128×128.
 
-**Glyph (`art/glyphs/bottle-16.glyph`):** A 16×16 round-bottomed potion bottle — magenta liquid, pale glass highlight, a two-pixel vapor wisp, `ink` outline — for Jade/WTHIT and recipe-viewer contexts. Distillation has no HUD slot (§2 below), so this glyph never renders as a HUD element.
+**Glyph (`art/glyphs/bottle-16.glyph`):** A 16×16 round-bottomed potion bottle — magenta liquid, pale glass highlight, a two-pixel vapor wisp, `ink` outline. The spec is an authored master only: no rendered copy ships yet and nothing displays it in-game (`design/ASSETS.md` tracks the intended `textures/gui/bottle.png` target for Jade/WTHIT and recipe-viewer contexts). Distillation has no HUD slot (§2 below), so this glyph would never render as a HUD element.
 
 ### Color Palette
 
@@ -51,7 +51,7 @@ Shared neutrals (text and surfaces) follow the standard tokens as-is — `--colo
 
 ## 2. HUD Decision
 
-**No slot, by design.** The standard's test (concord [`HUD-STANDARD.md`](../../concord/HUD-STANDARD.md)) grants a slot only for persistent ambient state the player needs while walking around. Distillation's state is either **already surfaced by vanilla UI** (active potion effects render as vanilla status-effect icons — the exact case the suite's Apothecary profile anticipated) or **screen-local** (discovery hints and the recipes page live inside the brewing stand screen; brew progress is the stand's own UI). Nothing needs a permanent screen element. The 16×16 bottle glyph exists for Jade/recipe-viewer contexts only, and the HUD accessors (`isHudVisible()` / `getHudHeight()`) are intentionally absent from the API — siblings' stacking math treats Distillation as never occupying a slot.
+**No slot, by design.** The standard's test (concord [`HUD-STANDARD.md`](../../concord/HUD-STANDARD.md)) grants a slot only for persistent ambient state the player needs while walking around. Distillation's state is either **already surfaced by vanilla UI** (active potion effects render as vanilla status-effect icons — the exact case the suite's Apothecary profile anticipated) or **screen-local** (discovery hints and the recipes page live inside the brewing stand screen; brew progress is the stand's own UI). Nothing needs a permanent screen element. The 16×16 bottle glyph is authored for Jade/recipe-viewer contexts only (its render is not yet shipped or wired), and the HUD accessors (`isHudVisible()` / `getHudHeight()`) are intentionally absent from the API — siblings' stacking math treats Distillation as never occupying a slot.
 
 ---
 

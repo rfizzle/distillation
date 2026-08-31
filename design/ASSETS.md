@@ -23,6 +23,7 @@
 |---|---|---|
 | Bottle brand glyph 16×16 (Jade/recipe viewers, suite footer) | `art/glyphs/bottle-16.glyph` | `assets/distillation/textures/gui/bottle.png` — (not yet shipped) |
 | Murky Draught item 16×16 | `art/glyphs/murky_draught.glyph` | `assets/distillation/textures/item/murky_draught.png` |
+| Antidote bottle item 16×16 (greyscale, tint-layered per cure) | `art/glyphs/antidote.glyph` | `assets/distillation/textures/item/antidote.png` |
 | Recipe Note item 16×16 | `art/glyphs/recipe_note.glyph` | `assets/distillation/textures/item/recipe_note.png` |
 | Half-draught liquid overlay 16×16 (potion model override, tint-layered) | `art/glyphs/draught_half.gen.sh` (derived from vanilla `item/potion_overlay`, lower bulb kept) | `assets/distillation/textures/item/draught_half.png` |
 | Flask item 16×16 (copper-and-glass vessel, hollow bulb) | `art/glyphs/flask.glyph` | `assets/distillation/textures/item/flask.png` |
@@ -40,7 +41,6 @@
 
 | Asset | Intended source | Destination |
 |---|---|---|
-| Antidote bottle item 16×16 (greyscale, tint-layered per cure) | `art/glyphs/antidote.glyph` | `assets/distillation/textures/item/antidote.png` |
 | Batch-row slot/steam sprite | `/glyph` → `art/glyphs/batch_row.glyph` | `assets/distillation/textures/gui/batch_row.png` — (planned, with implementation) |
 | Favicon set | derived from icon-128 | `site/assets/favicon.ico`, `favicon-32.png`, `apple-touch-icon.png` — (planned, branding) |
 | Bottle glyph web copy | rendered from `art/glyphs/bottle-16.glyph` | `site/assets/glyph-16.png` — (planned, with site assets) |
