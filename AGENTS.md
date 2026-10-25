@@ -18,8 +18,8 @@ with unit tests in `src/test/java` and in-world coverage in `src/gametest`.
 There is no released version yet — the `v*` tag that would cut one has not been
 pushed. The player promise is [`design/VISION.md`](design/VISION.md), the
 behavioral contract is [`design/SPEC.md`](design/SPEC.md), and the brand is
-[`design/DESIGN.md`](design/DESIGN.md). The implementation conforms to the
-spec, and a reviewer calls divergence a bug. Work is tracked in GitHub
+[`design/DESIGN.md`](design/DESIGN.md). A reviewer calls divergence from the
+spec a bug. Work is tracked in GitHub
 Issues — see the [Development lifecycle](#development-lifecycle) section below.
 
 ## Suite standards (Concord)
@@ -28,10 +28,10 @@ This mod is a member of Concord, a modular collection of system overhauls. Suite
 the [concord repo](https://github.com/rfizzle/concord) — checked out at `../concord/`
 in the local workspace. Normative for this repo:
 
-- [API-STANDARD.md](https://github.com/rfizzle/concord/blob/master/API-STANDARD.md) — the `api` package conventions (`design/SPEC.md` §Public API conforms)
+- [API-STANDARD.md](https://github.com/rfizzle/concord/blob/master/API-STANDARD.md) — the `api` package conventions
 - [HUD-STANDARD.md](https://github.com/rfizzle/concord/blob/master/HUD-STANDARD.md) — Distillation has **no HUD slot, by design** (`design/DESIGN.md` §2); it ships no HUD element and no HUD accessors
 - [DESIGN-SYSTEM.md](https://github.com/rfizzle/concord/blob/master/design/DESIGN-SYSTEM.md) — palette, typography, logo rules, texture/audio pipelines
-- [REPO-LAYOUT.md](https://github.com/rfizzle/concord/blob/master/REPO-LAYOUT.md) — where non-code files live (conforms)
+- [REPO-LAYOUT.md](https://github.com/rfizzle/concord/blob/master/REPO-LAYOUT.md) — where non-code files live
 
 ## Build
 
@@ -41,13 +41,16 @@ Java 21, Fabric Loader 0.16.10+, official Mojang mappings. Read
 [`.ai/skills/mc-gradle-builds/SKILL.md`](.ai/skills/mc-gradle-builds/SKILL.md)
 before running any Gradle command.
 
-- `make build` — compile, run unit tests, assemble the jar
-- `make test` — JUnit only
-- `./gradlew runGametest` — the Fabric gametest server
-- `make coverage` — unit tests + gametests, merged JaCoCo report (the mod's real
-  coverage number; `build/reports/jacoco/test/` is unit-tests-only)
-- `make run-client` / `make run-server` — dev launches
-- `make run-datagen` — regenerate `src/main/generated` (see Source layout below)
+The build wiring (git-derived version, base repositories, split source sets,
+gametest and datagen runs, JaCoCo and `jacocoMergedReport`, datagen idempotence,
+packaging excludes) lives in the hub-owned `gradle/concord-common.gradle`, and
+the shared make targets in `concord.mk`; both are synced verbatim from the
+concord repo, so change them there, not here. `build.gradle` keeps only the
+plugins, dependencies, member-only repositories and the access widener. Run
+`make help` for the targets (`make ci` runs exactly what CI runs;
+`make coverage` is the mod's real coverage number). The shared guard tests under
+`com.rfizzle.concord.guard` and the gametest `com.rfizzle.concord.gametest.MockPlayers`
+are propagated from the hub the same way.
 
 ## Source layout
 
