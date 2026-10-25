@@ -1,89 +1,13 @@
-import java.util.concurrent.TimeUnit
-
 plugins {
     id 'fabric-loom' version "${loom_version}"
     id 'jacoco'
 }
 
-jacoco {
-    toolVersion = '0.8.12'
-}
-
-version = computeModVersion()
-group = project.maven_group
-
-tasks.register('printVersion') {
-    doLast { println project.version }
-}
-
-// Derives a SemVer-compliant version from `mod_version` plus the git state:
-//   - exact tag match (e.g. HEAD == v0.0.0) → "0.0.0"
-//   - exact tag, dirty tree                      → "0.0.0+dirty"
-//   - N commits past the last matching tag       → "0.0.0+N.gSHA[.dirty]"
-//   - no matching tag yet                        → "0.0.0+gSHA[.dirty]"
-//   - git unavailable or describe fails          → "0.0.0"
-// The base ("0.0.0") comes from gradle.properties and is bumped via
-// scripts/release.sh. Tag pattern is `v*`.
-def computeModVersion() {
-    def base = project.mod_version
-    def tagPrefix = "v"
-    def described = runGitDescribe(tagPrefix)
-    if (described == null || described.isEmpty()) {
-        return base
-    }
-    if (described == "${tagPrefix}${base}") {
-        return base
-    }
-    if (described == "${tagPrefix}${base}-dirty") {
-        return "${base}+dirty"
-    }
-    def postTag = described =~ /^\Q${tagPrefix}\E(\S+?)-(\d+)-g([0-9a-f]+)(-dirty)?$/
-    if (postTag.matches()) {
-        def commits = postTag[0][2]
-        def sha = postTag[0][3]
-        def dirty = postTag[0][4] ? '.dirty' : ''
-        return "${base}+${commits}.g${sha}${dirty}"
-    }
-    def shaOnly = described =~ /^([0-9a-f]+)(-dirty)?$/
-    if (shaOnly.matches()) {
-        def sha = shaOnly[0][1]
-        def dirty = shaOnly[0][2] ? '.dirty' : ''
-        return "${base}+g${sha}${dirty}"
-    }
-    return base
-}
-
-def runGitDescribe(String tagPrefix) {
-    try {
-        def proc = new ProcessBuilder('git', 'describe', '--tags',
-                '--match', "${tagPrefix}*", '--dirty', '--always')
-                .directory(rootDir)
-                .redirectErrorStream(true)
-                .start()
-        // Bounded, never a bare waitFor(): this runs in the configuration phase, so a
-        // hung git wedges every task in the build, not just the version computation.
-        // Git does hang — a stale index.lock from a killed process, an unresponsive
-        // network filesystem, a credential helper waiting on a prompt with no terminal.
-        def finished = proc.waitFor(10, TimeUnit.SECONDS)
-        if (!finished) {
-            // destroyForcibly so the orphaned git process cannot outlive the daemon.
-            proc.destroyForcibly()
-            // Degrading to the mod_version base is right; doing it silently is not. On a
-            // machine where git is merely slow, every invocation pays the full ten seconds
-            // and then produces a jar versioned from the base with nothing in the log.
-            logger.warn('git describe timed out after 10s — version falls back to the mod_version base')
-            return null
-        }
-        def out = proc.inputStream.text.trim()
-        if (proc.exitValue() != 0) return null
-        return out
-    } catch (Exception ignored) {
-        return null
-    }
-}
+// Version, base repositories, split-environment/gametest/datagen wiring, JaCoCo + jacocoMergedReport,
+// datagen idempotence, and packaging excludes: hub-owned, synced verbatim (see mc-gradle-builds).
+apply from: 'gradle/concord-common.gradle'
 
 repositories {
-    mavenCentral()
     maven {
         name = 'TerraformersMC'
         url = 'https://maven.terraformersmc.com/'
@@ -91,12 +15,12 @@ repositories {
             includeGroup 'dev.emi'
         }
     }
+    // The shared base already declares 'Shedaniel' for Cloth Config; this one adds REI.
     maven {
-        name = 'Shedaniel'
+        name = 'ShedanielREI'
         url = 'https://maven.shedaniel.me/'
         content {
             includeGroup 'me.shedaniel'
-            includeGroup 'me.shedaniel.cloth'
             includeGroup 'dev.architectury'
         }
     }
@@ -112,13 +36,6 @@ repositories {
         url = 'https://maven.blamejared.com/'
         content {
             includeGroup 'mezz.jei'
-        }
-    }
-    maven {
-        name = 'Modrinth'
-        url = 'https://api.modrinth.com/maven'
-        content {
-            includeGroup 'maven.modrinth'
         }
     }
     // GitHub Releases — resolves sibling Concord mods straight from their release jars while
@@ -142,77 +59,18 @@ repositories {
             includeGroup 'rfizzle'
         }
     }
-    maven {
-        name = 'Bai'
-        url = 'https://maven2.bai.lol'
-        content {
-            includeGroup 'lol.bai'
-            includeGroup 'mcp.mobius.waila'
-        }
-    }
 }
 
 loom {
-    splitEnvironmentSourceSets()
     accessWidenerPath = file("src/main/resources/distillation.accesswidener")
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDirs += [ "src/main/generated" ]
-        }
-    }
-    gametest {
-        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
-        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
-    }
-    // Put the client source set's compiled output (not its dependency configurations) on the
-    // test classpath so unit tests can reach client-only classes such as ClientDistillationConfig.
-    // Only .output is added — never client.compileClasspath/runtimeClasspath — so the unmapped
-    // fabric-api sibling access widener that the testRuntimeClasspath exclusion below guards
-    // against is never pulled in.
-    test {
-        compileClasspath += sourceSets.client.output
-        runtimeClasspath += sourceSets.client.output
-    }
-}
-
-configurations {
-    gametestImplementation.extendsFrom implementation
-    gametestRuntimeOnly.extendsFrom runtimeOnly
-}
-
-// Minecraft's GameTestServer aborts ("No test functions were given!") when zero @GameTest
-// functions are registered, so runGametest would fail CI until the first gametest lands.
-// Skip the run while the gametest source set is empty; it runs normally once tests exist.
-// Loom registers runGametest during afterEvaluate, so match it lazily rather than by name.
-tasks.matching { it.name == 'runGametest' }.configureEach {
-    onlyIf {
-        !sourceSets.gametest.allJava.files.isEmpty()
-    }
-}
-
-loom {
-    runs {
-        datagen {
-            inherit server
-            name "Data Generation"
-            vmArg "-Dfabric-api.datagen"
-            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
-            vmArg "-Dfabric-api.datagen.modid=distillation"
-            runDir "build/datagen"
-        }
-        gametest {
-            server()
-            name "Game Test"
-            source sourceSets.gametest
-            vmArg "-Dfabric-api.gametest"
-            vmArg "-Dfabric-api.gametest.report-file=${layout.buildDirectory.file('junit-gametest.xml').get().asFile}"
-            runDir "build/gametest"
-        }
-    }
-}
+// Put the client source set's compiled output (not its dependency configurations) on the test
+// classpath so unit tests can reach client-only classes such as ClientDistillationConfig. Only
+// .output is added, so the unmapped fabric-api sibling the shared testRuntimeClasspath exclusion
+// guards against is never pulled in.
+sourceSets.test.compileClasspath += sourceSets.client.output
+sourceSets.test.runtimeClasspath += sourceSets.client.output
 
 dependencies {
     // Minecraft
@@ -280,234 +138,4 @@ dependencies {
     // Knot-based classloader that boots Fabric before tests run — registries,
     // item registrations, and onInitialize are available without Bootstrap.bootStrap().
     testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-}
-
-// With splitEnvironmentSourceSets, loom remaps fabric-api to *-common variants for the main
-// runtime classpath but leaves the unmapped fabric-api sibling on testRuntimeClasspath.
-// fabric-loader-junit then reads both the remapped (named) AW and the unmapped (intermediary)
-// AW and aborts on namespace mismatch. Dropping the unmapped sibling keeps the remapped
-// artifacts in place and lets the junit launcher boot.
-configurations.testRuntimeClasspath {
-    exclude group: 'net.fabricmc.fabric-api', module: 'fabric-api'
-}
-
-test {
-    useJUnitPlatform()
-    // GametestRegistrationTest reads the gametest source tree and both manifests off disk at
-    // runtime. Gradle sees no dependency between the test task and a source tree it never
-    // compiles, so without this block the guard reports UP-TO-DATE exactly when registration has
-    // drifted. The shipped manifest also arrives transitively through processResources, so listing
-    // it is not a live staleness hole — it is here so the block reads as "what this guard reads".
-    inputs.files(fileTree('src/gametest/java'),
-                 file('src/gametest/resources/fabric.mod.json'),
-                 file('src/main/resources/fabric.mod.json'))
-            .withPropertyName('gametestRegistration')
-            .withPathSensitivity(PathSensitivity.RELATIVE)
-    finalizedBy jacocoTestReport
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = true
-        html.required = true
-    }
-}
-
-// Attach the JaCoCo agent to the gametest server so code only exercised in-game
-// (brew completion, batch stands, commands, registration) counts toward coverage. The
-// includes filter keeps the agent from instrumenting Minecraft/Fabric classes.
-// Matched lazily for the same reason as the onlyIf guard above: Loom registers
-// runGametest during afterEvaluate, so it cannot be resolved by name here.
-tasks.matching { it.name == 'runGametest' }.configureEach {
-    jacoco.applyTo(it)
-    it.jacoco.destinationFile = layout.buildDirectory.file('jacoco/runGametest.exec').get().asFile
-    it.jacoco.includes = ['com.rfizzle.distillation.*']
-    // The agent's exec file is an @OutputFile, which would otherwise make this
-    // JavaExec up-to-date-checkable and silently skip the whole in-world suite on
-    // a repeat run — re-emitting the previous coverage number as if it were fresh.
-    // A gametest sweep must always execute.
-    it.outputs.upToDateWhen { false }
-}
-
-// Single source of coverage truth: unit tests + gametests merged over src/main.
-// jacocoTestReport covers the test task alone, which reads every gametest-only line
-// as a miss — read per-package coverage from this report, never from that one.
-tasks.register('jacocoMergedReport', JacocoReport) {
-    description = 'Merges unit-test and gametest execution data into one coverage report'
-    group = 'verification'
-    // The report reads compileJava/processResources output, so it must depend on them —
-    // without this, any invocation that compiles without also scheduling a test task
-    // (e.g. `gradlew jar jacocoMergedReport`) fails Gradle's implicit-dependency validation.
-    dependsOn tasks.named('classes')
-    // Ordering only — not dependsOn, so the report can run from existing exec data
-    // without forcing a gametest server spin-up.
-    mustRunAfter test, tasks.matching { it.name == 'runGametest' }
-    // fileTree only picks up exec files that exist, so the report still runs when
-    // one of the two sweeps hasn't.
-    executionData fileTree(layout.buildDirectory.dir('jacoco')) {
-        include 'test.exec', 'runGametest.exec'
-    }
-    // A sweep that never ran leaves its exec file absent, and one that was interrupted
-    // leaves it empty — Gradle deletes the file before the run and the agent only dumps
-    // at JVM exit. A sweep that ran before the last recompile is worse: JaCoCo matches
-    // execution data by class ID, so a stale exec contributes nothing and its classes
-    // read 0% rather than failing. Every one of those is a partial number under the
-    // "merged" label with no indication, so say so.
-    doFirst {
-        def newestClass = classDirectories.asFileTree.files*.lastModified().max() ?: 0L
-        ['test.exec', 'runGametest.exec'].each { name ->
-            def execFile = layout.buildDirectory.file("jacoco/${name}").get().asFile
-            if (!execFile.exists() || execFile.length() == 0) {
-                logger.warn("jacocoMergedReport: ${name} is missing or empty — this report is NOT merged coverage")
-            } else if (execFile.lastModified() < newestClass) {
-                logger.warn("jacocoMergedReport: ${name} predates the compiled classes — anything recompiled " +
-                        'since that sweep reads 0%; re-run `make coverage`')
-            }
-        }
-    }
-    sourceSets sourceSets.main
-    // Mixin bodies execute inside the transformed vanilla classes, so the agent can
-    // never attribute coverage to the mixin class files — excluding them keeps the
-    // denominator honest. What branching does live in a mixin body (the brewing-stand
-    // takeover dispatch) is covered indirectly through the handlers it delegates to.
-    // Derive from sourceSets.main lazily: the eager
-    // `files(classDirectories.files.collect { … })` form resolves at configuration
-    // time and discards the task dependency on `classes`.
-    classDirectories.setFrom(files(sourceSets.main.output).asFileTree.matching {
-        exclude 'com/rfizzle/distillation/mixin/**'
-    })
-    reports {
-        xml.required = true
-        html.required = true
-    }
-}
-
-tasks.register('cleanDatagenCache', Delete) {
-    description = 'Removes the Fabric datagen hash cache so the next runDatagen rewrites every file'
-    group = 'verification'
-    delete 'src/main/generated/.cache'
-}
-
-// Fabric datagen keeps a gitignored src/main/generated/.cache hash index and skips rewriting
-// any file whose provider hash is unchanged — so a hand edit to a generated file survives
-// runDatagen and the idempotency check compares the edit to itself: falsely green locally,
-// red only on a fresh CI checkout. Clearing the cache first makes the local run tell the truth.
-tasks.matching { it.name == 'runDatagen' }.configureEach {
-    mustRunAfter 'cleanDatagenCache'
-}
-
-tasks.register('verifyDatagenIdempotent') {
-    description = 'Runs datagen and asserts git reports no changes in src/main/generated/'
-    group = 'verification'
-    dependsOn 'cleanDatagenCache', 'runDatagen'
-    // The check shells out to git against live working-tree state, which Gradle cannot model as
-    // task inputs. Declaring the incompatibility keeps the intent explicit rather than leaving a
-    // hard failure for whoever enables the configuration cache.
-    notCompatibleWithConfigurationCache('shells out to git against live working-tree state')
-    doLast {
-        def genDir = file('src/main/generated').absolutePath
-        // Fail with an actionable message when git itself cannot run. ignoreExitValue covers a
-        // nonzero exit, not a process that never starts, so an absent binary surfaces here as a
-        // bare process-start exception naming neither datagen nor a remedy.
-        def runGit = { List<String> argv ->
-            try {
-                def out = providers.exec {
-                    commandLine argv
-                    ignoreExitValue = true
-                }
-                // providers.exec is lazy — the process starts on the first result read, so force
-                // it here to keep a failure to start inside this catch rather than at the use site.
-                out.result.get()
-                return out
-            } catch (Exception e) {
-                throw new GradleException(
-                        'verifyDatagenIdempotent needs git on PATH to inspect src/main/generated/, ' +
-                        'and could not run it: ' + e.message, e)
-            }
-        }
-        // Keep both git outputs readable, and say so when truncating: a run that rewrites a large
-        // provider's output lists hundreds of files, and git's own diagnostics are unbounded too.
-        def firstLines = { String text ->
-            def lines = text.trim().readLines()
-            lines.size() > 5 ? lines.take(5).join('\n') + "\n… (${lines.size()} lines total)"
-                             : lines.join('\n')
-        }
-        // --no-optional-locks keeps a read-only check from taking .git/index.lock: git status
-        // rewrites the index when cached stat info is stale, which is exactly the state runDatagen
-        // leaves behind after rewriting every generated file.
-        //
-        // The '--' separator is required: without it git parses the path as a revision-or-path,
-        // and aborts with exit 128 ("ambiguous argument") whenever src/main/generated is neither
-        // tracked nor present. With it, a missing directory is simply an empty pathspec and exits 0
-        // — which, before a fabric-datagen entrypoint existed, is exactly how this task passed
-        // while verifying nothing at all.
-        //
-        // --porcelain reports all three drift shapes in one machine-readable listing: staged
-        // ('M '), unstaged (' M'), and untracked ('??'). A git diff check sees only the
-        // worktree-versus-index delta, so drift that has been git add-ed slips past it while
-        // staying invisible to ls-files --others as well — a verification task passing on real
-        // drift. Reading stdout also frees every nonzero exit to mean git itself failed, and
-        // unlike 'git diff HEAD' this works in a repository with no commits yet.
-        def statusResult = runGit(['git', '--no-optional-locks', 'status', '--porcelain', '--', genDir])
-        // A failing git writes nothing to stdout, so an unchecked exit code would read as
-        // "no changes" — a verification task reporting clean because its tool broke.
-        def statusExit = statusResult.result.get().exitValue
-        if (statusExit != 0) {
-            throw new GradleException(
-                    "git status failed with exit ${statusExit} while checking src/main/generated/:\n" +
-                    firstLines(statusResult.standardError.asText.get()))
-        }
-        def dirty = statusResult.standardOutput.asText.get().trim()
-        if (!dirty.isEmpty()) {
-            throw new GradleException(
-                    'src/main/generated/ changed after runDatagen:\n' + firstLines(dirty) +
-                    '\nRun ./gradlew runDatagen, then git add and commit the results.')
-        }
-    }
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    // Scoped to the main source set: the gametest source set gets its own
-    // processGametestResources task with no expand filter, so a "${version}" placeholder in
-    // src/gametest/resources/fabric.mod.json would reach the loader as that literal string and
-    // fail semver parsing. That manifest hardcodes its version instead.
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
-    }
-
-    exclude "**/.gitkeep"
-    exclude "**/.cache"
-}
-
-processClientResources {
-    exclude "**/.gitkeep"
-    exclude "**/.cache"
-}
-
-tasks.withType(JavaCompile).configureEach {
-    it.options.release = project.java_version.toInteger()
-}
-
-java {
-    sourceCompatibility = JavaVersion.toVersion(project.java_version)
-    targetCompatibility = JavaVersion.toVersion(project.java_version)
-
-    withSourcesJar()
-}
-
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archives_base_name}" }
-    }
-    exclude "**/.gitkeep"
-    exclude "**/.cache"
-}
-
-tasks.named('sourcesJar') {
-    exclude "**/.gitkeep"
-    exclude "**/.cache"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
